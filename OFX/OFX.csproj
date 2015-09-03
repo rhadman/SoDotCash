@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0F035134-E200-41C5-B324-3023ED8DEFF7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OFX</RootNamespace>
+    <AssemblyName>OFX</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="OFX2_Protocol.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Doc\OFX 2.1.1.pdf" />
+    <None Include="OFX Schemas\OFX2_Protocol.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX3_Protocol_dotNET.xsd" />
+    <None Include="OFX Schemas\OFX_Banking.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Banking_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Banking_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_BillerDelivery.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_BillerDelivery_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_BillerDelivery_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_BillerDirectory.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_BillerDirectory_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_BillerDirectory_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_BillPay.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_BillPay_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_BillPay_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Common.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_CreditCard.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_CreditCard_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_CreditCard_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Email.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Email_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Email_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Image_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Image_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_InterTransfer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_InterTransfer_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_InterTransfer_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Investment.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Investment_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Investment_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Loans.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Loan_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Loan_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Profile.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Profile_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Profile_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_SecuritiesList.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_SecuritiesList_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_SecuritiesList_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Signon.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Signon_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Signon_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Signup.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Signup_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Signup_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Tax1098.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Tax1098_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Tax1098_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Tax1099.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Tax1099_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_Tax1099_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_TaxW2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_TaxW2_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_TaxW2_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_TypeDefinitions.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_WireTransfer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_WireTransfer_Messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OFX Schemas\OFX_WireTransfer_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
