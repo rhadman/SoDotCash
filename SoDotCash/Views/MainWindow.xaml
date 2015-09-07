@@ -5,10 +5,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SoDotCash"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
+        Title="MainWindow" Height="650" Width="625"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
         >
     <Grid>
-        <TextBox VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding TestString}"></TextBox>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="259*"/>
+            <ColumnDefinition Width="258*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel x:Name="contentPanel" Margin="8,32,0,0" Grid.ColumnSpan="2">
+            <TextBlock Text="Hello, world!" Margin="0,0,0,40"/>
+            <TextBlock Text="What's your name?"/>
+            <StackPanel x:Name="finputPanel" Orientation="Horizontal" Margin="0,0,0,0">
+                <TextBlock Text="First:"/>
+                <TextBox x:Name="firstNameInput" Width="280" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <StackPanel x:Name="minputPanel" Orientation="Horizontal" Margin="0,0,0,0">
+                <TextBlock Text="Middle:"/>
+                <TextBox x:Name="middleNameInput" Width="280" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <StackPanel x:Name="linputPanel" Orientation="Horizontal" Margin="0,0,0,0">
+                <TextBlock Text="Last:"/>
+                <TextBox x:Name="lastNameInput" Width="280" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <StackPanel x:Name="pinputPanel" Orientation="Horizontal" Margin="0,0,0,0">
+                <TextBlock Text="Password:"/>
+                <TextBox x:Name="passwordInput" Width="280" HorizontalAlignment="Left"/>
+            </StackPanel>
+
+
+            <Button x:Name="InputButton" Content="Click to create a new user" Click="inputButton_Click"/>
+
+            <StackPanel x:Name="outputPanel" Orientation="Horizontal" Margin="0,20,0,0">
+                <Button x:Name="OutputButton" Content="Click to display users" Click="outputButton_Click"/>
+            </StackPanel>
+            <StackPanel x:Name="displayOutPanel" Orientation="Horizontal" Margin="0,20,0,0">
+                <TextBox x:Name="outputInput" Width="480" Height ="80" HorizontalAlignment="Left"/>
+                
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Window>
