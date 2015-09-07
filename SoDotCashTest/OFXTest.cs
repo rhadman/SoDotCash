@@ -1,14 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.Text;
-using System.Collections.Generic;
 using System.Xml.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OFX;
+using System.Threading.Tasks;
 
 namespace SoDotCashTest
 {
     /// <summary>
-    /// Tests for OFX data structures
+    /// Tests for OFX data structure serialization/deserialization logic and compatibility with remote services
     /// </summary>
     [TestClass]
     public class OFXTest
@@ -16,65 +16,44 @@ namespace SoDotCashTest
         public OFXTest()
         {
         }
-
         private TestContext testContextInstance;
 
         /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext
+        /// </summary>
+        [TestMethod]
+        public async Task TestListProfiles()
         {
-            get
-            {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
-            }
+            OFXFinancialInstitution fi = new OFXFinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898");
+            OFXCredentials creds = new OFXCredentials("my_username", "my_password");
+            OFX2Service service = new OFX2Service(fi, creds);
+            OFX.OFX result = await service.listProfiles();
         }
 
-        #region Additional test attributes
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        // [ClassInitialize()]
-        // public static void MyClassInitialize(TestContext testContext) { }
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-        // Use TestInitialize to run code before running each test 
-        // [TestInitialize()]
-        // public void MyTestInitialize() { }
-        //
-        // Use TestCleanup to run code after each test has run
-        // [TestCleanup()]
-        // public void MyTestCleanup() { }
-        //
-        #endregion
-
+        /// <summary>
+        /// Validatation of deserialization of sample Credit Card response data with transaction entries.
+        /// Validates OFX deserialization logic for typical valid use case.
+        /// </summary>
         [TestMethod]
         public void TestCCResponse()
         {
+            // Open test input file - Credit Card Response containing sample transaction data
             Stream fs = File.OpenRead(@"test_cc_response_tx.ofx");
-            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(OFX.OFX));
+
+            // Instantiate an XML serializer which will be used to deserialize the sample data into the Object model
+            XmlSerializer serializer = new XmlSerializer(typeof(OFX.OFX));
+
+            // Deserialize the XML data 
             OFX.OFX obj = (OFX.OFX)serializer.Deserialize(fs);
 
-            // 2 response sets
+            // Expect: 2 response sets
             Assert.IsNotNull(obj.Items);
             Assert.AreEqual(obj.Items.Length, 2);
 
-            // Response message set 0 is SignonResponse
+            // Expect: Response message set 0 is SignonResponse
             Assert.IsInstanceOfType(obj.Items[0], typeof(OFX.SignonResponseMessageSetV1));
 
-            // Response message set 1 is CreditcardResponse
+            // Expect: Response message set 1 is CreditcardResponse
             Assert.IsInstanceOfType(obj.Items[1], typeof(OFX.CreditcardResponseMessageSetV1));
-
-
         }
     }
 }
