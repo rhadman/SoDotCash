@@ -50,9 +50,11 @@
     <Compile Include="OFX2_Protocol.cs" />
     <Compile Include="OFXCredentials.cs" />
     <Compile Include="OFXFinancialInstitution.cs" />
+    <Compile Include="OFXMessageSetData.cs" />
     <Compile Include="OFXStreamContent.cs" />
     <Compile Include="OFXTransport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Types\OFXAccounts.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Doc\OFX 2.1.1.pdf" />

@@ -23,94 +23,24 @@ namespace OFX
         /// URI of the remote OFX service endpoint. This is just the base enddpoint.
         /// The OFX protocol allows the service provider to specify alternative endpoints for specific request types.
         /// </summary>
-        public Uri ServiceEndpoint
-        {
-            get
-            {
-                return serviceEndpoint;
-            }
-
-            set
-            {
-                serviceEndpoint = value;
-            }
-        }
+        public Uri ServiceEndpoint { get; }
 
         /// <summary>
         /// A string field assigned by the Financial Institution to itself which the client uses to target the proper organization at the
         ///   FI service endpoint. This allows common service endpoints to handle multiple organizations
         /// </summary>
-        public string OrganizationId
-        {
-            get
-            {
-                return organizationId;
-            }
-
-            set
-            {
-                organizationId = value;
-            }
-        }
+        public string OrganizationId { get; }
 
         /// <summary>
         /// A string field assigned by the Financial Institution to itself which the client uses to target a particular financial unit within
         ///   the organization.
         /// </summary>
-        public string FinancialId
-        {
-            get
-            {
-                return financialId;
-            }
-
-            set
-            {
-                financialId = value;
-            }
-        }
+        public string FinancialId { get; }
 
         /// <summary>
         /// Indicator of whether this FI has online retrieval supported by the library
         /// </summary>
-        public bool SupportsOnlineRetrieval
-        {
-            get
-            {
-                return supportsOnlineRetrieval;
-            }
-
-            set
-            {
-                supportsOnlineRetrieval = value;
-            }
-        }
-
-
-        /// <summary>
-        /// URI of the remote OFX service endpoint. This is just the base enddpoint.
-        /// The OFX protocol allows the service provider to specify alternative endpoints for specific request types.
-        /// </summary>
-        private Uri serviceEndpoint;
-
-        /// <summary>
-        /// A string field assigned by the Financial Institution to itself which the client uses to target the proper organization at the
-        ///   FI service endpoint. This allows common service endpoints to handle multiple organizations
-        /// </summary>
-        private string organizationId;
-
-        /// <summary>
-        /// A string field assigned by the Financial Institution to itself which the client uses to target a particular financial unit within
-        ///   the organization.
-        /// </summary>
-        private string financialId;
-
-        /// <summary>
-        /// Indicator of whether this FI has online retrieval supported by the library
-        /// </summary>
-        private bool supportsOnlineRetrieval;
-
-
+        public bool SupportsOnlineRetrieval { get; }
     }
 
 }

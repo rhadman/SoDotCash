@@ -4,6 +4,8 @@ using System.Xml.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OFX;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace SoDotCashTest
 {
@@ -13,8 +15,14 @@ namespace SoDotCashTest
     [TestClass]
     public class OFXTest
     {
+        private static readonly OFXCredentials UserCredentials = new OFXCredentials("my_username", "my_password");
+        private static readonly OFXFinancialInstitution ChaseBankFi = new OFXFinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898"); 
+        private static readonly OFX2Service ChaseBankService = new OFX2Service(ChaseBankFi, UserCredentials);
+
+
         public OFXTest()
         {
+            Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
         }
         private TestContext testContextInstance;
 
@@ -23,10 +31,20 @@ namespace SoDotCashTest
         [TestMethod]
         public async Task TestListProfiles()
         {
-            OFXFinancialInstitution fi = new OFXFinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898");
-            OFXCredentials creds = new OFXCredentials("my_username", "my_password");
-            OFX2Service service = new OFX2Service(fi, creds);
-            OFX.OFX result = await service.listProfiles();
+            OFX.OFX result = await ChaseBankService.ListProfiles();
+        }
+
+        /// <summary>
+        /// </summary>
+        [TestMethod]
+        public async Task TestListAccounts()
+        {
+            IEnumerable<OFX.Types.Account> accounts = await ChaseBankService.ListAccounts();
+
+            foreach (var account in accounts)
+            {
+                Trace.WriteLine(account.GetType().Name);
+            }
         }
 
         /// <summary>

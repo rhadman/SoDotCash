@@ -21,45 +21,11 @@ namespace OFX
         /// <summary>
         /// 'userid' field passed in OFX credentials
         /// </summary>
-        public string UserId
-        {
-            get
-            {
-                return userId;
-            }
-
-            set
-            {
-                userId = value;
-            }
-        }
+        public string UserId { get; }
 
         /// <summary>
         /// 'passsword' field passed in OFX credentials
         /// </summary>
-        public string Password
-        {
-            get
-            {
-                return password;
-            }
-
-            set
-            {
-                password = value;
-            }
-        }
-
-
-        /// <summary>
-        /// 'userid' field passed in OFX credentials
-        /// </summary>
-        private string userId;
-
-        /// <summary>
-        /// 'passsword' field passed in OFX credentials
-        /// </summary>
-        private string password;
-
+        public string Password { get; }
     }
 }
