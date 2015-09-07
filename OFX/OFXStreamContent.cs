@@ -1,6 +1,7 @@
 ﻿
 namespace OFX
 {
+
     /// <summary>
     /// Derived HttpContent type for OFX requests 
     /// OFX Requests use the Content-Type of "application/x-ofx". 
