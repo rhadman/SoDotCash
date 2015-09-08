@@ -18,9 +18,230 @@ namespace OFX
             this.userCredentials = userCredentials;
 
             // Setup default MessageSetData  - used in requests that do not have more specific data
-            defaultMessageSetProfile = new DefaultMessageSetRequestProfile(financialInstitution.ServiceEndpoint, "Realm1");
+            defaultMessageSetProfile = new DefaultMessageSetRequestProfile(financialInstitution.ServiceEndpoint,
+                "Realm1");
         }
 
+
+        public async Task<IEnumerable<Types.Transaction>> ListTransactions(Types.BankAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
+        {
+            // Ensure service catalog is populated
+            await PopulateServiceProfiles();
+
+            // Retrieve request profile for this message set
+            var requestProfile = GetMessageSetRequestProfile(typeof(BankMessageSetV1));
+
+            // Form specification of the account to retrieve information for
+            var bankAccount = getOFXBankAccount(account);
+
+            // Form transaction inclusion specification for date range. Always include transaction details
+            var transactionInclusion = new IncTransaction
+            {
+                DTSTART = DateToOFX(startDate),
+                DTEND = DateToOFX(endDate),
+                INCLUDE = BooleanType.Y
+            };
+
+            // Wrap in statement request
+            var statementRequest = new StatementRequest
+            {
+                BANKACCTFROM = bankAccount,
+                INCTRAN = transactionInclusion
+            };
+
+            // Wrap in transaction
+            var transactionRequest = new StatementTransactionRequest
+            {
+                TRNUID = GetNextTransactionId(),
+                STMTRQ = statementRequest
+            };
+
+            // Wrap in messageset
+            var messageSet = new BankRequestMessageSetV1 {Items = new AbstractRequest[1] { transactionRequest } };
+
+            // Gather all message sets in the request
+            var requestMessageSets = new List<AbstractTopLevelMessageSet>
+            {
+                CreateSignonRequest(userCredentials, requestProfile),
+                messageSet
+            };
+
+            // Send to service and await response
+            OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+
+            // TODO: Check response for errors
+
+            // Walk nested elements to retrieve transactions
+            List<Types.Transaction> transactionList = new List<Types.Transaction>();
+            foreach (
+                var responseMessageSet in
+                    response.Items.Where(item => item.GetType() == typeof (BankResponseMessageSetV1))
+                        .Select(item => (BankResponseMessageSetV1) item))
+            {
+                foreach (
+                    var transactionResponse in
+                        responseMessageSet.Items.Where(item => item.GetType() == typeof (StatementTransactionResponse))
+                            .Select(item => (StatementTransactionResponse) item))
+                {
+                    // Iterate each account
+                    foreach (var ofxTransaction in transactionResponse.STMTRS.BANKTRANLIST.STMTTRN)
+                    {
+                        // Parse decimal value to int
+                        char[] delimiters = { '.' };
+                        int amount = 0;
+                        bool negative = false;
+                        foreach (var piece in ofxTransaction.TRNAMT.Split(delimiters))
+                        {
+                            amount *= 100;
+                            amount += Int32.Parse(piece);
+                            if (amount < 0)
+                            {
+                                negative = true;
+                                amount = -amount;
+                            }
+                        }
+                        if (negative)
+                            amount = -amount;
+
+                        // Add transaction
+                        transactionList.Add(new Types.Transaction(DateFromOFX(ofxTransaction.DTPOSTED),
+                            ofxTransaction.FITID, amount, (string) ofxTransaction.Item));
+                    }
+                }
+            }
+
+            return transactionList;
+        }
+
+
+        public async Task<IEnumerable<Types.Transaction>> ListTransactions(Types.CreditCardAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
+        {
+            // Ensure service catalog is populated
+            await PopulateServiceProfiles();
+
+            // Retrieve request profile for this message set
+            var requestProfile = GetMessageSetRequestProfile(typeof(BankMessageSetV1));
+
+            // Form specification of the account to retrieve information for
+            var creditAccount = getOFXCreditAccount(account);
+
+            // Form transaction inclusion specification for date range. Always include transaction details
+            var transactionInclusion = new IncTransaction
+            {
+                DTSTART = DateToOFX(startDate),
+                DTEND = DateToOFX(endDate),
+                INCLUDE = BooleanType.Y
+            };
+
+            // Wrap in statement request
+            var statementRequest = new CreditCardStatementRequest
+            {
+                CCACCTFROM = creditAccount,
+                INCTRAN = transactionInclusion
+            };
+
+            // Wrap in transaction
+            var transactionRequest = new CreditCardStatementTransactionRequest
+            {
+                TRNUID = GetNextTransactionId(),
+                CCSTMTRQ = statementRequest
+            };
+
+            // Wrap in messageset
+            var messageSet = new CreditcardRequestMessageSetV1 { Items = new AbstractTransactionRequest[1] { transactionRequest } };
+
+            // Gather all message sets in the request
+            var requestMessageSets = new List<AbstractTopLevelMessageSet>
+            {
+                CreateSignonRequest(userCredentials, requestProfile),
+                messageSet
+            };
+
+            // Send to service and await response
+            OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+
+            // TODO: Check response for errors
+
+            // Walk nested elements to retrieve transactions
+            List<Types.Transaction> transactionList = new List<Types.Transaction>();
+            foreach (
+                var responseMessageSet in
+                    response.Items.Where(item => item.GetType() == typeof(CreditcardResponseMessageSetV1))
+                        .Select(item => (CreditcardResponseMessageSetV1)item))
+            {
+                foreach (
+                    var transactionResponse in
+                        responseMessageSet.Items.Where(item => item.GetType() == typeof(CreditCardStatementTransactionResponse))
+                            .Select(item => (CreditCardStatementTransactionResponse)item))
+                {
+                    // 
+                    if (transactionResponse.CCSTMTRS.BANKTRANLIST.STMTTRN == null)
+                        return transactionList;
+
+                    // Iterate each account
+                    foreach (var ofxTransaction in transactionResponse.CCSTMTRS.BANKTRANLIST.STMTTRN)
+                    {
+                        // Parse decimal value to int
+                        char[] delimiters = { '.' };
+                        int amount = 0;
+                        bool negative = false;
+                        foreach (var piece in ofxTransaction.TRNAMT.Split(delimiters))
+                        {
+                            amount *= 100;
+                            amount += Int32.Parse(piece);
+                            if (amount < 0)
+                            {
+                                negative = true;
+                                amount = -amount;
+                            }
+                        }
+                        if (negative)
+                            amount = -amount;
+
+                        // Add transaction
+                        transactionList.Add(new Types.Transaction(DateFromOFX(ofxTransaction.DTPOSTED),
+                            ofxTransaction.FITID, amount, (string)ofxTransaction.Item));
+                    }
+                }
+            }
+
+            return transactionList;
+        }
+
+        /// <summary>
+        /// Helper method which creates and fills in a BankAccount with information from the passed account info
+        /// </summary>
+        /// <param name="account">Populated Types.BankAccount with bank info</param>
+        /// <returns>Populated OFX BankAccount</returns>
+        protected BankAccount getOFXBankAccount(Types.BankAccount account)
+        {
+            var bankAccount = new BankAccount
+            {
+                BANKID = account.RoutingId,
+                ACCTID = account.AccountId
+            };
+            if (account is Types.CheckingAccount)
+                bankAccount.ACCTTYPE = AccountEnum.CHECKING;
+            else
+                bankAccount.ACCTTYPE = AccountEnum.SAVINGS;
+
+            return bankAccount;
+        }
+
+        /// <summary>
+        /// Helper method which creates and fills in a BankAccount with information from the passed account info
+        /// </summary>
+        /// <param name="account">Populated Types.BankAccount with bank info</param>
+        /// <returns>Populated OFX BankAccount</returns>
+        protected CreditCardAccount getOFXCreditAccount(Types.CreditCardAccount account)
+        {
+            var creditAccount = new CreditCardAccount
+            {
+                ACCTID = account.AccountId
+            };
+
+            return creditAccount;
+        }
 
         /// <summary>
         /// List all accounts available from the service
@@ -266,6 +487,20 @@ namespace OFX
         protected string DateToOFX(DateTimeOffset date)
         {
             return date.ToString("yyyyMMddHHmmss.000[z:\\G\\M\\T]");
+        }
+
+        /// <summary>
+        /// Helper method to convert from OFX Date/Time string format to system DateTimeOffset
+        /// </summary>
+        /// <param name="ofxDate">Date to convert</param>
+        /// <returns>Converted date</returns>
+        protected DateTimeOffset DateFromOFX(string ofxDate)
+        {
+            // Split at colon to strip the end
+            char[] delimiters = {'[', ':'};
+            DateTime dateTime = DateTime.ParseExact(ofxDate.Split(delimiters)[0], "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
+            TimeSpan tzOffset = new TimeSpan(Int32.Parse(ofxDate.Split(delimiters)[1]), 0, 0);
+            return new DateTimeOffset(dateTime, tzOffset);
         }
 
         #region MyRegion

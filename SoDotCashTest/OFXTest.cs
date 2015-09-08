@@ -48,6 +48,24 @@ namespace SoDotCashTest
         }
 
         /// <summary>
+        /// </summary>
+        [TestMethod]
+        public async Task TestListTransactions()
+        {
+            IEnumerable<OFX.Types.Account> accounts = await ChaseBankService.ListAccounts();
+            foreach (var account in accounts)
+            {
+                DateTimeOffset startTime = DateTimeOffset.Now.Subtract(new TimeSpan(30, 0, 0, 0));
+                IEnumerable<OFX.Types.Transaction> transactions =
+                    await ChaseBankService.ListTransactions((OFX.Types.CreditCardAccount)account, startTime, DateTimeOffset.Now);
+                foreach (var transaction in transactions)
+                {
+                    Trace.WriteLine(transaction.Name);
+                }
+            }
+        }
+
+        /// <summary>
         /// Validatation of deserialization of sample Credit Card response data with transaction entries.
         /// Validates OFX deserialization logic for typical valid use case.
         /// </summary>
