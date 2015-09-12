@@ -23,7 +23,14 @@ namespace OFX
         }
 
 
-        public async Task<IEnumerable<Types.Transaction>> ListTransactions(Types.BankAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
+        /// <summary>
+        /// Retrieve a statement for a single bank account. Includes transaction details.
+        /// </summary>
+        /// <param name="account">The bank account to retrieve statement data for</param>
+        /// <param name="startDate">Start of date range for transactions</param>
+        /// <param name="endDate">End of date range for transactions</param>
+        /// <returns>List of statements containing the requested data.</returns>
+        public async Task<IEnumerable<Types.Statement>> GetStatement(Types.BankAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             // Ensure service catalog is populated
             await PopulateServiceProfiles();
@@ -37,8 +44,8 @@ namespace OFX
             // Form transaction inclusion specification for date range. Always include transaction details
             var transactionInclusion = new IncTransaction
             {
-                DTSTART = DateToOFX(startDate),
-                DTEND = DateToOFX(endDate),
+                DTSTART = OFXUtils.DateToOFX(startDate),
+                DTEND = OFXUtils.DateToOFX(endDate),
                 INCLUDE = BooleanType.Y
             };
 
@@ -71,50 +78,18 @@ namespace OFX
 
             // TODO: Check response for errors
 
-            // Walk nested elements to retrieve transactions
-            List<Types.Transaction> transactionList = new List<Types.Transaction>();
-            foreach (
-                var responseMessageSet in
-                    response.Items.Where(item => item.GetType() == typeof (BankResponseMessageSetV1))
-                        .Select(item => (BankResponseMessageSetV1) item))
-            {
-                foreach (
-                    var transactionResponse in
-                        responseMessageSet.Items.Where(item => item.GetType() == typeof (StatementTransactionResponse))
-                            .Select(item => (StatementTransactionResponse) item))
-                {
-                    // Iterate each account
-                    foreach (var ofxTransaction in transactionResponse.STMTRS.BANKTRANLIST.STMTTRN)
-                    {
-                        // Parse decimal value to int
-                        char[] delimiters = { '.' };
-                        int amount = 0;
-                        bool negative = false;
-                        foreach (var piece in ofxTransaction.TRNAMT.Split(delimiters))
-                        {
-                            amount *= 100;
-                            amount += Int32.Parse(piece);
-                            if (amount < 0)
-                            {
-                                negative = true;
-                                amount = -amount;
-                            }
-                        }
-                        if (negative)
-                            amount = -amount;
-
-                        // Add transaction
-                        transactionList.Add(new Types.Transaction(DateFromOFX(ofxTransaction.DTPOSTED),
-                            ofxTransaction.FITID, amount, (string) ofxTransaction.Item));
-                    }
-                }
-            }
-
-            return transactionList;
+            // Extract statement data and return
+            return Types.Statement.CreateFromOFXResponse(response);
         }
 
-
-        public async Task<IEnumerable<Types.Transaction>> ListTransactions(Types.CreditCardAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
+        /// <summary>
+        /// Retrieve a statement for a single credit card account. Includes transaction details.
+        /// </summary>
+        /// <param name="account">The credit card account to retrieve statement data for</param>
+        /// <param name="startDate">Start of date range for transactions</param>
+        /// <param name="endDate">End of date range for transactions</param>
+        /// <returns>List of statements containing the requested data.</returns>
+        public async Task<IEnumerable<Types.Statement>> GetStatement(Types.CreditCardAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             // Ensure service catalog is populated
             await PopulateServiceProfiles();
@@ -128,8 +103,8 @@ namespace OFX
             // Form transaction inclusion specification for date range. Always include transaction details
             var transactionInclusion = new IncTransaction
             {
-                DTSTART = DateToOFX(startDate),
-                DTEND = DateToOFX(endDate),
+                DTSTART = OFXUtils.DateToOFX(startDate),
+                DTEND = OFXUtils.DateToOFX(endDate),
                 INCLUDE = BooleanType.Y
             };
 
@@ -162,50 +137,8 @@ namespace OFX
 
             // TODO: Check response for errors
 
-            // Walk nested elements to retrieve transactions
-            List<Types.Transaction> transactionList = new List<Types.Transaction>();
-            foreach (
-                var responseMessageSet in
-                    response.Items.Where(item => item.GetType() == typeof(CreditcardResponseMessageSetV1))
-                        .Select(item => (CreditcardResponseMessageSetV1)item))
-            {
-                foreach (
-                    var transactionResponse in
-                        responseMessageSet.Items.Where(item => item.GetType() == typeof(CreditCardStatementTransactionResponse))
-                            .Select(item => (CreditCardStatementTransactionResponse)item))
-                {
-                    // 
-                    if (transactionResponse.CCSTMTRS.BANKTRANLIST.STMTTRN == null)
-                        return transactionList;
-
-                    // Iterate each account
-                    foreach (var ofxTransaction in transactionResponse.CCSTMTRS.BANKTRANLIST.STMTTRN)
-                    {
-                        // Parse decimal value to int
-                        char[] delimiters = { '.' };
-                        int amount = 0;
-                        bool negative = false;
-                        foreach (var piece in ofxTransaction.TRNAMT.Split(delimiters))
-                        {
-                            amount *= 100;
-                            amount += Int32.Parse(piece);
-                            if (amount < 0)
-                            {
-                                negative = true;
-                                amount = -amount;
-                            }
-                        }
-                        if (negative)
-                            amount = -amount;
-
-                        // Add transaction
-                        transactionList.Add(new Types.Transaction(DateFromOFX(ofxTransaction.DTPOSTED),
-                            ofxTransaction.FITID, amount, (string)ofxTransaction.Item));
-                    }
-                }
-            }
-
-            return transactionList;
+            // Extract statement data and return
+            return Types.Statement.CreateFromOFXResponse(response);
         }
 
         /// <summary>
@@ -300,20 +233,12 @@ namespace OFX
                         {
                             // There are multiple types of bank accounts we support
                             var bankAccountInfo = (BankAccountInfo) specificAccountInfo;
-                            switch (bankAccountInfo.BANKACCTFROM.ACCTTYPE)
-                            {
-                                case AccountEnum.CHECKING:
-                                    accountList.Add(new Types.CheckingAccount(bankAccountInfo.BANKACCTFROM.BANKID, bankAccountInfo.BANKACCTFROM.ACCTID, accountInfo.DESC, bankAccountInfo.SVCSTATUS == ServiceStatusEnum.ACTIVE));
-                                    break;
-                                case AccountEnum.SAVINGS:
-                                    accountList.Add(new Types.SavingsAccount(bankAccountInfo.BANKACCTFROM.BANKID, bankAccountInfo.BANKACCTFROM.ACCTID, accountInfo.DESC, bankAccountInfo.SVCSTATUS == ServiceStatusEnum.ACTIVE));
-                                    break;
-                            }
+                            accountList.Add(Types.Account.Create(bankAccountInfo.BANKACCTFROM));
                         }
                         if (specificAccountInfo.GetType() == typeof(CreditCardAccountInfo))
                         {
                             var creditAccountInfo = (CreditCardAccountInfo)specificAccountInfo;
-                            accountList.Add(new Types.CreditCardAccount(creditAccountInfo.CCACCTFROM.ACCTID, accountInfo.DESC, creditAccountInfo.SVCSTATUS == ServiceStatusEnum.ACTIVE));
+                            accountList.Add(Types.Account.Create(creditAccountInfo.CCACCTFROM));
                         }
                     }
                 }
@@ -394,7 +319,7 @@ namespace OFX
             // Populate a signon request with the current date and provided user credentials
             var signonRequest = new SignonRequest
             {
-                DTCLIENT = DateToOFX(new DateTimeOffset(DateTime.Now)),
+                DTCLIENT = OFXUtils.DateToOFX(new DateTimeOffset(DateTime.Now)),
                 ItemsElementName = new ItemsChoiceType[2] {ItemsChoiceType.USERID, ItemsChoiceType.USERPASS},
                 Items = new string[2] {credentials.UserId, credentials.Password},
                 FI = fi,
@@ -479,29 +404,7 @@ namespace OFX
             return Guid.NewGuid().ToString();
         }
 
-        /// <summary>
-        /// Helper method to convert from a system Date/Time with Offset from GMT into a format that OFX understands
-        /// </summary>
-        /// <param name="date">The date/time to convert</param>
-        /// <returns>Properly formatted OFX date/time string with offset from GMT</returns>
-        protected string DateToOFX(DateTimeOffset date)
-        {
-            return date.ToString("yyyyMMddHHmmss.000[z:\\G\\M\\T]");
-        }
 
-        /// <summary>
-        /// Helper method to convert from OFX Date/Time string format to system DateTimeOffset
-        /// </summary>
-        /// <param name="ofxDate">Date to convert</param>
-        /// <returns>Converted date</returns>
-        protected DateTimeOffset DateFromOFX(string ofxDate)
-        {
-            // Split at colon to strip the end
-            char[] delimiters = {'[', ':'};
-            DateTime dateTime = DateTime.ParseExact(ofxDate.Split(delimiters)[0], "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
-            TimeSpan tzOffset = new TimeSpan(Int32.Parse(ofxDate.Split(delimiters)[1]), 0, 0);
-            return new DateTimeOffset(dateTime, tzOffset);
-        }
 
         #region MyRegion
         /// <summary>

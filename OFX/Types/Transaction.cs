@@ -20,6 +20,24 @@ namespace OFX.Types
         }
 
         /// <summary>
+        /// Construct a statement transaction by parsing an OFX transaction entity
+        /// </summary>
+        /// <param name="ofxTransaction"></param>
+        public Transaction(StatementTransaction ofxTransaction)
+        {
+            // Assign to internal state
+            PostDate = OFXUtils.DateFromOFX(ofxTransaction.DTPOSTED);
+            TransactionId = ofxTransaction.FITID;
+            Amount = OFXUtils.decimalStringToFixedInt(ofxTransaction.TRNAMT);
+            Name = (string) ofxTransaction.Item;
+        }
+
+        public override string ToString()
+        {
+            return "TRANS " + TransactionId + " on " + PostDate + " for " + Amount + " Desc: " + Name;
+        }
+
+        /// <summary>
         /// Date transaction has posted
         /// </summary>
         public DateTimeOffset PostDate { get; }
@@ -38,6 +56,7 @@ namespace OFX.Types
         /// Name associated with this transaction
         /// </summary>
         public string Name { get; }
+
     }
 
 }
