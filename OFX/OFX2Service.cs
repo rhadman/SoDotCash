@@ -22,6 +22,21 @@ namespace OFX
                 "Realm1");
         }
 
+        /// <summary>
+        /// Retrieve a statement for a single account. Includes transaction details.
+        /// </summary>
+        /// <param name="account">The account to retrieve statement data for</param>
+        /// <param name="startDate">Start of date range for transactions</param>
+        /// <param name="endDate">End of date range for transactions</param>
+        /// <returns>List of statements containing the requested data.</returns>
+        public async Task<IEnumerable<Types.Statement>> GetStatement(Types.Account account, DateTimeOffset startDate,
+            DateTimeOffset endDate)
+        {
+            if (account is Types.BankAccount)
+                return await GetStatement((Types.BankAccount)account, startDate, endDate);
+            else
+                return await GetStatement((Types.CreditCardAccount)account, startDate, endDate);
+        }
 
         /// <summary>
         /// Retrieve a statement for a single bank account. Includes transaction details.
