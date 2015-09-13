@@ -15,7 +15,7 @@ namespace SoDotCashTest
     [TestClass]
     public class OFXTest
     {
-        private static readonly OFXCredentials UserCredentials = new OFXCredentials("my_username", "my_password");
+        private static readonly OFXCredentials UserCredentials = new OFXCredentials("myuser", "mypass");
         private static readonly OFXFinancialInstitution ChaseBankFi = new OFXFinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898"); 
         private static readonly OFX2Service ChaseBankService = new OFX2Service(ChaseBankFi, UserCredentials);
 
@@ -25,6 +25,50 @@ namespace SoDotCashTest
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
         }
         private TestContext testContextInstance;
+
+        protected void DumpStatement(IEnumerable<OFX.Types.Statement> statements)
+        {
+            foreach (var statement in statements)
+            {
+                Trace.WriteLine("Statement for " + statement.OwningAccount.ToString());
+                foreach (var transaction in statement.Transactions)
+                {
+                    Trace.WriteLine(transaction);
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [TestMethod]
+        public void TestOfx1()
+        {
+            using (var stream = new FileStream("test_cc_1.ofx", FileMode.Open))
+            {
+                OFX1ToOFX2Converter converter = new OFX1ToOFX2Converter(stream);
+
+                Stream outStream = converter.convert();
+
+                // Instantiate an XML serializer which will be used to deserialize the sample data into the Object model
+                XmlSerializer serializer = new XmlSerializer(typeof(OFX.OFX));
+
+                // Deserialize the XML data 
+                OFX.OFX obj = (OFX.OFX)serializer.Deserialize(outStream);
+
+                // Expect: 2 response sets
+                Assert.IsNotNull(obj.Items);
+                Assert.AreEqual(obj.Items.Length, 2);
+
+                // Expect: Response message set 0 is SignonResponse
+                Assert.IsInstanceOfType(obj.Items[0], typeof(OFX.SignonResponseMessageSetV1));
+
+                // Expect: Response message set 1 is CreditcardResponse
+                //Assert.IsInstanceOfType(obj.Items[1], typeof(OFX.CreditcardResponseMessageSetV1));
+
+                DumpStatement(OFX.Types.Statement.CreateFromOFXResponse(obj));
+
+            }
+        }
 
         /// <summary>
         /// </summary>
@@ -50,18 +94,15 @@ namespace SoDotCashTest
         /// <summary>
         /// </summary>
         [TestMethod]
-        public async Task TestListTransactions()
+        public async Task TestGetStatement()
         {
             IEnumerable<OFX.Types.Account> accounts = await ChaseBankService.ListAccounts();
             foreach (var account in accounts)
             {
-                DateTimeOffset startTime = DateTimeOffset.Now.Subtract(new TimeSpan(30, 0, 0, 0));
-                IEnumerable<OFX.Types.Transaction> transactions =
-                    await ChaseBankService.ListTransactions((OFX.Types.CreditCardAccount)account, startTime, DateTimeOffset.Now);
-                foreach (var transaction in transactions)
-                {
-                    Trace.WriteLine(transaction.Name);
-                }
+                var startTime = DateTimeOffset.Now.Subtract(new TimeSpan(30, 0, 0, 0));
+                var statements =
+                    await ChaseBankService.GetStatement((OFX.Types.CreditCardAccount)account, startTime, DateTimeOffset.Now);
+                DumpStatement(statements);
             }
         }
 
