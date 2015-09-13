@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace OFX
 {
@@ -15,7 +16,12 @@ namespace OFX
             ofx1Reader = new StreamReader(ofx1Stream);
         }
 
-        public Stream convert()
+
+        /// <summary>
+        /// Convert input OFX1 data into OFX2 data
+        /// </summary>
+        /// <returns>Stream of OFX2 formatted data ready to be read</returns>
+        public Stream Convert()
         {
             var outStream = new MemoryStream();
             var outWriter = new StreamWriter(outStream, new System.Text.UTF8Encoding(false));
@@ -63,6 +69,18 @@ namespace OFX
             return outStream;
         }
 
+        /// <summary>
+        /// Convert wrapped OFX1 data into an OFX object
+        /// </summary>
+        /// <returns>OFX object populated with data from the converted input</returns>
+        public OFX ConvertToOFX()
+        {
+            // Instantiate an XML serializer which will be used to deserialize the XML data into the Object model
+            XmlSerializer serializer = new XmlSerializer(typeof (OFX));
+
+            // Deserialize the converted XML data and return
+            return (OFX) serializer.Deserialize(Convert());
+        }
 
         private readonly StreamReader ofx1Reader;
     }
