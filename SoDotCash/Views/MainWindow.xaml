@@ -26,9 +26,6 @@
             </TreeView.ItemTemplate>
         </TreeView>
         <DataGrid x:Name="transactionDataGrid" HorizontalAlignment="Left" Margin="168,60,-293,0" VerticalAlignment="Top" Height="249" Width="642">
-            <DataGrid.DataContext>
-                <ViewModels:TransactionViewModel/>
-            </DataGrid.DataContext>
         </DataGrid>
     </Grid>
 </Window>
