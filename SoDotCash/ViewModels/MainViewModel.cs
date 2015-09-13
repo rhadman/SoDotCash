@@ -65,10 +65,10 @@ namespace SoDotCash.ViewModels
             DateTimeOffset startTime = endTime - new TimeSpan(1, 0, 0, 0);
             foreach (var account in await ofxService.ListAccounts())
             {
-                Account viewAccount;
+                Models.Account viewAccount;
                 if (account is OFX.Types.CheckingAccount)
                 {
-                    viewAccount = new Account
+                    viewAccount = new Models.Account
                     {
                         Name = ((OFX.Types.CheckingAccount)account).AccountId,
                         AccountType = EAccountType.Checking
@@ -76,7 +76,7 @@ namespace SoDotCash.ViewModels
                 }
                 else if (account is OFX.Types.SavingsAccount)
                 {
-                    viewAccount = new Account
+                    viewAccount = new Models.Account
                     {
                         Name = ((OFX.Types.SavingsAccount)account).AccountId,
                         AccountType = EAccountType.Savings
@@ -84,7 +84,7 @@ namespace SoDotCash.ViewModels
                 }
                 else //(account is OFX.Types.CreditCardAccount)
                 {
-                    viewAccount = new Account
+                    viewAccount = new Models.Account
                     {
                         Name = ((OFX.Types.CreditCardAccount)account).AccountId,
                         AccountType = EAccountType.CreditCard
