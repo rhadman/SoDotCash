@@ -1,14 +1,34 @@
-﻿<Window x:Class="SoDotCash.Views.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SoDotCash"
+        xmlns:ViewModels="clr-namespace:SoDotCash.ViewModels"
+        x:Class="SoDotCash.Views.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
-        DataContext="{Binding Main, Source={StaticResource Locator}}"
+        Title="MainWindow" Height="350"
+        DataContext="{Binding Main, Source={StaticResource Locator}}" Width="821.774"
         >
+
     <Grid>
-        <TextBox VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding TestString}"></TextBox>
+        <TextBox VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding TestString}" Margin="352,22,170,274" Height="23" Width="292"/>
+        <TreeView x:Name="accountsView" HorizontalAlignment="Left" Margin="0,60,0,10" Width="163" ItemsSource="{Binding Path=AccountViewItems.Values}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Accounts}">
+                    <TextBlock Text="{Binding Name}" />
+                    <HierarchicalDataTemplate.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </HierarchicalDataTemplate.ItemTemplate>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <DataGrid x:Name="transactionDataGrid" HorizontalAlignment="Left" Margin="168,60,-293,0" VerticalAlignment="Top" Height="249" Width="642">
+            <DataGrid.DataContext>
+                <ViewModels:TransactionViewModel/>
+            </DataGrid.DataContext>
+        </DataGrid>
     </Grid>
 </Window>

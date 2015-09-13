@@ -1,4 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows.Controls;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
+using OFX;
+using SoDotCash.Models;
 
 namespace SoDotCash.ViewModels
 {
@@ -16,6 +24,7 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
+
         #region [ Public Bound Properties ]
 
         public string TestString
@@ -34,9 +43,67 @@ namespace SoDotCash.ViewModels
 
         private string _testString;
 
+        /// <summary>
+        /// List of accounts
+        /// </summary>
+        public Dictionary<EAccountType, AccountList> AccountViewItems { get; set; }= new AccountTypes();
+
         #endregion
 
+
         #region [ Constructors ]
+
+
+
+        protected async void LoadAccounts(string username, string password)
+        {
+            var chaseBankFi = new OFX.OFXFinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898");
+            var userCredentials = new OFX.OFXCredentials(username, password);
+            var ofxService = new OFX.OFX2Service(chaseBankFi, userCredentials);
+
+            DateTimeOffset endTime = DateTimeOffset.Now;
+            DateTimeOffset startTime = endTime - new TimeSpan(1, 0, 0, 0);
+            foreach (var account in await ofxService.ListAccounts())
+            {
+                Account viewAccount;
+                if (account is OFX.Types.CheckingAccount)
+                {
+                    viewAccount = new Account
+                    {
+                        Name = ((OFX.Types.CheckingAccount)account).AccountId,
+                        AccountType = EAccountType.Checking
+                    };
+                }
+                else if (account is OFX.Types.SavingsAccount)
+                {
+                    viewAccount = new Account
+                    {
+                        Name = ((OFX.Types.SavingsAccount)account).AccountId,
+                        AccountType = EAccountType.Savings
+                    };
+                }
+                else //(account is OFX.Types.CreditCardAccount)
+                {
+                    viewAccount = new Account
+                    {
+                        Name = ((OFX.Types.CreditCardAccount)account).AccountId,
+                        AccountType = EAccountType.CreditCard
+                    };
+                }
+
+                AccountViewItems[viewAccount.AccountType].Accounts.Add(viewAccount);
+
+                /*
+                var statements = await ofxService.GetStatement(account, startTime, endTime);
+                if (statements != null)
+                {
+                    foreach (var statement in statements)
+                    {
+                    }
+                }
+                */
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -44,6 +111,7 @@ namespace SoDotCash.ViewModels
         public MainViewModel()
         {
             TestString = IsInDesignMode ? "This is a string that is shown when designing" : "This is a string that is shown at runtime";
+            //LoadAccounts("myuser", "mypass");
         }
 
         #endregion
