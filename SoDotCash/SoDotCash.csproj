@@ -146,6 +146,11 @@
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\AccountType.cs" />
     <Compile Include="DatabaseClasses.cs" />
+    <Compile Include="SoCash.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SoCash.xsd</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Page Include="Views\MainWindow.xaml">
@@ -187,6 +192,17 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="SoCash.xsc">
+      <DependentUpon>SoCash.xsd</DependentUpon>
+    </None>
+    <None Include="SoCash.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SoCash.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="SoCash.xss">
+      <DependentUpon>SoCash.xsd</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
