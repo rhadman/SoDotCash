@@ -47,13 +47,8 @@ namespace SoDotCashTest
             {
                 OFX1ToOFX2Converter converter = new OFX1ToOFX2Converter(stream);
 
-                Stream outStream = converter.convert();
-
-                // Instantiate an XML serializer which will be used to deserialize the sample data into the Object model
-                XmlSerializer serializer = new XmlSerializer(typeof(OFX.OFX));
-
                 // Deserialize the XML data 
-                OFX.OFX obj = (OFX.OFX)serializer.Deserialize(outStream);
+                var obj = converter.ConvertToOFX();
 
                 // Expect: 2 response sets
                 Assert.IsNotNull(obj.Items);
