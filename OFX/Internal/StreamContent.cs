@@ -1,26 +1,26 @@
 ﻿
 using OFX.Protocol;
 
-namespace OFX
+namespace OFX.Internal
 {
 
     /// <summary>
     /// Derived HttpContent type for OFX requests 
     /// OFX Requests use the Content-Type of "application/x-ofx". 
     /// </summary>
-    public class OFXStreamContent : System.Net.Http.StreamContent
+    public class StreamContent : System.Net.Http.StreamContent
     {
-        public OFXStreamContent(System.IO.Stream sourceStream) : base(sourceStream)
+        public StreamContent(System.IO.Stream sourceStream) : base(sourceStream)
         {
             this.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-ofx");
         }
 
         /// <summary>
-        /// Construct an OFXStreamContent from a provided populated OFX object
+        /// Construct an StreamContent from a provided populated OFX object
         /// </summary>
         /// <param name="ofxObject">A populated OFX message with request or response data</param>
-        /// <returns>Created OFXStreamContent ready to send with HttpClient.Post</returns>
-        public static OFXStreamContent Create(Protocol.OFX ofxObject)
+        /// <returns>Created StreamContent ready to send with HttpClient.Post</returns>
+        public static StreamContent Create(Protocol.OFX ofxObject)
         {
             // Serialized data will be written to a MemoryStream
             var memoryStream = new System.IO.MemoryStream();
@@ -41,19 +41,19 @@ namespace OFX
             memoryStream.Position = 0;
 
             // Wrap in our HttpContent-derived class to provide headers and other HTTP encoding information
-            return new OFXStreamContent(memoryStream);
+            return new StreamContent(memoryStream);
         }
 
         /// <summary>
-        /// Construct an OFXStreamContent from a provided array of AbstractTopLevelMessageSet.
+        /// Construct an StreamContent from a provided array of AbstractTopLevelMessageSet.
         /// Since all OFX messages are an OFX wrapper around an 1 or more AbstractTopLevelMessageSet entities, this 
         ///   convenience function saves the caller having to construct a wrapper OFX object on each call.
         /// 
         /// Note that the AbstractTopLevelMessageSet order must obey the rules for the OFX protocol. See OFX specification v2.1.1 for details.
         /// </summary>
         /// <param name="messageSets">1 or more populated AbstractTopLevelMessageSet objects representing OFX requests or responses.</param>
-        /// <returns>Created OFXStreamContent ready to send with HttpClient.Post</returns>
-        public static OFXStreamContent Create(AbstractTopLevelMessageSet[] messageSets)
+        /// <returns>Created StreamContent ready to send with HttpClient.Post</returns>
+        public static StreamContent Create(AbstractTopLevelMessageSet[] messageSets)
         {
             // Wrap message sets in OFX object
             Protocol.OFX ofx = new Protocol.OFX();

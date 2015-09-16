@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using OFX.Internal;
 using OFX.Protocol;
 using OFX.Types;
 using BankAccount = OFX.Protocol.BankAccount;
@@ -93,7 +94,7 @@ namespace OFX
             };
 
             // Send to service and await response
-            Protocol.OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            Protocol.OFX response = await new Transport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
 
@@ -152,7 +153,7 @@ namespace OFX
             };
 
             // Send to service and await response
-            Protocol.OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            Protocol.OFX response = await new Transport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
 
@@ -228,7 +229,7 @@ namespace OFX
             };
 
             // Send to service and await response
-            Protocol.OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            Protocol.OFX response = await new Transport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
 
@@ -308,7 +309,7 @@ namespace OFX
             };
 
             // Send to service and await response
-            return await new OFXTransport(financialInstitution.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            return await new Transport(financialInstitution.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
         }
 
         /// <summary>
