@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using OFX.Protocol;
 using OFX.Types;
+using BankAccount = OFX.Protocol.BankAccount;
+using CreditCardAccount = OFX.Protocol.CreditCardAccount;
+using FinancialInstitution = OFX.Protocol.FinancialInstitution;
 
 namespace OFX
 {
@@ -89,7 +93,7 @@ namespace OFX
             };
 
             // Send to service and await response
-            OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            Protocol.OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
 
@@ -148,7 +152,7 @@ namespace OFX
             };
 
             // Send to service and await response
-            OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            Protocol.OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
 
@@ -224,7 +228,7 @@ namespace OFX
             };
 
             // Send to service and await response
-            OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            Protocol.OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
 
@@ -271,7 +275,7 @@ namespace OFX
         /// This is an asyncronous call.
         /// </summary>
         /// <returns>The completed task returns an OFX wrapper containing the result of the call and, on success, a ProfileResponseMessageSetV1</returns>
-        public async Task<OFX> ListProfiles()
+        public async Task<Protocol.OFX> ListProfiles()
         {
             // Populate the profile request
             var profileRequest = new ProfileRequest

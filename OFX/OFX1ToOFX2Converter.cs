@@ -73,13 +73,13 @@ namespace OFX
         /// Convert wrapped OFX1 data into an OFX object
         /// </summary>
         /// <returns>OFX object populated with data from the converted input</returns>
-        public OFX ConvertToOFX()
+        public Protocol.OFX ConvertToOFX()
         {
             // Instantiate an XML serializer which will be used to deserialize the XML data into the Object model
-            XmlSerializer serializer = new XmlSerializer(typeof (OFX));
+            XmlSerializer serializer = new XmlSerializer(typeof (Protocol.OFX));
 
             // Deserialize the converted XML data and return
-            return (OFX) serializer.Deserialize(Convert());
+            return (Protocol.OFX) serializer.Deserialize(Convert());
         }
 
         private readonly StreamReader ofx1Reader;

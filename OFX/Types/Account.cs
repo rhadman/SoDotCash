@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using OFX.Protocol;
 
 namespace OFX.Types
 {
@@ -21,7 +22,7 @@ namespace OFX.Types
         /// </summary>
         /// <param name="ofxAccount">OFX BankAccount object</param>
         /// <returns></returns>
-        public static Account Create(global::OFX.BankAccount ofxAccount)
+        public static Account Create(global::OFX.Protocol.BankAccount ofxAccount)
         {
             return BankAccount.Create(ofxAccount);
         }
@@ -31,7 +32,7 @@ namespace OFX.Types
         /// </summary>
         /// <param name="ofxAccount">OFX CreditCardAccount object</param>
         /// <returns></returns>
-        public static Account Create(global::OFX.CreditCardAccount ofxAccount)
+        public static Account Create(global::OFX.Protocol.CreditCardAccount ofxAccount)
         {
             return new CreditCardAccount(ofxAccount);
         }

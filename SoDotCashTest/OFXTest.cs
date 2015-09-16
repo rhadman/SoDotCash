@@ -6,6 +6,7 @@ using OFX;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Collections.Generic;
+using OFX.Protocol;
 using OFX.Types;
 using FinancialInstitution = OFX.Types.FinancialInstitution;
 
@@ -57,7 +58,7 @@ namespace SoDotCashTest
                 Assert.AreEqual(obj.Items.Length, 2);
 
                 // Expect: Response message set 0 is SignonResponse
-                Assert.IsInstanceOfType(obj.Items[0], typeof(OFX.SignonResponseMessageSetV1));
+                Assert.IsInstanceOfType(obj.Items[0], typeof(SignonResponseMessageSetV1));
 
                 // Expect: Response message set 1 is CreditcardResponse
                 //Assert.IsInstanceOfType(obj.Items[1], typeof(OFX.CreditcardResponseMessageSetV1));
@@ -72,7 +73,7 @@ namespace SoDotCashTest
         [TestMethod]
         public async Task TestListProfiles()
         {
-            OFX.OFX result = await ChaseBankService.ListProfiles();
+            OFX.Protocol.OFX result = await ChaseBankService.ListProfiles();
         }
 
         /// <summary>
@@ -114,20 +115,20 @@ namespace SoDotCashTest
             Stream fs = File.OpenRead(@"test_cc_response_tx.ofx");
 
             // Instantiate an XML serializer which will be used to deserialize the sample data into the Object model
-            XmlSerializer serializer = new XmlSerializer(typeof(OFX.OFX));
+            XmlSerializer serializer = new XmlSerializer(typeof(OFX.Protocol.OFX));
 
             // Deserialize the XML data 
-            OFX.OFX obj = (OFX.OFX)serializer.Deserialize(fs);
+            OFX.Protocol.OFX obj = (OFX.Protocol.OFX)serializer.Deserialize(fs);
 
             // Expect: 2 response sets
             Assert.IsNotNull(obj.Items);
             Assert.AreEqual(obj.Items.Length, 2);
 
             // Expect: Response message set 0 is SignonResponse
-            Assert.IsInstanceOfType(obj.Items[0], typeof(OFX.SignonResponseMessageSetV1));
+            Assert.IsInstanceOfType(obj.Items[0], typeof(SignonResponseMessageSetV1));
 
             // Expect: Response message set 1 is CreditcardResponse
-            Assert.IsInstanceOfType(obj.Items[1], typeof(OFX.CreditcardResponseMessageSetV1));
+            Assert.IsInstanceOfType(obj.Items[1], typeof(CreditcardResponseMessageSetV1));
         }
     }
 }

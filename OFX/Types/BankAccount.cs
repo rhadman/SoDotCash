@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using OFX.Protocol;
 
 namespace OFX.Types
 {
@@ -20,7 +21,7 @@ namespace OFX.Types
         /// </summary>
         /// <param name="ofxAccount">OFX BankAccount object</param>
         /// <returns></returns>
-        public new static Account Create(global::OFX.BankAccount ofxAccount)
+        public new static Account Create(global::OFX.Protocol.BankAccount ofxAccount)
         {
             // Route to proper constructor
             if (ofxAccount.ACCTTYPE == AccountEnum.SAVINGS)
@@ -31,7 +32,7 @@ namespace OFX.Types
         /// <summary>
         /// Internal constructor so derived classes can have alternate constructors
         /// </summary>
-        protected BankAccount(global::OFX.BankAccount ofxAccount) : 
+        protected BankAccount(global::OFX.Protocol.BankAccount ofxAccount) : 
             base("", true)
         {
             RoutingId = ofxAccount.BANKID;

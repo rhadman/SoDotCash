@@ -14,7 +14,7 @@ namespace OFX.Types
             AccountId = accountId;
         }
 
-        public CreditCardAccount(global::OFX.CreditCardAccount ofxAccount) :
+        public CreditCardAccount(global::OFX.Protocol.CreditCardAccount ofxAccount) :
             base("", true)
         {
             AccountId = ofxAccount.ACCTID;

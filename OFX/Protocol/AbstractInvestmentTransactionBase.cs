@@ -1,0 +1,36 @@
+namespace OFX.Protocol
+{
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AbstractInvestmentSellTransaction))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SellStock))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SellOther))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SellOption))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SellMutualFund))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SellDebt))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AbstractInvestmentTransaction))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Transfer))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Split))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ReturnOfCapital))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Reinvest))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MarginInterest))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(JournalSecurity))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(JournalFund))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvestmentSell))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvestmentExpense))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InvestmentBuy))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(Income))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ClosureOption))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AbstractInvestmentBuyTransaction))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BuyStock))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BuyOther))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BuyOption))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BuyMutualFund))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BuyDebt))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.81.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute()]
+    public abstract partial class AbstractInvestmentTransactionBase {
+    }
+}

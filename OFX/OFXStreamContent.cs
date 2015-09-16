@@ -1,4 +1,6 @@
 ﻿
+using OFX.Protocol;
+
 namespace OFX
 {
 
@@ -18,7 +20,7 @@ namespace OFX
         /// </summary>
         /// <param name="ofxObject">A populated OFX message with request or response data</param>
         /// <returns>Created OFXStreamContent ready to send with HttpClient.Post</returns>
-        public static OFXStreamContent Create(OFX ofxObject)
+        public static OFXStreamContent Create(Protocol.OFX ofxObject)
         {
             // Serialized data will be written to a MemoryStream
             var memoryStream = new System.IO.MemoryStream();
@@ -54,7 +56,7 @@ namespace OFX
         public static OFXStreamContent Create(AbstractTopLevelMessageSet[] messageSets)
         {
             // Wrap message sets in OFX object
-            OFX ofx = new OFX();
+            Protocol.OFX ofx = new Protocol.OFX();
             ofx.Items = messageSets;
 
             // Call through to OFX class-based factory method
@@ -64,6 +66,6 @@ namespace OFX
         /// <summary>
         /// XML serializer capable of converting between XML and Object representation
         /// </summary>
-        protected static System.Xml.Serialization.XmlSerializer m_serializer = new System.Xml.Serialization.XmlSerializer(typeof(OFX));
+        protected static System.Xml.Serialization.XmlSerializer m_serializer = new System.Xml.Serialization.XmlSerializer(typeof(Protocol.OFX));
     }
 }

@@ -15,7 +15,7 @@ namespace OFX.Types
             // Stub - ensures the type is correct even though no extra content from parent
         }
 
-        public CheckingAccount(global::OFX.BankAccount ofxAccount) :
+        public CheckingAccount(global::OFX.Protocol.BankAccount ofxAccount) :
             base(ofxAccount)
         {
             // Stub - ensures the type is correct even though no extra content from parent
