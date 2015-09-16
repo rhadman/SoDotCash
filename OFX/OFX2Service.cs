@@ -12,7 +12,7 @@ namespace OFX
     /// </summary>
     public class OFX2Service
     {
-        public OFX2Service(OFXFinancialInstitution financialInstitution, OFXCredentials userCredentials)
+        public OFX2Service(Types.FinancialInstitution financialInstitution, Credentials userCredentials)
         {
             this.financialInstitution = financialInstitution;
             this.userCredentials = userCredentials;
@@ -298,7 +298,7 @@ namespace OFX
             // Gather all message sets in the request
             var requestMessageSets = new List<AbstractTopLevelMessageSet>
             {
-                CreateSignonRequest(new OFXCredentials("anonymous00000000000000000000000",
+                CreateSignonRequest(new Credentials("anonymous00000000000000000000000",
                     "anonymous00000000000000000000000")),
                 profileMessageSet
             };
@@ -315,7 +315,7 @@ namespace OFX
         /// <param name="credentials">Authentication credentials to use for this request. If no credentials are specified, the default user credentials for the service are used.</param>
         /// <param name="requestProfile">Request profile specifying communication parameters for this request</param>
         /// <returns></returns>
-        protected SignonRequestMessageSetV1 CreateSignonRequest(OFXCredentials credentials=null, MessageSetRequestProfile requestProfile=null)
+        protected SignonRequestMessageSetV1 CreateSignonRequest(Credentials credentials=null, MessageSetRequestProfile requestProfile=null)
         {
             // If no credentials are specified, use the default user credentials assigned when the service was constructed
             if (credentials == null)
@@ -430,12 +430,12 @@ namespace OFX
         /// <summary>
         /// Properties of the financial institution used for online communication
         /// </summary>
-        protected OFXFinancialInstitution financialInstitution;
+        protected Types.FinancialInstitution financialInstitution;
 
         /// <summary>
         /// Credentials used to authenticate with the OFX service provider
         /// </summary>
-        protected OFXCredentials userCredentials;
+        protected Credentials userCredentials;
 
         /// <summary>
         /// Application Id of the product making the call.

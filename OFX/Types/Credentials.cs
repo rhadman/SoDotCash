@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OFX
+﻿namespace OFX.Types
 {
     /// <summary>
     /// Container class for authentication credentials provided to OFX.
     /// Supports only UserId and Password currently
     /// </summary>
-    public class OFXCredentials
+    public class Credentials
     {
-        public OFXCredentials(string userId, string password)
+        public Credentials(string userId, string password)
         {
             UserId = userId;
             Password = password;

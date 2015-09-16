@@ -6,6 +6,8 @@ using OFX;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Collections.Generic;
+using OFX.Types;
+using FinancialInstitution = OFX.Types.FinancialInstitution;
 
 namespace SoDotCashTest
 {
@@ -15,8 +17,8 @@ namespace SoDotCashTest
     [TestClass]
     public class OFXTest
     {
-        private static readonly OFXCredentials UserCredentials = new OFXCredentials("myuser", "mypass");
-        private static readonly OFXFinancialInstitution ChaseBankFi = new OFXFinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898"); 
+        private static readonly Credentials UserCredentials = new Credentials("myuser", "mypass");
+        private static readonly FinancialInstitution ChaseBankFi = new FinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898"); 
         private static readonly OFX2Service ChaseBankService = new OFX2Service(ChaseBankFi, UserCredentials);
 
 

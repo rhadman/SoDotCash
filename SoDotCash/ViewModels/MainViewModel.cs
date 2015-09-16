@@ -58,8 +58,8 @@ namespace SoDotCash.ViewModels
 
         //protected async void LoadAccounts(string username, string password)
         //{
-        //    var chaseBankFi = new OFX.OFXFinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898");
-        //    var userCredentials = new OFX.OFXCredentials(username, password);
+        //    var chaseBankFi = new OFX.FinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898");
+        //    var userCredentials = new OFX.Credentials(username, password);
         //    var ofxService = new OFX.OFX2Service(chaseBankFi, userCredentials);
 
         //    DateTimeOffset endTime = DateTimeOffset.Now;

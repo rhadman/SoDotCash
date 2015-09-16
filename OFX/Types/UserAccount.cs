@@ -8,8 +8,8 @@ namespace OFX.Types
     /// </summary>
     public class UserAccount
     {
-        public OFXCredentials Credentials { get; private set; }
-        public OFXFinancialInstitution FinancialInstitution { get; private set; }
+        public Credentials Credentials { get; private set; }
+        public FinancialInstitution FinancialInstitution { get; private set; }
 
         public List<Account> Accounts = new List<Account>();
     }

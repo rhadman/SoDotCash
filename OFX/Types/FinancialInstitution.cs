@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OFX
+namespace OFX.Types
 {
     /// <summary>
     /// Container class for the basic information needed to identify and communicate with a Financial Institution
     /// </summary>
-    public class OFXFinancialInstitution
+    public class FinancialInstitution
     {
-        public OFXFinancialInstitution(Uri serviceEndpoint, string organizationId, string financialUnitId, bool supportsOnlineRetrieval = true)
+        public FinancialInstitution(Uri serviceEndpoint, string organizationId, string financialUnitId, bool supportsOnlineRetrieval = true)
         {
             ServiceEndpoint = serviceEndpoint;
             OrganizationId = organizationId;
