@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OFX
+namespace OFX.Internal
 {
     /// <summary>
     /// Wrapper class for OFX utility functions
@@ -32,7 +32,7 @@ namespace OFX
             {
                 dateTime = DateTime.ParseExact(ofxDatePieces[0], "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
             }
-            catch (FormatException)
+            catch (System.FormatException)
             {
                 dateTime = DateTime.ParseExact(ofxDatePieces[0], "yyyyMMddHHmmss.000", System.Globalization.CultureInfo.InvariantCulture);
             }

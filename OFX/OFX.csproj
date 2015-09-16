@@ -43,12 +43,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interface\ITransactionsProvider.cs" />
+    <Compile Include="Internal\AbstractMessageSetRequestProfile.cs" />
+    <Compile Include="Internal\DefaultMessageSetRequestProfile.cs" />
+    <Compile Include="Internal\MessageSetRequestProfile.cs" />
+    <Compile Include="Internal\OFXUtils.cs" />
+    <Compile Include="Internal\Transport.cs" />
+    <Compile Include="Internal\StreamContent.cs" />
     <Compile Include="OFX1ToOFX2Converter.cs" />
     <Compile Include="OFX2Service.cs" />
-    <Compile Include="OFXMessageSetData.cs" />
-    <Compile Include="OFXStreamContent.cs" />
-    <Compile Include="OFXTransport.cs" />
-    <Compile Include="OFXUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocol\AbstractAccount.cs" />
     <Compile Include="Protocol\AbstractAccountInfo.cs" />

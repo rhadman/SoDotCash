@@ -2,15 +2,15 @@
 using System.Threading.Tasks;
 using OFX.Protocol;
 
-namespace OFX
+namespace OFX.Internal
 {
     /// <summary>
     /// Encapsulates the transport layer of the OFX protocol specification.
     /// Uses HTTPS to send and receive messages
     /// </summary>
-    class OFXTransport
+    class Transport
     {
-        public OFXTransport(Uri serviceEndpoint) 
+        public Transport(Uri serviceEndpoint) 
         {
             m_serviceURI = serviceEndpoint;
         }
@@ -25,7 +25,7 @@ namespace OFX
         public async Task<Protocol.OFX> sendRequestAsync(Protocol.OFX ofxRequest)
         {
             // Create a HttpContent object wrapping the OFX request object
-            var request = OFXStreamContent.Create(ofxRequest);
+            var request = StreamContent.Create(ofxRequest);
 
             // Send and await results
             return await sendRequestAsync(request).ConfigureAwait(false);
@@ -41,7 +41,7 @@ namespace OFX
         public async Task<Protocol.OFX> sendRequestAsync(AbstractTopLevelMessageSet[] messageSets)
         {
             // Create a HttpContent object wrapping the message sets
-            var request = OFXStreamContent.Create(messageSets);
+            var request = StreamContent.Create(messageSets);
 
             // Send and await results
             return await sendRequestAsync(request).ConfigureAwait(false);
@@ -54,7 +54,7 @@ namespace OFX
         /// </summary>
         /// <param name="request">Populated OFX request object</param>
         /// <returns>The returned task includes a populated OFX response object on successfull call</returns>
-        public async Task<Protocol.OFX> sendRequestAsync(OFXStreamContent request)
+        public async Task<Protocol.OFX> sendRequestAsync(StreamContent request)
         {
             // Create an HTTPClient to send the request
             using (var client = new System.Net.Http.HttpClient())
