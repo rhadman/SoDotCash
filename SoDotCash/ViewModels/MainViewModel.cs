@@ -6,7 +6,9 @@ using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 using OFX;
-using SoDotCash.Models;
+using OFX.Types;
+
+//using SoDotCash.Models;
 
 namespace SoDotCash.ViewModels
 {
@@ -37,16 +39,15 @@ namespace SoDotCash.ViewModels
             }
         }
 
+        public ObservableCollection<UserAccount> UserAccounts { get; set; } = new ObservableCollection<UserAccount>();
+
         #endregion
 
         #region [ Private Backing Fields ]
 
         private string _testString;
 
-        /// <summary>
-        /// List of accounts
-        /// </summary>
-        public Dictionary<EAccountType, AccountList> AccountViewItems { get; set; }= new AccountTypes();
+        
 
         #endregion
 
@@ -55,55 +56,55 @@ namespace SoDotCash.ViewModels
 
 
 
-        protected async void LoadAccounts(string username, string password)
-        {
-            var chaseBankFi = new OFX.OFXFinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898");
-            var userCredentials = new OFX.OFXCredentials(username, password);
-            var ofxService = new OFX.OFX2Service(chaseBankFi, userCredentials);
+        //protected async void LoadAccounts(string username, string password)
+        //{
+        //    var chaseBankFi = new OFX.OFXFinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898");
+        //    var userCredentials = new OFX.OFXCredentials(username, password);
+        //    var ofxService = new OFX.OFX2Service(chaseBankFi, userCredentials);
 
-            DateTimeOffset endTime = DateTimeOffset.Now;
-            DateTimeOffset startTime = endTime - new TimeSpan(1, 0, 0, 0);
-            foreach (var account in await ofxService.ListAccounts())
-            {
-                Models.Account viewAccount;
-                if (account is OFX.Types.CheckingAccount)
-                {
-                    viewAccount = new Models.Account
-                    {
-                        Name = ((OFX.Types.CheckingAccount)account).AccountId,
-                        AccountType = EAccountType.Checking
-                    };
-                }
-                else if (account is OFX.Types.SavingsAccount)
-                {
-                    viewAccount = new Models.Account
-                    {
-                        Name = ((OFX.Types.SavingsAccount)account).AccountId,
-                        AccountType = EAccountType.Savings
-                    };
-                }
-                else //(account is OFX.Types.CreditCardAccount)
-                {
-                    viewAccount = new Models.Account
-                    {
-                        Name = ((OFX.Types.CreditCardAccount)account).AccountId,
-                        AccountType = EAccountType.CreditCard
-                    };
-                }
+        //    DateTimeOffset endTime = DateTimeOffset.Now;
+        //    DateTimeOffset startTime = endTime - new TimeSpan(1, 0, 0, 0);
+        //    foreach (var account in await ofxService.ListAccounts())
+        //    {
+        //        Models.Account viewAccount;
+        //        if (account is OFX.Types.CheckingAccount)
+        //        {
+        //            viewAccount = new Models.Account
+        //            {
+        //                Name = ((OFX.Types.CheckingAccount)account).AccountId,
+        //                AccountType = EAccountType.Checking
+        //            };
+        //        }
+        //        else if (account is OFX.Types.SavingsAccount)
+        //        {
+        //            viewAccount = new Models.Account
+        //            {
+        //                Name = ((OFX.Types.SavingsAccount)account).AccountId,
+        //                AccountType = EAccountType.Savings
+        //            };
+        //        }
+        //        else //(account is OFX.Types.CreditCardAccount)
+        //        {
+        //            viewAccount = new Models.Account
+        //            {
+        //                Name = ((OFX.Types.CreditCardAccount)account).AccountId,
+        //                AccountType = EAccountType.CreditCard
+        //            };
+        //        }
 
-                AccountViewItems[viewAccount.AccountType].Accounts.Add(viewAccount);
+        //        //AccountViewItems[viewAccount.AccountType].Accounts.Add(viewAccount);
 
-                /*
-                var statements = await ofxService.GetStatement(account, startTime, endTime);
-                if (statements != null)
-                {
-                    foreach (var statement in statements)
-                    {
-                    }
-                }
-                */
-            }
-        }
+        //        /*
+        //        var statements = await ofxService.GetStatement(account, startTime, endTime);
+        //        if (statements != null)
+        //        {
+        //            foreach (var statement in statements)
+        //            {
+        //            }
+        //        }
+        //        */
+        //    }
+        //}
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.

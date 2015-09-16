@@ -143,8 +143,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Models\Account.cs" />
-    <Compile Include="Models\AccountType.cs" />
     <Compile Include="DatabaseClasses.cs" />
     <Compile Include="SoCash.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -153,6 +151,10 @@
     </Compile>
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
+    <Page Include="Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -208,7 +210,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Converters\" />
+    <Folder Include="Models\" />
     <Folder Include="Services\" />
+    <Folder Include="Views\Dialogs\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OFX\OFX.csproj">

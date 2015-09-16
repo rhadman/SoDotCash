@@ -9,6 +9,11 @@
              xmlns:viewModels="clr-namespace:SoDotCash.ViewModels">
     
   <Application.Resources>
-    <viewModels:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:SoDotCash.ViewModels" />
+  	<ResourceDictionary>
+  		<ResourceDictionary.MergedDictionaries>
+  			<ResourceDictionary Source="Styles.xaml"/>
+  		</ResourceDictionary.MergedDictionaries>
+  		<vm:ViewModelLocator xmlns:vm="clr-namespace:SoDotCash.ViewModels" x:Key="Locator" d:IsDataSource="True" />
+  	</ResourceDictionary>
   </Application.Resources>
 </Application>

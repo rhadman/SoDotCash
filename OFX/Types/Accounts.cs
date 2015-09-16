@@ -1,7 +1,21 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 
 namespace OFX.Types
 {
+    /// <summary>
+    /// User account use to abstract away the multiple layers required for an account
+    /// </summary>
+    public class UserAccount
+    {
+        public OFXCredentials Credentials { get; private set; }
+        public OFXFinancialInstitution FinancialInstitution { get; private set; }
+
+        public List<Account> Accounts = new List<Account>();
+    }
+
+
+
     /// <summary>
     /// Base account type from which other account types derive.
     /// Container for account data.
@@ -43,6 +57,11 @@ namespace OFX.Types
         /// Status of the account - whether it's active or not
         /// </summary>
         public bool Active { get; }
+
+        /// <summary>
+        /// The type of account - Checking, Savings, Money Market etc
+        /// </summary>
+        public AccountEnum AccountType { get; private set; }
     }
 
 

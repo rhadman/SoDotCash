@@ -53,6 +53,7 @@
     <Compile Include="OFXUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\Accounts.cs" />
+    <Compile Include="Types\ITransactionsProvider.cs" />
     <Compile Include="Types\Statement.cs" />
     <Compile Include="Types\Transaction.cs" />
   </ItemGroup>
