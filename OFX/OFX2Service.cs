@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
+using OFX.Protocol;
 using OFX.Types;
+using BankAccount = OFX.Protocol.BankAccount;
+using CreditCardAccount = OFX.Protocol.CreditCardAccount;
+using FinancialInstitution = OFX.Protocol.FinancialInstitution;
 
 namespace OFX
 {
@@ -12,7 +15,7 @@ namespace OFX
     /// </summary>
     public class OFX2Service
     {
-        public OFX2Service(OFXFinancialInstitution financialInstitution, OFXCredentials userCredentials)
+        public OFX2Service(Types.FinancialInstitution financialInstitution, Credentials userCredentials)
         {
             this.financialInstitution = financialInstitution;
             this.userCredentials = userCredentials;
@@ -29,7 +32,7 @@ namespace OFX
         /// <param name="startDate">Start of date range for transactions</param>
         /// <param name="endDate">End of date range for transactions</param>
         /// <returns>List of statements containing the requested data.</returns>
-        public async Task<IEnumerable<Types.Statement>> GetStatement(Types.Account account, DateTimeOffset startDate,
+        public async Task<IEnumerable<Statement>> GetStatement(Account account, DateTimeOffset startDate,
             DateTimeOffset endDate)
         {
             if (account is Types.BankAccount)
@@ -45,7 +48,7 @@ namespace OFX
         /// <param name="startDate">Start of date range for transactions</param>
         /// <param name="endDate">End of date range for transactions</param>
         /// <returns>List of statements containing the requested data.</returns>
-        public async Task<IEnumerable<Types.Statement>> GetStatement(Types.BankAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<Statement>> GetStatement(Types.BankAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             // Ensure service catalog is populated
             await PopulateServiceProfiles();
@@ -89,12 +92,12 @@ namespace OFX
             };
 
             // Send to service and await response
-            OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            Protocol.OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
 
             // Extract statement data and return
-            return Types.Statement.CreateFromOFXResponse(response);
+            return Statement.CreateFromOFXResponse(response);
         }
 
         /// <summary>
@@ -104,7 +107,7 @@ namespace OFX
         /// <param name="startDate">Start of date range for transactions</param>
         /// <param name="endDate">End of date range for transactions</param>
         /// <returns>List of statements containing the requested data.</returns>
-        public async Task<IEnumerable<Types.Statement>> GetStatement(Types.CreditCardAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<Statement>> GetStatement(Types.CreditCardAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             // Ensure service catalog is populated
             await PopulateServiceProfiles();
@@ -148,12 +151,12 @@ namespace OFX
             };
 
             // Send to service and await response
-            OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            Protocol.OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
 
             // Extract statement data and return
-            return Types.Statement.CreateFromOFXResponse(response);
+            return Statement.CreateFromOFXResponse(response);
         }
 
         /// <summary>
@@ -168,7 +171,7 @@ namespace OFX
                 BANKID = account.RoutingId,
                 ACCTID = account.AccountId
             };
-            if (account is Types.CheckingAccount)
+            if (account is CheckingAccount)
                 bankAccount.ACCTTYPE = AccountEnum.CHECKING;
             else
                 bankAccount.ACCTTYPE = AccountEnum.SAVINGS;
@@ -195,7 +198,7 @@ namespace OFX
         /// List all accounts available from the service
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<Types.Account>> ListAccounts()
+        public async Task<IEnumerable<Account>> ListAccounts()
         {
             // Ensure service catalog is populated
             await PopulateServiceProfiles();
@@ -224,14 +227,14 @@ namespace OFX
             };
 
             // Send to service and await response
-            OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
+            Protocol.OFX response = await new OFXTransport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
 
 
 
             // Walk nested elements to find accounts
-            List<Types.Account> accountList = new List<Account>();
+            List<Account> accountList = new List<Account>();
             foreach (var responseMessageSet in response.Items.Where(item => item.GetType() == typeof(SignupResponseMessageSetV1)).Select(item => (SignupResponseMessageSetV1)item))
             {
                 foreach (
@@ -248,12 +251,12 @@ namespace OFX
                         {
                             // There are multiple types of bank accounts we support
                             var bankAccountInfo = (BankAccountInfo) specificAccountInfo;
-                            accountList.Add(Types.Account.Create(bankAccountInfo.BANKACCTFROM));
+                            accountList.Add(Account.Create(bankAccountInfo.BANKACCTFROM));
                         }
                         if (specificAccountInfo.GetType() == typeof(CreditCardAccountInfo))
                         {
                             var creditAccountInfo = (CreditCardAccountInfo)specificAccountInfo;
-                            accountList.Add(Types.Account.Create(creditAccountInfo.CCACCTFROM));
+                            accountList.Add(Account.Create(creditAccountInfo.CCACCTFROM));
                         }
                     }
                 }
@@ -271,7 +274,7 @@ namespace OFX
         /// This is an asyncronous call.
         /// </summary>
         /// <returns>The completed task returns an OFX wrapper containing the result of the call and, on success, a ProfileResponseMessageSetV1</returns>
-        public async Task<OFX> ListProfiles()
+        public async Task<Protocol.OFX> ListProfiles()
         {
             // Populate the profile request
             var profileRequest = new ProfileRequest
@@ -298,7 +301,7 @@ namespace OFX
             // Gather all message sets in the request
             var requestMessageSets = new List<AbstractTopLevelMessageSet>
             {
-                CreateSignonRequest(new OFXCredentials("anonymous00000000000000000000000",
+                CreateSignonRequest(new Credentials("anonymous00000000000000000000000",
                     "anonymous00000000000000000000000")),
                 profileMessageSet
             };
@@ -315,7 +318,7 @@ namespace OFX
         /// <param name="credentials">Authentication credentials to use for this request. If no credentials are specified, the default user credentials for the service are used.</param>
         /// <param name="requestProfile">Request profile specifying communication parameters for this request</param>
         /// <returns></returns>
-        protected SignonRequestMessageSetV1 CreateSignonRequest(OFXCredentials credentials=null, MessageSetRequestProfile requestProfile=null)
+        protected SignonRequestMessageSetV1 CreateSignonRequest(Credentials credentials=null, MessageSetRequestProfile requestProfile=null)
         {
             // If no credentials are specified, use the default user credentials assigned when the service was constructed
             if (credentials == null)
@@ -327,8 +330,8 @@ namespace OFX
             // Populate the FinancialInstitution data
             var fi = new FinancialInstitution
             {
-                ORG = this.financialInstitution.OrganizationId,
-                FID = this.financialInstitution.FinancialId
+                ORG = financialInstitution.OrganizationId,
+                FID = financialInstitution.FinancialId
             };
 
             // Populate a signon request with the current date and provided user credentials
@@ -430,12 +433,12 @@ namespace OFX
         /// <summary>
         /// Properties of the financial institution used for online communication
         /// </summary>
-        protected OFXFinancialInstitution financialInstitution;
+        protected Types.FinancialInstitution financialInstitution;
 
         /// <summary>
         /// Credentials used to authenticate with the OFX service provider
         /// </summary>
-        protected OFXCredentials userCredentials;
+        protected Credentials userCredentials;
 
         /// <summary>
         /// Application Id of the product making the call.

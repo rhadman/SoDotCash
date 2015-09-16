@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using OFX.Protocol;
 
 namespace OFX
 {
@@ -25,7 +22,7 @@ namespace OFX
         /// </summary>
         /// <param name="request">Populated OFX request object</param>
         /// <returns>The returned task includes a populated OFX response object on successfull call</returns>
-        public async Task<OFX> sendRequestAsync(OFX ofxRequest)
+        public async Task<Protocol.OFX> sendRequestAsync(Protocol.OFX ofxRequest)
         {
             // Create a HttpContent object wrapping the OFX request object
             var request = OFXStreamContent.Create(ofxRequest);
@@ -41,7 +38,7 @@ namespace OFX
         /// </summary>
         /// <param name="messageSets">Array of populated OFX message requests</param>
         /// <returns>The returned task includes a populated OFX response object on successfull call</returns>
-        public async Task<OFX> sendRequestAsync(AbstractTopLevelMessageSet[] messageSets)
+        public async Task<Protocol.OFX> sendRequestAsync(AbstractTopLevelMessageSet[] messageSets)
         {
             // Create a HttpContent object wrapping the message sets
             var request = OFXStreamContent.Create(messageSets);
@@ -57,7 +54,7 @@ namespace OFX
         /// </summary>
         /// <param name="request">Populated OFX request object</param>
         /// <returns>The returned task includes a populated OFX response object on successfull call</returns>
-        public async Task<OFX> sendRequestAsync(OFXStreamContent request)
+        public async Task<Protocol.OFX> sendRequestAsync(OFXStreamContent request)
         {
             // Create an HTTPClient to send the request
             using (var client = new System.Net.Http.HttpClient())
@@ -72,7 +69,7 @@ namespace OFX
                 var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
                 // Deserialize XML stream into object
-                return (OFX)m_serializer.Deserialize(responseStream);
+                return (Protocol.OFX)m_serializer.Deserialize(responseStream);
             }
         }
 
@@ -84,6 +81,6 @@ namespace OFX
         /// <summary>
         /// XML serializer capable of converting between XML and Object representation
         /// </summary>
-        protected static System.Xml.Serialization.XmlSerializer m_serializer = new System.Xml.Serialization.XmlSerializer(typeof(OFX));
+        protected static System.Xml.Serialization.XmlSerializer m_serializer = new System.Xml.Serialization.XmlSerializer(typeof(Protocol.OFX));
     }
 }

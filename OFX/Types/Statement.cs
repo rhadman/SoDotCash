@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OFX.Protocol;
 
 namespace OFX.Types
 {
@@ -60,7 +61,7 @@ namespace OFX.Types
         /// </summary>
         /// <param name="ofxResponse">OFX object populated with one or more statement responses</param>
         /// <returns></returns>
-        public static List<Statement> CreateFromOFXResponse(OFX ofxResponse)
+        public static List<Statement> CreateFromOFXResponse(Protocol.OFX ofxResponse)
         {
             List<Statement> statementList = new List<Statement>();
 

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OFX
 {
@@ -36,7 +32,7 @@ namespace OFX
             {
                 dateTime = DateTime.ParseExact(ofxDatePieces[0], "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
             }
-            catch (System.FormatException)
+            catch (FormatException)
             {
                 dateTime = DateTime.ParseExact(ofxDatePieces[0], "yyyyMMddHHmmss.000", System.Globalization.CultureInfo.InvariantCulture);
             }
