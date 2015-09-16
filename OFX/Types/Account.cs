@@ -48,6 +48,6 @@ namespace OFX.Types
         /// <summary>
         /// The type of account - Checking, Savings, Money Market etc
         /// </summary>
-        public AccountEnum AccountType { get; private set; }
+        public AccountEnum AccountType { get; set; }
     }
 }
