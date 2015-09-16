@@ -24,7 +24,11 @@
             </Grid.ColumnDefinitions>
 
             <TreeView Margin="10" ItemsSource="{Binding UserAccounts}" >
-               
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Accounts}">
+                        
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
             </TreeView>
 
             <ListView Grid.Column="1" Margin="10"/>

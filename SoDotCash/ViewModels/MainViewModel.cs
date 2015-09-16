@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Windows.Controls;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Messaging;
 using OFX;
 using OFX.Types;
 
@@ -111,7 +107,15 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public MainViewModel()
         {
-            TestString = IsInDesignMode ? "This is a string that is shown when designing" : "This is a string that is shown at runtime";
+            TestString = IsInDesignMode
+                ? "This is a string that is shown when designing"
+                : "This is a string that is shown at runtime";
+
+                var usrAct = new UserAccount();
+                usrAct.Accounts = new List<OFX.Types.Account>();
+                usrAct.Accounts.Add(new OFX.Types.Account("test",true) {AccountType = AccountEnum.CHECKING});
+                UserAccounts.Add(usrAct);
+            
             //LoadAccounts("myuser", "mypass");
         }
 

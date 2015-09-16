@@ -11,7 +11,7 @@ namespace OFX.Types
         public OFXCredentials Credentials { get; private set; }
         public OFXFinancialInstitution FinancialInstitution { get; private set; }
 
-        public List<Account> Accounts = new List<Account>();
+        public List<Account> Accounts { get; set; } = new List<Account>();
     }
 
 
@@ -61,7 +61,7 @@ namespace OFX.Types
         /// <summary>
         /// The type of account - Checking, Savings, Money Market etc
         /// </summary>
-        public AccountEnum AccountType { get; private set; }
+        public AccountEnum AccountType { get; set; }
     }
 
 
