@@ -41,7 +41,7 @@ namespace SoDotCash.ViewModels
         }
 
         //public ObservableCollection<UserAccount> UserAccounts { get; set; } = new ObservableCollection<UserAccount>();
-        public Dictionary<AccountEnum, ObservableCollection<UserAccount>> AccountsView { get; set; } = new Dictionary<AccountEnum, ObservableCollection<UserAccount>>();
+        public Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>> AccountsView { get; set; } = new Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>>();
         public ObservableCollection<OFX.Types.Account> DumbAccounts { get; set; } = new ObservableCollection<OFX.Types.Account>();
     
         #endregion
@@ -157,16 +157,11 @@ namespace SoDotCash.ViewModels
             //usrAct.Accounts.Add(AccountEnum.CHECKING, new ObservableCollection<OFX.Types.Account> { new OFX.Types.Account("test", true) { AccountType = AccountEnum.CHECKING }});
 
             AccountsView.Add(AccountEnum.CHECKING,
-                new ObservableCollection<UserAccount>
+                new ObservableCollection<OFX.Types.Account>
                 {
-                    new UserAccount
-                    {
-                        Accounts =
-                            new List<OFX.Types.Account>
-                            {
                                 new OFX.Types.Account("test", true) {AccountType = AccountEnum.CHECKING}
-                            }
-                    }
+                            
+                    
                 });
 
             //UserAccounts.Add(usrAct);

@@ -31,9 +31,9 @@
                         <TextBlock Text="{Binding Key}" />
                         
                         <HierarchicalDataTemplate.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Accounts}">
+                            <DataTemplate>
                                 <TextBlock Text="{Binding Description}"></TextBlock>
-                            </HierarchicalDataTemplate>
+                            </DataTemplate>
                         </HierarchicalDataTemplate.ItemTemplate>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
