@@ -23,14 +23,24 @@
                 <ColumnDefinition Width="4*" />
             </Grid.ColumnDefinitions>
 
-            <TreeView Margin="10" ItemsSource="{Binding UserAccounts}" >
+
+            <TreeView Margin="10" ItemsSource="{Binding AccountsView}">
+                
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Accounts}">
+                    <HierarchicalDataTemplate ItemsSource="{Binding Value }">
+                        <TextBlock Text="{Binding Key}" />
                         
+                        <HierarchicalDataTemplate.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Accounts}">
+                                <TextBlock Text="{Binding Description}"></TextBlock>
+                            </HierarchicalDataTemplate>
+                        </HierarchicalDataTemplate.ItemTemplate>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
+                
+                
             </TreeView>
-
+            
             <ListView Grid.Column="1" Margin="10"/>
             
         </Grid>

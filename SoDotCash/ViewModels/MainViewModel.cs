@@ -40,8 +40,10 @@ namespace SoDotCash.ViewModels
             }
         }
 
-        public ObservableCollection<UserAccount> UserAccounts { get; set; } = new ObservableCollection<UserAccount>();
-
+        //public ObservableCollection<UserAccount> UserAccounts { get; set; } = new ObservableCollection<UserAccount>();
+        public Dictionary<AccountEnum, ObservableCollection<UserAccount>> AccountsView { get; set; } = new Dictionary<AccountEnum, ObservableCollection<UserAccount>>();
+        public ObservableCollection<OFX.Types.Account> DumbAccounts { get; set; } = new ObservableCollection<OFX.Types.Account>();
+    
         #endregion
 
         #region [ Private Backing Fields ]
@@ -112,6 +114,7 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public MainViewModel()
         {
+            #region [ Database Init]
 
             AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
 
@@ -137,6 +140,8 @@ namespace SoDotCash.ViewModels
                 db.SaveChanges();
             }
 
+        #endregion
+
             TestString = IsInDesignMode
                 ? "This is a string that is shown when designing"
                 : "This is a string that is shown at runtime";
@@ -148,9 +153,24 @@ namespace SoDotCash.ViewModels
                     new OFX.Types.Account("test", true) {AccountType = AccountEnum.CHECKING}
                 }
             };
-
-            UserAccounts.Add(usrAct);
             
+            //usrAct.Accounts.Add(AccountEnum.CHECKING, new ObservableCollection<OFX.Types.Account> { new OFX.Types.Account("test", true) { AccountType = AccountEnum.CHECKING }});
+
+            AccountsView.Add(AccountEnum.CHECKING,
+                new ObservableCollection<UserAccount>
+                {
+                    new UserAccount
+                    {
+                        Accounts =
+                            new List<OFX.Types.Account>
+                            {
+                                new OFX.Types.Account("test", true) {AccountType = AccountEnum.CHECKING}
+                            }
+                    }
+                });
+
+            //UserAccounts.Add(usrAct);
+            DumbAccounts.Add(new OFX.Types.Account("test", true) { AccountType = AccountEnum.CHECKING });
             //LoadAccounts("myuser", "mypass");
         }
 
