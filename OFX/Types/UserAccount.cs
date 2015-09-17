@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using OFX.Protocol;
 
 namespace OFX.Types
 {
@@ -7,10 +9,10 @@ namespace OFX.Types
     /// </summary>
     public class UserAccount
     {
-        public Credentials Credentials { get; private set; }
-        public FinancialInstitution FinancialInstitution { get; private set; }
-
-        public List<Account> Accounts = new List<Account>();
+        public Credentials Credentials { get; set; }
+        public FinancialInstitution FinancialInstitution { get; set; }
+        
+        public List<Account> Accounts { get; set; } = new List<Account>();
     }
 
 }
