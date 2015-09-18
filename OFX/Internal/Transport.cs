@@ -1,5 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using OFX.Protocol;
 
 namespace OFX.Internal
@@ -68,8 +72,19 @@ namespace OFX.Internal
                 // Read into stream
                 var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
-                // Deserialize XML stream into object
-                return (Protocol.OFX)m_serializer.Deserialize(responseStream);
+                // Deserialize XML stream into object - try directly deserializing
+                try
+                {
+                    return (Protocol.OFX) m_serializer.Deserialize(responseStream);
+                }
+                catch (System.InvalidOperationException)
+                {
+                    // This is sometimes thrown when the response is actually UTF-8, but the xml marker claims utf-16
+                    responseStream.Position = 0;
+                    var streamReader = new StreamReader(responseStream, Encoding.UTF8);
+                    return (Protocol.OFX)m_serializer.Deserialize(streamReader);
+                }
+
             }
         }
 
