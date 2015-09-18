@@ -1,4 +1,5 @@
 ﻿
+using System.Xml.Serialization;
 using OFX.Protocol;
 
 namespace OFX.Internal
@@ -25,14 +26,20 @@ namespace OFX.Internal
             // Serialized data will be written to a MemoryStream
             var memoryStream = new System.IO.MemoryStream();
 
-            // XMLWriter will be used to encode the data using UTF8Encoding without a Byte Order Marker (BOM)
+            // XMLWriter will be used to encode the data using UTF16Encoding without a Byte Order Marker (BOM)
             var xmlWriter = new System.Xml.XmlTextWriter(memoryStream, new System.Text.UTF8Encoding(false));
 
+            // Write xml processing instruction
+            xmlWriter.WriteStartDocument();
             // Our OFX protocol uses a version 2.0.0 header with 2.1.1 protocol body
             xmlWriter.WriteProcessingInstruction("OFX", "OFXHEADER=\"200\" VERSION=\"211\" SECURITY=\"NONE\" OLDFILEUID=\"NONE\" NEWFILEUID=\"NONE\"");
 
+            // Don't include namespaces in the root element
+            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+
             // Generate XML to the stream
-            m_serializer.Serialize(xmlWriter, ofxObject);
+            m_serializer.Serialize(xmlWriter, ofxObject, ns);
 
             // Flush writer to stream
             xmlWriter.Flush();
