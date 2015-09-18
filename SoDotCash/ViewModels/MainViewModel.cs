@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.IO;
+using System.Linq;
+using System.Windows;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using OFX;
 using OFX.Protocol;
 using OFX.Types;
-using SoDotCash.Models;
+using FinancialInstitution = OFX.Protocol.FinancialInstitution;
+
+//using SoDotCash.Models;
 
 //using SoDotCash.Models;
 
@@ -40,10 +45,12 @@ namespace SoDotCash.ViewModels
             }
         }
 
+        public RelayCommand LoadTransactionsRelay { get; set; }
+
         //public ObservableCollection<UserAccount> UserAccounts { get; set; } = new ObservableCollection<UserAccount>();
         public Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>> AccountsView { get; set; } = new Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>>();
         public ObservableCollection<OFX.Types.Account> DumbAccounts { get; set; } = new ObservableCollection<OFX.Types.Account>();
-    
+        public ObservableCollection<Statement> Statements { get; set; }
         #endregion
 
         #region [ Private Backing Fields ]
@@ -114,6 +121,9 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public MainViewModel()
         {
+            Statements = new ObservableCollection<Statement>();
+            LoadTransactionsRelay = new RelayCommand(LoadTransactionsCommand);
+
             #region [ Database Init]
 
             AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
@@ -122,9 +132,9 @@ namespace SoDotCash.ViewModels
 
             // TODO: FIXME: For now we drop and recreate the database if the model changes. This is fine for development, but not
             //   for production
-            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<SoCashDbContext>());
+            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<Models.SoCashDbContext>());
 
-            using (var db = new SoCashDbContext())
+            using (var db = new Models.SoCashDbContext())
             {
                 /*
                 var fi = new FinancialInstitution()
@@ -145,17 +155,7 @@ namespace SoDotCash.ViewModels
             TestString = IsInDesignMode
                 ? "This is a string that is shown when designing"
                 : "This is a string that is shown at runtime";
-
-            var usrAct = new UserAccount
-            {
-                Accounts = new List<OFX.Types.Account>
-                {
-                    new OFX.Types.Account("test", true) {AccountType = AccountEnum.CHECKING}
-                }
-            };
             
-            //usrAct.Accounts.Add(AccountEnum.CHECKING, new ObservableCollection<OFX.Types.Account> { new OFX.Types.Account("test", true) { AccountType = AccountEnum.CHECKING }});
-
             AccountsView.Add(AccountEnum.CHECKING,
                 new ObservableCollection<OFX.Types.Account>
                 {
@@ -164,9 +164,34 @@ namespace SoDotCash.ViewModels
                     
                 });
 
-            //UserAccounts.Add(usrAct);
+            
             DumbAccounts.Add(new OFX.Types.Account("test", true) { AccountType = AccountEnum.CHECKING });
-            //LoadAccounts("myuser", "mypass");
+        }
+
+        private async void LoadTransactionsCommand()
+        {
+            var fi = new OFX.Types.FinancialInstitution("State Employees Credit Union", new Uri("https://onlineaccess.ncsecu.org/secuofx/secu.ofx"),
+                "SECU", "1001");
+            var creds = new Credentials("UserName", "Password");
+            var service = new OFX2Service(fi, creds);
+            try
+            {
+                var acts = await service.ListAccounts();
+                var endTime = DateTimeOffset.Now;
+                var startTime = endTime - new TimeSpan(1, 0, 0, 0);
+
+                var statements = await service.GetStatement(acts.First(), startTime, endTime);
+
+                Statements = new ObservableCollection<Statement>(statements);
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+            
+
+            
         }
 
         #endregion
