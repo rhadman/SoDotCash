@@ -26,7 +26,7 @@ namespace OFX.Internal
             // Serialized data will be written to a MemoryStream
             var memoryStream = new System.IO.MemoryStream();
 
-            // XMLWriter will be used to encode the data using UTF16Encoding without a Byte Order Marker (BOM)
+            // XMLWriter will be used to encode the data using UTF8Encoding without a Byte Order Marker (BOM)
             var xmlWriter = new System.Xml.XmlTextWriter(memoryStream, new System.Text.UTF8Encoding(false));
 
             // Write xml processing instruction
