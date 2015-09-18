@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using OFX.Internal;
 using OFX.Protocol;
 using OFX.Types;
@@ -16,6 +19,26 @@ namespace OFX
     /// </summary>
     public class OFX2Service
     {
+        /// <summary>
+        /// List all financial institutions known to the library
+        /// </summary>
+        /// <returns></returns>
+        public static List<Types.FinancialInstitution> ListFinancialInstitutions()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            using (var institutionsListStream = assembly.GetManifestResourceStream("OFX.ofx_institutions.xml"))
+            {
+                // Instantiate an XML serializer which will be used to deserialize the XML data into the Object model
+                var serializer = new XmlSerializer(typeof(OFXHome.institutions));
+
+                // Deserialize the converted XML data
+                var institutions = (OFXHome.institutions)serializer.Deserialize(institutionsListStream);
+
+                // Convert each institution from the file into a FinancialInstitution
+                return institutions.institution.Select(institution => new Types.FinancialInstitution(institution.name, new Uri(institution.url), institution.org, institution.fid, true)).ToList();
+            }
+        } 
+
         public OFX2Service(Types.FinancialInstitution financialInstitution, Credentials userCredentials)
         {
             this.financialInstitution = financialInstitution;

@@ -51,6 +51,9 @@
     <Compile Include="Internal\StreamContent.cs" />
     <Compile Include="OFX1ToOFX2Converter.cs" />
     <Compile Include="OFX2Service.cs" />
+    <Compile Include="OFXHome\institutions.cs" />
+    <Compile Include="OFXHome\institutionsInstitution.cs" />
+    <Compile Include="OFXHome\institutionsInstitutionProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocol\AbstractAccount.cs" />
     <Compile Include="Protocol\AbstractAccountInfo.cs" />
@@ -693,176 +696,185 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Doc\OFX 2.1.1.pdf" />
-    <None Include="OFX Schemas\OFX2_Protocol.xsd">
+    <None Include="Schemas\OFX\OFX2_Protocol.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX3_Protocol_dotNET.xsd" />
-    <None Include="OFX Schemas\OFX_Banking.xsd">
+    <None Include="Schemas\OFX\OFX3_Protocol_dotNET.xsd" />
+    <None Include="Schemas\OFX\OFX_Banking.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Banking_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Banking_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Banking_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Banking_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_BillerDelivery.xsd">
+    <None Include="Schemas\OFX\OFX_BillerDelivery.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_BillerDelivery_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_BillerDelivery_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_BillerDelivery_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_BillerDelivery_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_BillerDirectory.xsd">
+    <None Include="Schemas\OFX\OFX_BillerDirectory.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_BillerDirectory_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_BillerDirectory_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_BillerDirectory_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_BillerDirectory_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_BillPay.xsd">
+    <None Include="Schemas\OFX\OFX_BillPay.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_BillPay_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_BillPay_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_BillPay_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_BillPay_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Common.xsd">
+    <None Include="Schemas\OFX\OFX_Common.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_CreditCard.xsd">
+    <None Include="Schemas\OFX\OFX_CreditCard.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_CreditCard_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_CreditCard_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_CreditCard_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_CreditCard_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Email.xsd">
+    <None Include="Schemas\OFX\OFX_Email.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Email_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Email_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Email_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Email_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Image_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Image_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Image_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Image_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_InterTransfer.xsd">
+    <None Include="Schemas\OFX\OFX_InterTransfer.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_InterTransfer_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_InterTransfer_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_InterTransfer_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_InterTransfer_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Investment.xsd">
+    <None Include="Schemas\OFX\OFX_Investment.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Investment_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Investment_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Investment_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Investment_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Loans.xsd">
+    <None Include="Schemas\OFX\OFX_Loans.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Loan_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Loan_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Loan_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Loan_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Profile.xsd">
+    <None Include="Schemas\OFX\OFX_Profile.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Profile_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Profile_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Profile_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Profile_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_SecuritiesList.xsd">
+    <None Include="Schemas\OFX\OFX_SecuritiesList.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_SecuritiesList_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_SecuritiesList_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_SecuritiesList_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_SecuritiesList_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Signon.xsd">
+    <None Include="Schemas\OFX\OFX_Signon.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Signon_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Signon_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Signon_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Signon_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Signup.xsd">
+    <None Include="Schemas\OFX\OFX_Signup.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Signup_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Signup_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Signup_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Signup_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Tax1098.xsd">
+    <None Include="Schemas\OFX\OFX_Tax1098.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Tax1098_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Tax1098_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Tax1098_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Tax1098_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Tax1099.xsd">
+    <None Include="Schemas\OFX\OFX_Tax1099.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Tax1099_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_Tax1099_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_Tax1099_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_Tax1099_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_TaxW2.xsd">
+    <None Include="Schemas\OFX\OFX_TaxW2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_TaxW2_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_TaxW2_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_TaxW2_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_TaxW2_Message_Wrappers.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_TypeDefinitions.xsd">
+    <None Include="Schemas\OFX\OFX_TypeDefinitions.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_WireTransfer.xsd">
+    <None Include="Schemas\OFX\OFX_WireTransfer.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_WireTransfer_Messages.xsd">
+    <None Include="Schemas\OFX\OFX_WireTransfer_Messages.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="OFX Schemas\OFX_WireTransfer_Message_Wrappers.xsd">
+    <None Include="Schemas\OFX\OFX_WireTransfer_Message_Wrappers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ofx_institutions.xml" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="Schemas\OFXHome\ofxhome.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

@@ -7,13 +7,19 @@ namespace OFX.Types
     /// </summary>
     public class FinancialInstitution
     {
-        public FinancialInstitution(Uri serviceEndpoint, string organizationId, string financialUnitId, bool supportsOnlineRetrieval = true)
+        public FinancialInstitution(string name, Uri serviceEndpoint, string organizationId, string financialUnitId, bool supportsOnlineRetrieval = true)
         {
+            Name = name;
             ServiceEndpoint = serviceEndpoint;
             OrganizationId = organizationId;
             FinancialId = financialUnitId;
             SupportsOnlineRetrieval = supportsOnlineRetrieval;
         }
+
+        /// <summary>
+        /// Human readable name of the financial institution. Used for displaying and prompting users.
+        /// </summary>
+        public string Name { get; }
 
         /// <summary>
         /// URI of the remote OFX service endpoint. This is just the base enddpoint.

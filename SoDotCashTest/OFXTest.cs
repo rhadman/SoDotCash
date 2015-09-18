@@ -19,7 +19,7 @@ namespace SoDotCashTest
     public class OFXTest
     {
         private static readonly Credentials UserCredentials = new Credentials("myuser", "mypass");
-        private static readonly FinancialInstitution ChaseBankFi = new FinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898"); 
+        private static readonly FinancialInstitution ChaseBankFi = new FinancialInstitution("Chase Bank", new Uri("https://ofx.chase.com"), "B1", "10898"); 
         private static readonly OFX2Service ChaseBankService = new OFX2Service(ChaseBankFi, UserCredentials);
 
 
@@ -28,6 +28,8 @@ namespace SoDotCashTest
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
         }
         private TestContext testContextInstance;
+
+
 
         protected void DumpStatement(IEnumerable<OFX.Types.Statement> statements)
         {
@@ -40,6 +42,35 @@ namespace SoDotCashTest
                 }
             }
         }
+
+        /// <summary>
+        /// Test the ability to list financial institutions from the embedded data file
+        /// </summary>
+        [TestMethod]
+        public void TestListFinancialInstitutions()
+        {
+            // Retrieve financial institutions
+            var financialInstitutions = OFX2Service.ListFinancialInstitutions();
+
+            // Must not be null
+            Assert.IsNotNull(financialInstitutions);
+
+            // Must have at least 1 entry
+            Assert.IsTrue(financialInstitutions.Count >0);
+
+            // All entries must have a name URL, FI and ORG specified
+            foreach (var fi in financialInstitutions)
+            {
+                Assert.IsNotNull(fi.Name);
+                Assert.IsNotNull(fi.ServiceEndpoint);
+                Assert.IsNotNull(fi.FinancialId);
+                Assert.IsNotNull(fi.OrganizationId);
+            }
+
+            // Log number of entries to assist with manual diagnostics
+            Trace.WriteLine("There are " + financialInstitutions.Count + " institutions in the embedded FI list.");
+        }
+
 
         /// <summary>
         /// </summary>
