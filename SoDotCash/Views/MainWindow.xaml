@@ -5,14 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="SoDotCash.Views.MainWindow"
         mc:Ignorable="d"
-        Title="So.Cash" Height="350"
-        DataContext="{Binding Main, Source={StaticResource Locator}}" Width="821.774"
+        Title="So.Cash" Height="350" Width="800"
+        DataContext="{Binding Main, Source={StaticResource Locator}}" 
         >
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="5*"/>
+            <RowDefinition Height="1.5*" />
         </Grid.RowDefinitions>
 
         <TextBox VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding TestString}" />
@@ -25,11 +26,9 @@
 
 
             <TreeView Margin="10" ItemsSource="{Binding AccountsView}">
-                
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Value }">
                         <TextBlock Text="{Binding Key}" />
-                        
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Description}"></TextBlock>
@@ -37,12 +36,17 @@
                         </HierarchicalDataTemplate.ItemTemplate>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
-                
-                
             </TreeView>
             
-            <ListView Grid.Column="1" Margin="10"/>
+            <ListView Grid.Column="1" Margin="10" ItemsSource="{Binding Statements}" DisplayMemberPath="AccountBalance"/>
             
         </Grid>
+        <UniformGrid Grid.Row="2" Columns="5">
+            <TextBlock/>
+            <TextBlock/>
+            <TextBlock/>
+            <TextBlock/>
+            <Button Margin="10" Content="LoadTransactions" Command="{Binding LoadTransactionsRelay}" />
+        </UniformGrid>
     </Grid>
 </Window>
