@@ -230,11 +230,12 @@ namespace SoDotCash.ViewModels
             foreach (
                 var statement in
                     _statementCollection.Where(
-                        statement => statement.OwningAccount.AccountId == SelectedAccount.AccountId))
+                        statement => statement.OwningAccount.AccountId == SelectedAccount.AccountId)
+                        )
             {
                 Statements.Add(statement);
             }
-
+            
         }
 
         #endregion

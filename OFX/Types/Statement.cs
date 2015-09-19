@@ -31,7 +31,10 @@ namespace OFX.Types
             AccountBalance = OFXUtils.DecimalStringToFixedInt(statementResponse.LEDGERBAL.BALAMT);
 
             // Convert OFX transactions into our normalized Transaction objects
-            Transactions = new List<Transaction>(from ofxTransaction in statementResponse.BANKTRANLIST.STMTTRN select new Transaction(ofxTransaction));
+            var unorderedTransactions = from ofxTransaction in statementResponse.BANKTRANLIST.STMTTRN
+                                        select new Transaction(ofxTransaction);
+
+            Transactions = new List<Transaction>(unorderedTransactions.OrderByDescending(trans => trans.PostDate));
         }
 
         /// <summary>
@@ -54,7 +57,10 @@ namespace OFX.Types
             AccountBalance = OFXUtils.DecimalStringToFixedInt(statementResponse.LEDGERBAL.BALAMT);
 
             // Convert OFX transactions into our normalized Transaction objects
-            Transactions = new List<Transaction>(from ofxTransaction in statementResponse.BANKTRANLIST.STMTTRN select new Transaction(ofxTransaction));
+            var unorderedTransactions = from ofxTransaction in statementResponse.BANKTRANLIST.STMTTRN
+                select new Transaction(ofxTransaction);
+            
+            Transactions = new List<Transaction>(unorderedTransactions.OrderByDescending(trans => trans.PostDate));
         }
 
         /// <summary>

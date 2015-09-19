@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="SoDotCash.Views.MainWindow"
         mc:Ignorable="d"
-        Title="So.Cash" Height="350" Width="800"
+        Title="So.Cash" Height="350" Width="950"
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
         >
 
@@ -50,7 +50,7 @@
             <ListView Grid.Column="1" Margin="10" ItemsSource="{Binding Statements[0].Transactions}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Date" DisplayMemberBinding="{Binding PostDate, StringFormat={}{0:dd/MMM/yyy-hh:mm:ss tt}}" />
+                        <GridViewColumn Header="Date" DisplayMemberBinding="{Binding PostDate, StringFormat={}{0:dd/MMM/yyyy-hh:mm:ss tt}}" />
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
                         <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding LocalizedAmount, StringFormat={}{0:C2}}" >
                             <GridViewColumn.CellTemplate>
@@ -78,7 +78,7 @@
             <TextBlock/>
             <TextBlock/>
             <TextBlock/>
-            <Button Margin="10" Content="LoadTransactions" 
+            <Button Margin="10" Content="Load Transactions" 
                     Command="{Binding LoadTransactionsRelay}" 
                     IsEnabled="{Binding RetrievingTransactions, Converter={StaticResource BoolToInverseBoolConverter}}" />
         </UniformGrid>
