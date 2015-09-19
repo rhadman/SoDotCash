@@ -48,7 +48,7 @@ namespace OFX.Internal
         /// Convert a decimal number (such as 10.55) string to an integer without the decimal point (1055)
         /// </summary>
         /// <param name="ofxValue">Decimal number in string format</param>
-        public static int decimalStringToFixedInt(string ofxValue)
+        public static int DecimalStringToFixedInt(string ofxValue)
         {
             // Remove decimal points and convert to a number
             return Int32.Parse(ofxValue.Replace(".", ""));

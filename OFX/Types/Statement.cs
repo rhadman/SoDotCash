@@ -28,7 +28,7 @@ namespace OFX.Types
             EndDate = OFXUtils.DateFromOFX(statementResponse.BANKTRANLIST.DTEND);
 
             // Parse account balance
-            AccountBalance = OFXUtils.decimalStringToFixedInt(statementResponse.LEDGERBAL.BALAMT);
+            AccountBalance = OFXUtils.DecimalStringToFixedInt(statementResponse.LEDGERBAL.BALAMT);
 
             // Convert OFX transactions into our normalized Transaction objects
             Transactions = new List<Transaction>(from ofxTransaction in statementResponse.BANKTRANLIST.STMTTRN select new Transaction(ofxTransaction));
@@ -51,7 +51,7 @@ namespace OFX.Types
             EndDate = OFXUtils.DateFromOFX(statementResponse.BANKTRANLIST.DTEND);
 
             // Parse account balance
-            AccountBalance = OFXUtils.decimalStringToFixedInt(statementResponse.LEDGERBAL.BALAMT);
+            AccountBalance = OFXUtils.DecimalStringToFixedInt(statementResponse.LEDGERBAL.BALAMT);
 
             // Convert OFX transactions into our normalized Transaction objects
             Transactions = new List<Transaction>(from ofxTransaction in statementResponse.BANKTRANLIST.STMTTRN select new Transaction(ofxTransaction));
@@ -132,5 +132,7 @@ namespace OFX.Types
         /// The account balance reported in this statement request. In the currency units of the account.
         /// </summary>
         public int AccountBalance { get; }
+
+        public decimal LocalizedAccountBalance => AccountBalance/100m;
     }
 }

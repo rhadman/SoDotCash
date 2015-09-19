@@ -6,25 +6,21 @@
     /// </summary>
     public class CreditCardAccount : Account
     {
-        public CreditCardAccount(string accountId, string description, bool active) : base(description, active)
+        public CreditCardAccount(string accountId, string description, bool active)
+            : base(description, active, accountId)
         {
-            AccountId = accountId;
+            //AccountId = accountId;
         }
 
         public CreditCardAccount(Protocol.CreditCardAccount ofxAccount) :
-            base("", true)
+            base("", true, ofxAccount.ACCTID)
         {
-            AccountId = ofxAccount.ACCTID;
+            //AccountId = ofxAccount.ACCTID;
         }
 
         public override string ToString()
         {
             return "Credit Card (" + AccountId + ")";
         }
-
-        /// <summary>
-        /// Account number of this credit card account
-        /// </summary>
-        public string AccountId { get; }
     }
 }

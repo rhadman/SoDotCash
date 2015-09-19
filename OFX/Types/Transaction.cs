@@ -30,7 +30,7 @@ namespace OFX.Types
             // Assign to internal state
             PostDate = OFXUtils.DateFromOFX(ofxTransaction.DTPOSTED);
             TransactionId = ofxTransaction.FITID;
-            Amount = OFXUtils.decimalStringToFixedInt(ofxTransaction.TRNAMT);
+            Amount = OFXUtils.DecimalStringToFixedInt(ofxTransaction.TRNAMT);
             Name = (string) ofxTransaction.Item;
         }
 
@@ -53,6 +53,8 @@ namespace OFX.Types
         /// Amount of the transaction in integral units of the currency (cents for USD)
         /// </summary>
         public int Amount { get; }
+
+        public decimal LocalizedAmount => Amount/100m;
 
         /// <summary>
         /// Name associated with this transaction

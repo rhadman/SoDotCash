@@ -10,7 +10,6 @@ using GalaSoft.MvvmLight.Command;
 using OFX;
 using OFX.Protocol;
 using OFX.Types;
-using FinancialInstitution = OFX.Protocol.FinancialInstitution;
 
 //using SoDotCash.Models;
 
@@ -40,81 +39,63 @@ namespace SoDotCash.ViewModels
             get { return _testString; }
             set
             {
-                _testString = value; 
+                _testString = value;
                 RaisePropertyChanged();
             }
         }
 
-        public RelayCommand LoadTransactionsRelay { get; set; }
+        public RelayCommand<int> LoadTransactionsRelay { get; set; }
+        public RelayCommand<OFX.Types.Account> SelectedAccountChangedCommand { get; set; }
+
 
         //public ObservableCollection<UserAccount> UserAccounts { get; set; } = new ObservableCollection<UserAccount>();
-        public Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>> AccountsView { get; set; } = new Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>>();
-        public ObservableCollection<OFX.Types.Account> DumbAccounts { get; set; } = new ObservableCollection<OFX.Types.Account>();
+        public Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>> AccountsView { get; set; } =
+            new Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>>();
+
+        public ObservableCollection<OFX.Types.Account> DumbAccounts { get; set; } =
+            new ObservableCollection<OFX.Types.Account>();
+
         public ObservableCollection<Statement> Statements { get; set; }
+
+        public OFX.Types.Account SelectedAccount
+        {
+            get { return _selectedAccount; }
+            set
+            {
+                _selectedAccount = value;
+                SelectedAccountChanged();
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool RetrievingTransactions
+        {
+            get { return _retrievingTransactions; }
+            set
+            {
+                _retrievingTransactions = value;
+                RaisePropertyChanged();
+            }
+        }
+
         #endregion
 
         #region [ Private Backing Fields ]
 
         private string _testString;
-
-        
+        private bool _retrievingTransactions;
+        private OFX.Types.Account _selectedAccount;
 
         #endregion
 
+        #region [ Private fields ]
+
+        private IEnumerable<Statement> _statementCollection = new Collection<Statement>();
+
+        #endregion
 
         #region [ Constructors ]
 
-
-
-        //protected async void LoadAccounts(string username, string password)
-        //{
-        //    var chaseBankFi = new OFX.FinancialInstitution(new Uri("https://ofx.chase.com"), "B1", "10898");
-        //    var userCredentials = new OFX.Credentials(username, password);
-        //    var ofxService = new OFX.OFX2Service(chaseBankFi, userCredentials);
-
-        //    DateTimeOffset endTime = DateTimeOffset.Now;
-        //    DateTimeOffset startTime = endTime - new TimeSpan(1, 0, 0, 0);
-        //    foreach (var account in await ofxService.ListAccounts())
-        //    {
-        //        Models.Account viewAccount;
-        //        if (account is OFX.Types.CheckingAccount)
-        //        {
-        //            viewAccount = new Models.Account
-        //            {
-        //                Name = ((OFX.Types.CheckingAccount)account).AccountId,
-        //                AccountType = EAccountType.Checking
-        //            };
-        //        }
-        //        else if (account is OFX.Types.SavingsAccount)
-        //        {
-        //            viewAccount = new Models.Account
-        //            {
-        //                Name = ((OFX.Types.SavingsAccount)account).AccountId,
-        //                AccountType = EAccountType.Savings
-        //            };
-        //        }
-        //        else //(account is OFX.Types.CreditCardAccount)
-        //        {
-        //            viewAccount = new Models.Account
-        //            {
-        //                Name = ((OFX.Types.CreditCardAccount)account).AccountId,
-        //                AccountType = EAccountType.CreditCard
-        //            };
-        //        }
-
-        //        //AccountViewItems[viewAccount.AccountType].Accounts.Add(viewAccount);
-
-        //        /*
-        //        var statements = await ofxService.GetStatement(account, startTime, endTime);
-        //        if (statements != null)
-        //        {
-        //            foreach (var statement in statements)
-        //            {
-        //            }
-        //        }
-        //        */
-        //    }
-        //}
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -122,9 +103,30 @@ namespace SoDotCash.ViewModels
         public MainViewModel()
         {
             Statements = new ObservableCollection<Statement>();
-            LoadTransactionsRelay = new RelayCommand(LoadTransactionsCommand);
+            LoadTransactionsRelay = new RelayCommand<int>(LoadTransactionsCommand);
 
-            #region [ Database Init]
+            InitDB();
+
+            TestString = IsInDesignMode
+                ? "This is a string that is shown when designing"
+                : "This is a string that is shown at runtime";
+
+            //AccountsView.Add(AccountEnum.CHECKING,
+            //    new ObservableCollection<OFX.Types.Account>
+            //    {
+            //        new OFX.Types.Account("test", true) {AccountType = AccountEnum.CHECKING}
+            //    });
+
+            //DumbAccounts.Add(new OFX.Types.Account("test", true) { AccountType = AccountEnum.CHECKING });
+        }
+
+        #endregion
+
+        #region [ Database Init ]
+
+        private void InitDB()
+        {
+
 
             AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
 
@@ -149,49 +151,90 @@ namespace SoDotCash.ViewModels
                 */
                 db.SaveChanges();
             }
+        }
 
         #endregion
 
-            TestString = IsInDesignMode
-                ? "This is a string that is shown when designing"
-                : "This is a string that is shown at runtime";
-            
-            AccountsView.Add(AccountEnum.CHECKING,
-                new ObservableCollection<OFX.Types.Account>
-                {
-                                new OFX.Types.Account("test", true) {AccountType = AccountEnum.CHECKING}
-                            
-                    
-                });
+        #region [ Relay Commands ]
 
-            
-            DumbAccounts.Add(new OFX.Types.Account("test", true) { AccountType = AccountEnum.CHECKING });
-        }
-
-        private async void LoadTransactionsCommand()
+        private async void LoadTransactionsCommand(int counter = 0)
         {
-            var fi = new OFX.Types.FinancialInstitution("State Employees Credit Union", new Uri("https://onlineaccess.ncsecu.org/secuofx/secu.ofx"),
+            RetrievingTransactions = true;
+            
+            var fi = new OFX.Types.FinancialInstitution("State Employees Credit Union",
+                new Uri("https://onlineaccess.ncsecu.org/secuofx/secu.ofx"),
                 "SECU", "1001");
-            var creds = new Credentials("UserName", "Password");
+            var creds = new Credentials("username", "password");
             var service = new OFX2Service(fi, creds);
             try
             {
                 var acts = await service.ListAccounts();
                 var endTime = DateTimeOffset.Now;
-                var startTime = endTime - new TimeSpan(1, 0, 0, 0);
+                var startTime = endTime - new TimeSpan(30, 0, 0, 0);
 
-                var statements = await service.GetStatement(acts.First(), startTime, endTime);
 
-                Statements = new ObservableCollection<Statement>(statements);
+                //TODO: IMPLEMENT ITERATING OVER ACCOUNTS AND HANDLE EXCEPTIONS MORE GRACIOUSLY
+                //var stmts = new List<OFX.Types.Statement>();
+
+                //foreach (var account in acts)
+                //{
+                //    stmts.AddRange(await service.GetStatement(account, startTime, endTime));
+                //}
+
+                //_statementCollection = stmts;
+
+                _statementCollection = await service.GetStatement(acts.First(), startTime, endTime);
+
+                //Statements = new ObservableCollection<Statement>(statements);
+                RaisePropertyChanged("Statements");
+
+                var accountList = acts.GroupBy(act => act.AccountType);
+
+                AccountsView = new Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>>();
+
+                foreach (var act in accountList)
+                {
+                    AccountsView.Add(act.Key, new ObservableCollection<OFX.Types.Account>(act.ToList()));
+                }
+                RaisePropertyChanged("AccountsView");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                
-                throw;
+                if (counter > 5)
+                {
+                    MessageBox.Show($"An Error Occured When Retrieved your account info.  Please Try Again\n{ex.Message}\n{ex.StackTrace}", "Error");
+                    return;
+                }
+                LoadTransactionsCommand(++counter);
             }
-            
 
-            
+
+            RetrievingTransactions = false;
+        }
+
+        public void SetSelectedItem(object account)
+        {
+            if ((account as OFX.Types.Account) == null)
+                return;
+
+            SelectedAccount = (OFX.Types.Account) account;
+        }
+
+        #endregion
+
+        #region [ Helper Commands ]
+
+        private void SelectedAccountChanged()
+        {
+            Statements.Clear();
+            foreach (
+                var statement in
+                    _statementCollection.Where(
+                        statement => statement.OwningAccount.AccountId == SelectedAccount.AccountId))
+            {
+                Statements.Add(statement);
+            }
+
         }
 
         #endregion

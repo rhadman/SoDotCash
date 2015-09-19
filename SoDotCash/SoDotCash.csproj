@@ -145,6 +145,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\BoolToInverseBoolConverter.cs" />
     <Compile Include="DatabaseClasses.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\FinancialInstitution.cs" />
@@ -217,7 +218,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Converters\" />
     <Folder Include="Services\" />
     <Folder Include="Views\Dialogs\" />
   </ItemGroup>

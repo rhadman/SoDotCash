@@ -9,10 +9,11 @@ namespace OFX.Types
     /// </summary>
     public class Account
     {
-        public Account(string description, bool active)
+        public Account(string description, bool active, string actId)
         {
             Description = description;
             Active = active;
+            AccountId = actId;
         }
 
         /// <summary>
@@ -49,5 +50,7 @@ namespace OFX.Types
         /// The type of account - Checking, Savings, Money Market etc
         /// </summary>
         public AccountEnum AccountType { get; set; }
+
+        public string AccountId { get; private set; }
     }
 }

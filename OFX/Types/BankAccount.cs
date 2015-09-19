@@ -8,10 +8,10 @@ namespace OFX.Types
     public class BankAccount : Account
     {
         public BankAccount(string routingId, string accountId, string description, bool active)
-            : base(description, active)
+            : base(description, active, accountId)
         {
             RoutingId = routingId;
-            AccountId = accountId;
+            //AccountId = accountId;
         }
 
         /// <summary>
@@ -30,22 +30,17 @@ namespace OFX.Types
         /// <summary>
         /// Internal constructor so derived classes can have alternate constructors
         /// </summary>
-        protected BankAccount(Protocol.BankAccount ofxAccount) : 
-            base("", true)
+        protected BankAccount(Protocol.BankAccount ofxAccount) :
+            base("", true, ofxAccount.ACCTID)
         {
             RoutingId = ofxAccount.BANKID;
-            AccountId = ofxAccount.ACCTID;
+            //AccountId = ofxAccount.ACCTID;
         }
 
         /// <summary>
         /// Routing ID associated with bank account
         /// </summary>
         public string RoutingId { get; }
-
-        /// <summary>
-        /// Account ID associated with bank account
-        /// </summary>
-        public string AccountId { get; }
     }
 
 }
