@@ -157,6 +157,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SoCash.xsd</DependentUpon>
     </Compile>
+    <Compile Include="Utility\BindableSelectedItemBehavior.cs" />
     <Compile Include="ViewModels\AccountsViewModel.cs" />
     <Compile Include="ViewModels\AddAccountViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
