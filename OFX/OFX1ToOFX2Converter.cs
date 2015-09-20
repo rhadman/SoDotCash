@@ -37,22 +37,51 @@ namespace OFX
                     continue;
                 }
 
-                // Echo file lines
-                int endTagIndex = line.IndexOf(">");
-
-                // If there is no content after the start tag, echo the start tag out
-                if (endTagIndex == (line.Length - 1))
+                // Process tags in line
+                while (line.Length > 0)
                 {
-                    outWriter.WriteLine(line);
-                    continue;
+                    // Find first end tag
+                    int endTagIndex = line.IndexOf(">");
+
+                    // See if this line has multiple values
+                    int nextLineIndex = line.IndexOf("<", endTagIndex);
+
+                    
+                    string workingLine = line;
+                    if (nextLineIndex > -1)
+                    {
+                        workingLine = line.Substring(0, nextLineIndex);
+                        line = line.Substring(nextLineIndex);
+                    }
+                    else
+                    {
+                        // Done
+                        line = "";
+                    }
+
+
+                    // If there is no content after the start tag, echo the start tag out
+                    if (endTagIndex == (workingLine.Length - 1))
+                    {
+                        outWriter.WriteLine(workingLine);
+                        continue;
+                    }
+
+                    // Grab start tag
+                    string startTag = workingLine.Substring(1, endTagIndex - 1);
+
+                    // Skip intuit-specific tags
+                    if (startTag.StartsWith("INTU."))
+                        continue;
+
+                    // Sometimes language comes through in lower case - correct
+                    if (startTag == "LANGUAGE")
+                        workingLine = workingLine.ToUpper();
+
+                    // Single value - write line followed by closing tag
+                    outWriter.Write(workingLine);
+                    outWriter.WriteLine("</" + startTag + ">");
                 }
-
-                // Grab start tag
-                string startTag = line.Substring(1, endTagIndex-1);
-
-                // Write line followed by closing tag
-                outWriter.Write(line);
-                outWriter.WriteLine("</" + startTag + ">");
             }
 
             // Flush writer
