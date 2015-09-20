@@ -26,6 +26,11 @@
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:TypeExtension TreeViewItem}">
                         <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                        </Style.Triggers>
                     </Style>
                 </TreeView.ItemContainerStyle>
                 <TreeView.ItemTemplate>
