@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SoDotCash.Views.Dialogs"
+             xmlns:utility="clr-namespace:SoDotCash.Utility"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
@@ -18,6 +20,14 @@
             <Label Content="Accounts" HorizontalAlignment="Center" Margin="11,0,119,0" />
 
             <TreeView Grid.Row="1" Margin="10" ItemsSource="{Binding AccountsView}">
+                <i:Interaction.Behaviors>
+                    <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
+                </i:Interaction.Behaviors>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:TypeExtension TreeViewItem}">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Path=Value}">
                         <TextBlock Text="{Binding Path=Key}" />
@@ -31,12 +41,12 @@
             </TreeView>
 
         </Grid>
-        <ListView Margin="206,42,10,21" ItemsSource="{Binding Statements[0].Transactions}">
+        <ListView Margin="206,42,10,21" ItemsSource="{Binding Transactions}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Date" DisplayMemberBinding="{Binding PostDate, StringFormat=\{0:dd/MMM/yyyy-hh:mm:ss tt\}}" />
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding LocalizedAmount, StringFormat=\{0:C2\}}" >
+                    <GridViewColumn Header="Date" DisplayMemberBinding="{Binding date, StringFormat=\{0:dd/MMM/yyyy-hh:mm:ss tt\}}" />
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding description}" />
+                    <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding localizedAmount, StringFormat=\{0:C2\}}" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding}">
@@ -47,10 +57,11 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding TransactionId}" />
+                    <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding fiTransactionId}" />
                 </GridView>
             </ListView.View>
         </ListView>
         <Button x:Name="addAccount" Content="Add Account" HorizontalAlignment="Left" Margin="113,10,0,0" VerticalAlignment="Top" Width="75" Command="{Binding AddAccountCommand}"/>
+        <Button x:Name="button_importTransactions" Content="Import Transactions" HorizontalAlignment="Left" Margin="206,10,0,0" VerticalAlignment="Top" Width="149" Command="{Binding ImportTransactionsCommand}"/>
     </Grid>
 </UserControl>
