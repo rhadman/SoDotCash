@@ -13,7 +13,7 @@ namespace SoDotCash.Models
         [Key]
         public int accountID { get; set; }
 
-        public int fiUserId { get; set; }
+        public int? fiUserId { get; set; }
 
         [StringLength(50)]
         public string accountName { get; set; }
