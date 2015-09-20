@@ -191,6 +191,8 @@ namespace SoDotCash.ViewModels
                 }
             }
 
+            // Update transactions
+            RaisePropertyChanged("Transactions");
         }
 
     }
