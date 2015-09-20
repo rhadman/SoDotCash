@@ -34,6 +34,14 @@ namespace SoDotCash.Models
         [InverseProperty("transactions")]
         [ForeignKey("accountId")]
         public virtual Account account { get; set; }
+
+
+
+        /// <summary>
+        /// Proxy property which converts the amount in dollars into cents
+        /// TODO: Handle different currency types
+        /// </summary>
+        public decimal localizedAmount => amount / 100m;
     }
 
 }

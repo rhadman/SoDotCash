@@ -54,8 +54,6 @@ namespace OFX.Types
         /// </summary>
         public int Amount { get; }
 
-        public decimal LocalizedAmount => Amount/100m;
-
         /// <summary>
         /// Name associated with this transaction
         /// </summary>
