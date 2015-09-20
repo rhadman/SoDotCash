@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="SoDotCash.Views.Dialogs.AccountsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SoDotCash.Views.Dialogs"
+             xmlns:utility="clr-namespace:SoDotCash.Utility"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             mc:Ignorable="d"
+             Height="350" Width="950"
+             DataContext="{Binding Accounts, Source={StaticResource Locator}}"
+             >
+    <Grid>
+        <Grid Grid.Column="0" Margin="10,7,752,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Label Content="Accounts" HorizontalAlignment="Center" Margin="11,0,119,0" />
+
+            <TreeView Grid.Row="1" Margin="10" ItemsSource="{Binding AccountsView}">
+                <i:Interaction.Behaviors>
+                    <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
+                </i:Interaction.Behaviors>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:TypeExtension TreeViewItem}">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Value}">
+                        <TextBlock Text="{Binding Path=Key}" />
+                        <HierarchicalDataTemplate.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=accountName}"/>
+                            </DataTemplate>
+                        </HierarchicalDataTemplate.ItemTemplate>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+
+        </Grid>
+        <ListView Margin="206,42,10,21" ItemsSource="{Binding Transactions}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Date" DisplayMemberBinding="{Binding date, StringFormat=\{0:dd/MMM/yyyy-hh:mm:ss tt\}}" />
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding description}" />
+                    <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding localizedAmount, StringFormat=\{0:C2\}}" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}"/>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding fiTransactionId}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button x:Name="addAccount" Content="Add Account" HorizontalAlignment="Left" Margin="113,10,0,0" VerticalAlignment="Top" Width="75" Command="{Binding AddAccountCommand}"/>
+        <Button x:Name="button_importTransactions" Content="Import Transactions" HorizontalAlignment="Left" Margin="206,10,0,0" VerticalAlignment="Top" Width="149" Command="{Binding ImportTransactionsCommand}"/>
+    </Grid>
+</UserControl>

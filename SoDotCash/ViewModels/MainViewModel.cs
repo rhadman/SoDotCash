@@ -1,4 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data.Entity;
+using System.IO;
+using System.Linq;
+using System.Windows;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using OFX;
+using OFX.Protocol;
+using OFX.Types;
+
+//using SoDotCash.Models;
+
+//using SoDotCash.Models;
 
 namespace SoDotCash.ViewModels
 {
@@ -16,14 +31,49 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
+
         #region [ Public Bound Properties ]
 
-        public string TestString
+        /// <summary>
+        /// Relative path and name of the xaml of the active view within the window
+        /// </summary>
+        private string _ActiveViewSource;
+        public string ActiveViewSource
         {
-            get { return _testString; }
+            get { return _ActiveViewSource; }
             set
             {
-                _testString = value; 
+                _ActiveViewSource = value;
+                RaisePropertyChanged("ActiveViewSource");
+            }
+        }
+
+
+        public RelayCommand<int> LoadTransactionsRelay { get; set; }
+        public RelayCommand<OFX.Types.Account> SelectedAccountChangedCommand { get; set; }
+
+
+
+
+        public ObservableCollection<Statement> Statements { get; set; }
+
+        public OFX.Types.Account SelectedAccount
+        {
+            get { return _selectedAccount; }
+            set
+            {
+                _selectedAccount = value;
+                SelectedAccountChanged();
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool RetrievingTransactions
+        {
+            get { return _retrievingTransactions; }
+            set
+            {
+                _retrievingTransactions = value;
                 RaisePropertyChanged();
             }
         }
@@ -33,17 +83,152 @@ namespace SoDotCash.ViewModels
         #region [ Private Backing Fields ]
 
         private string _testString;
+        private bool _retrievingTransactions;
+        private OFX.Types.Account _selectedAccount;
+
+        #endregion
+
+        #region [ Private fields ]
+
+        private IEnumerable<Statement> _statementCollection = new Collection<Statement>();
 
         #endregion
 
         #region [ Constructors ]
+
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
         public MainViewModel()
         {
-            TestString = IsInDesignMode ? "This is a string that is shown when designing" : "This is a string that is shown at runtime";
+            ActiveViewSource = "Accountsview.xaml";
+
+            Statements = new ObservableCollection<Statement>();
+            //LoadTransactionsRelay = new RelayCommand<int>(LoadTransactionsCommand);
+
+            InitDB();
+
+        }
+
+        #endregion
+
+        #region [ Database Init ]
+
+        private void InitDB()
+        {
+
+
+            AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
+
+            //Database.SetInitializer(new DropCreateDatabaseAlways<SoCashDbContext>());
+
+            // TODO: FIXME: For now we drop and recreate the database if the model changes. This is fine for development, but not
+            //   for production
+            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<Models.SoCashDbContext>());
+
+            using (var db = new Models.SoCashDbContext())
+            {
+                /*
+                var fi = new FinancialInstitution()
+                {
+                    //fiID = 1,
+                    name = "Chase",
+                    ofxUpdateUrl = "https://ofx.chase.com",
+                    ofxOrganizationId = "B1",
+                    ofxFinancialUnitId = "10898"
+                };
+                db.FinancialInstitutions.Add(fi);
+                */
+                db.SaveChanges();
+            }
+        }
+
+        #endregion
+
+        #region [ Relay Commands ]
+
+        /*
+        private async void LoadTransactionsCommand(int counter = 0)
+        {
+            RetrievingTransactions = true;
+            
+            var fi = new OFX.Types.FinancialInstitution("State Employees Credit Union",
+                new Uri("https://onlineaccess.ncsecu.org/secuofx/secu.ofx"),
+                "SECU", "1001");
+            var creds = new Credentials("username", "password");
+            var service = new OFX2Service(fi, creds);
+            try
+            {
+                var acts = await service.ListAccounts();
+                var endTime = DateTimeOffset.Now;
+                var startTime = endTime - new TimeSpan(30, 0, 0, 0);
+
+
+                //TODO: IMPLEMENT ITERATING OVER ACCOUNTS AND HANDLE EXCEPTIONS MORE GRACIOUSLY
+                //var stmts = new List<OFX.Types.Statement>();
+
+                //foreach (var account in acts)
+                //{
+                //    stmts.AddRange(await service.GetStatement(account, startTime, endTime));
+                //}
+
+                //_statementCollection = stmts;
+
+                _statementCollection = await service.GetStatement(acts.First(), startTime, endTime);
+
+                //Statements = new ObservableCollection<Statement>(statements);
+                RaisePropertyChanged("Statements");
+
+                var accountList = acts.GroupBy(act => act.AccountType);
+
+                AccountsView = new Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>>();
+
+                foreach (var act in accountList)
+                {
+                    AccountsView.Add(act.Key, new ObservableCollection<OFX.Types.Account>(act.ToList()));
+                }
+                RaisePropertyChanged("AccountsView");
+            }
+            catch (Exception ex)
+            {
+                if (counter > 5)
+                {
+                    MessageBox.Show($"An Error Occured When Retrieved your account info.  Please Try Again\n{ex.Message}\n{ex.StackTrace}", "Error");
+                    return;
+                }
+                LoadTransactionsCommand(++counter);
+            }
+
+
+            RetrievingTransactions = false;
+        }
+        */
+
+        public void SetSelectedItem(object account)
+        {
+            if ((account as OFX.Types.Account) == null)
+                return;
+
+            SelectedAccount = (OFX.Types.Account) account;
+        }
+
+        #endregion
+
+        #region [ Helper Commands ]
+
+        private void SelectedAccountChanged()
+        {
+            Statements.Clear();
+            foreach (
+                var statement in
+                    _statementCollection.Where(
+                        statement => statement.OwningAccount.AccountId == SelectedAccount.AccountId)
+                        )
+            {
+                Statements.Add(statement);
+            }
+            
         }
 
         #endregion
