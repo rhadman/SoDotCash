@@ -63,7 +63,21 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound current account
         /// </summary>
-        public Models.Account SelectedAccount { get; set; }
+        protected Models.Account _selectedAccount;
+
+        public Models.Account SelectedAccount
+        {
+            get { return _selectedAccount; }
+            set
+            {
+                // Assign
+                _selectedAccount = value;
+
+                // Update transactions
+                RaisePropertyChanged("Transactions");
+
+            }
+        }
 
         /// <summary>
         /// Provides the collection of transactions for the currently selected account
