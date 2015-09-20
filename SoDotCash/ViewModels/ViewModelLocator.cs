@@ -43,9 +43,24 @@ namespace SoDotCash.ViewModels
             ////}
 
             SimpleIoc.Default.Register<MainViewModel>();
+            SimpleIoc.Default.Register<AccountsViewModel>();
+            SimpleIoc.Default.Register<AddAccountViewModel>();
         }
 
+        /// <summary>
+        /// The single main view model - backing the single MainWindow
+        /// </summary>
         public MainViewModel Main => ServiceLocator.Current.GetInstance<MainViewModel>();
+
+        /// <summary>
+        /// The single accounts view model - backing the single AccountsView
+        /// </summary>
+        public AccountsViewModel Accounts => ServiceLocator.Current.GetInstance<AccountsViewModel>();
+
+        /// <summary>
+        /// The single add account view model - backing the single AddAccountView
+        /// </summary>
+        public AddAccountViewModel AddAccount => ServiceLocator.Current.GetInstance<AddAccountViewModel>();
 
         public static void Cleanup()
         {
