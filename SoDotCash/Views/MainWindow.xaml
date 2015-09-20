@@ -5,82 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="SoDotCash.Views.MainWindow"
         mc:Ignorable="d"
-        Title="So.Cash" Height="350" Width="950"
+        Title="So.Cash" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
         >
+    <Window.Resources>
+        <XmlDataProvider x:Key="views">
+            <x:XData>
+                <Views xmlns="">
+                    <View Title="Accounts">
+                        <Page Source="Dialogs\AccountsView.xaml"/>
+                    </View>
+                </Views>
+            </x:XData>
+        </XmlDataProvider>
 
+        <Storyboard x:Key="slideLeftToRight"  
+                    TargetProperty="RenderTransform.(TranslateTransform.X)"
+                    AccelerationRatio=".4"
+                    DecelerationRatio=".4">
+            <DoubleAnimation Storyboard.TargetName="viewer" Duration="0:0:0.6" From="950" To="0"/>
+        </Storyboard>
+
+        <Storyboard x:Key="slideRightToLeft" 
+                    TargetProperty="RenderTransform.(TranslateTransform.X)"
+                    AccelerationRatio=".4"
+                    DecelerationRatio=".4">
+            <DoubleAnimation Storyboard.TargetName="viewer" Duration="0:0:0.6" From="-950" To="0"/>
+        </Storyboard>
+
+        <VisualBrush x:Key="VisualBrush1" Visual="{Binding ElementName=frame}"/>
+
+    </Window.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="1.5*" />
-        </Grid.RowDefinitions>
-
-        <Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="{Binding TestString}" />
-
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="4*" />
-            </Grid.ColumnDefinitions>
-
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-
-                <Label Content="Accounts" HorizontalAlignment="Center" />
-
-                <TreeView Grid.Row="1" Margin="10" ItemsSource="{Binding AccountsView}" SelectedItemChanged="TreeView_OnSelectedItemChanged">
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Value }">
-                            <TextBlock Text="{Binding Key}" />
-                            <HierarchicalDataTemplate.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding AccountId}"></TextBlock>
-                                </DataTemplate>
-                            </HierarchicalDataTemplate.ItemTemplate>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
-
-            </Grid>
-
-            <ListView Grid.Column="1" Margin="10" ItemsSource="{Binding Statements[0].Transactions}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Date" DisplayMemberBinding="{Binding PostDate, StringFormat={}{0:dd/MMM/yyyy-hh:mm:ss tt}}" />
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
-                        <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding LocalizedAmount, StringFormat={}{0:C2}}" >
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Style.Triggers>
-                                                    <!--<DataTrigger Binding="{Binding Amount}"Value=""></DataTrigger>-->
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding TransactionId}" />
-                    </GridView>
-                </ListView.View>
-            </ListView>
-            
-        </Grid>
-        <UniformGrid Grid.Row="2" Columns="5">
-            <TextBlock/>
-            <TextBlock/>
-            <TextBlock/>
-            <TextBlock/>
-            <Button Margin="10" Content="Load Transactions" 
-                    Command="{Binding LoadTransactionsRelay}" 
-                    IsEnabled="{Binding RetrievingTransactions, Converter={StaticResource BoolToInverseBoolConverter}}" />
-        </UniformGrid>
+        <Frame x:Name="frame" Source="{Binding ActiveViewSource}"/>
     </Grid>
 </Window>

@@ -34,26 +34,26 @@ namespace SoDotCash.ViewModels
 
         #region [ Public Bound Properties ]
 
-        public string TestString
+        /// <summary>
+        /// Relative path and name of the xaml of the active view within the window
+        /// </summary>
+        private string _ActiveViewSource;
+        public string ActiveViewSource
         {
-            get { return _testString; }
+            get { return _ActiveViewSource; }
             set
             {
-                _testString = value;
-                RaisePropertyChanged();
+                _ActiveViewSource = value;
+                RaisePropertyChanged("ActiveViewSource");
             }
         }
+
 
         public RelayCommand<int> LoadTransactionsRelay { get; set; }
         public RelayCommand<OFX.Types.Account> SelectedAccountChangedCommand { get; set; }
 
 
-        //public ObservableCollection<UserAccount> UserAccounts { get; set; } = new ObservableCollection<UserAccount>();
-        public Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>> AccountsView { get; set; } =
-            new Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>>();
 
-        public ObservableCollection<OFX.Types.Account> DumbAccounts { get; set; } =
-            new ObservableCollection<OFX.Types.Account>();
 
         public ObservableCollection<Statement> Statements { get; set; }
 
@@ -102,22 +102,13 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public MainViewModel()
         {
+            ActiveViewSource = "Accountsview.xaml";
+
             Statements = new ObservableCollection<Statement>();
-            LoadTransactionsRelay = new RelayCommand<int>(LoadTransactionsCommand);
+            //LoadTransactionsRelay = new RelayCommand<int>(LoadTransactionsCommand);
 
             InitDB();
 
-            TestString = IsInDesignMode
-                ? "This is a string that is shown when designing"
-                : "This is a string that is shown at runtime";
-
-            //AccountsView.Add(AccountEnum.CHECKING,
-            //    new ObservableCollection<OFX.Types.Account>
-            //    {
-            //        new OFX.Types.Account("test", true) {AccountType = AccountEnum.CHECKING}
-            //    });
-
-            //DumbAccounts.Add(new OFX.Types.Account("test", true) { AccountType = AccountEnum.CHECKING });
         }
 
         #endregion
@@ -157,6 +148,7 @@ namespace SoDotCash.ViewModels
 
         #region [ Relay Commands ]
 
+        /*
         private async void LoadTransactionsCommand(int counter = 0)
         {
             RetrievingTransactions = true;
@@ -211,6 +203,7 @@ namespace SoDotCash.ViewModels
 
             RetrievingTransactions = false;
         }
+        */
 
         public void SetSelectedItem(object account)
         {
