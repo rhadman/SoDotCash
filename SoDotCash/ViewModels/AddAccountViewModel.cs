@@ -20,13 +20,6 @@ namespace SoDotCash.ViewModels
         public static readonly string ViewXaml = "AddAccountView.xaml";
 
         /// <summary>
-        /// Initializes a new instance of the AddAccountViewModel class.
-        /// </summary>
-        public AddAccountViewModel()
-        {
-        }
-
-        /// <summary>
         /// Retrieve all account types for populating a selection list
         /// </summary>
         public IEnumerable<AccountType> AllAccountTypes
@@ -61,7 +54,7 @@ namespace SoDotCash.ViewModels
         {
             // Transition to Accounts View
             var locator = new ViewModelLocator();
-            locator.Main.ActiveViewSource = AccountsViewModel.ViewXaml;
+            locator.Main.ActiveViewModel = locator.Accounts;
         }
 
         /// <summary>
@@ -79,11 +72,11 @@ namespace SoDotCash.ViewModels
         public void CreateAccount()
         {
             // Add the new account
-            using (var db = new Models.SoCashDbContext())
+            using (var db = new SoCashDbContext())
             {
                 var newAccount = new Account
                 {
-                    accountName = this.AccountName,
+                    accountName = AccountName,
                     accountID = 0,
                     accountType = SelectedAccountType,
                     currency = "USD"
@@ -94,7 +87,7 @@ namespace SoDotCash.ViewModels
 
             // Transition back to accounts view
             var locator = new ViewModelLocator();
-            locator.Main.ActiveViewSource = AccountsViewModel.ViewXaml;
+            locator.Main.ActiveViewModel = locator.Accounts;
         }
 
 

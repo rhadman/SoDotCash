@@ -12,19 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using SoDotCash.ViewModels;
 
 namespace SoDotCash.Views
 {
     /// <summary>
-    /// Interaction logic for AccountsView.xaml
+    /// Interaction logic for TransactionView.xaml
     /// </summary>
-    public partial class AccountsView : UserControl
+    public partial class TransactionView : UserControl
     {
-        public AccountsView()
+        public TransactionView()
         {
             InitializeComponent();
         }
-
     }
 }

@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="SoDotCash.Views.Dialogs.AccountsView"
+﻿<UserControl x:Class="SoDotCash.Views.AccountsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:SoDotCash.Views.Dialogs"
+             xmlns:local="clr-namespace:SoDotCash.Views"
              xmlns:utility="clr-namespace:SoDotCash.Utility"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d"
@@ -11,6 +11,9 @@
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
              >
     <Grid>
+        <Button x:Name="addAccount" Content="Add Account" HorizontalAlignment="Left" Margin="113,10,0,0" VerticalAlignment="Top" Width="75" Command="{Binding AddAccountCommand}"/>
+        <Button x:Name="button_importTransactions" Content="Import Transactions" HorizontalAlignment="Left" Margin="206,10,0,0" VerticalAlignment="Top" Width="149" Command="{Binding ImportTransactionsCommand}"/>
+
         <Grid Grid.Column="0" Margin="10,7,752,10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
@@ -46,27 +49,6 @@
             </TreeView>
 
         </Grid>
-        <ListView Margin="206,42,10,21" ItemsSource="{Binding Transactions}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Date" DisplayMemberBinding="{Binding date, StringFormat=\{0:dd/MMM/yyyy-hh:mm:ss tt\}}" />
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding description}" />
-                    <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding localizedAmount, StringFormat=\{0:C2\}}" >
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="{x:Type TextBlock}"/>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding fiTransactionId}" />
-                </GridView>
-            </ListView.View>
-        </ListView>
-        <Button x:Name="addAccount" Content="Add Account" HorizontalAlignment="Left" Margin="113,10,0,0" VerticalAlignment="Top" Width="75" Command="{Binding AddAccountCommand}"/>
-        <Button x:Name="button_importTransactions" Content="Import Transactions" HorizontalAlignment="Left" Margin="206,10,0,0" VerticalAlignment="Top" Width="149" Command="{Binding ImportTransactionsCommand}"/>
+        <ContentControl Margin="206,42,10,21" Width="740" Height="290" Content="{Binding ActiveViewModel}"/>
     </Grid>
 </UserControl>

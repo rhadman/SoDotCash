@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.IO;
-using System.Linq;
-using System.Windows;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using OFX;
-using OFX.Protocol;
 using OFX.Types;
 
 //using SoDotCash.Models;
@@ -35,45 +30,15 @@ namespace SoDotCash.ViewModels
         #region [ Public Bound Properties ]
 
         /// <summary>
-        /// Relative path and name of the xaml of the active view within the window
+        /// The ViewModel tied to the currently active view in the GUI
         /// </summary>
-        private string _ActiveViewSource;
-        public string ActiveViewSource
+        private ViewModelBase _activeViewModel;
+        public ViewModelBase ActiveViewModel
         {
-            get { return _ActiveViewSource; }
+            get { return _activeViewModel; }
             set
             {
-                _ActiveViewSource = value;
-                RaisePropertyChanged("ActiveViewSource");
-            }
-        }
-
-
-        public RelayCommand<int> LoadTransactionsRelay { get; set; }
-        public RelayCommand<OFX.Types.Account> SelectedAccountChangedCommand { get; set; }
-
-
-
-
-        public ObservableCollection<Statement> Statements { get; set; }
-
-        public OFX.Types.Account SelectedAccount
-        {
-            get { return _selectedAccount; }
-            set
-            {
-                _selectedAccount = value;
-                SelectedAccountChanged();
-                RaisePropertyChanged();
-            }
-        }
-
-        public bool RetrievingTransactions
-        {
-            get { return _retrievingTransactions; }
-            set
-            {
-                _retrievingTransactions = value;
+                _activeViewModel = value;
                 RaisePropertyChanged();
             }
         }
@@ -81,10 +46,6 @@ namespace SoDotCash.ViewModels
         #endregion
 
         #region [ Private Backing Fields ]
-
-        private string _testString;
-        private bool _retrievingTransactions;
-        private OFX.Types.Account _selectedAccount;
 
         #endregion
 
@@ -102,13 +63,10 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public MainViewModel()
         {
-            ActiveViewSource = "Accountsview.xaml";
-
-            Statements = new ObservableCollection<Statement>();
-            //LoadTransactionsRelay = new RelayCommand<int>(LoadTransactionsCommand);
+            var locator = new ViewModelLocator();
+            ActiveViewModel = locator.Accounts;
 
             InitDB();
-
         }
 
         #endregion
@@ -117,8 +75,6 @@ namespace SoDotCash.ViewModels
 
         private void InitDB()
         {
-
-
             AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
 
             //Database.SetInitializer(new DropCreateDatabaseAlways<SoCashDbContext>());
@@ -126,22 +82,6 @@ namespace SoDotCash.ViewModels
             // TODO: FIXME: For now we drop and recreate the database if the model changes. This is fine for development, but not
             //   for production
             Database.SetInitializer(new DropCreateDatabaseIfModelChanges<Models.SoCashDbContext>());
-
-            using (var db = new Models.SoCashDbContext())
-            {
-                /*
-                var fi = new FinancialInstitution()
-                {
-                    //fiID = 1,
-                    name = "Chase",
-                    ofxUpdateUrl = "https://ofx.chase.com",
-                    ofxOrganizationId = "B1",
-                    ofxFinancialUnitId = "10898"
-                };
-                db.FinancialInstitutions.Add(fi);
-                */
-                db.SaveChanges();
-            }
         }
 
         #endregion
@@ -205,32 +145,9 @@ namespace SoDotCash.ViewModels
         }
         */
 
-        public void SetSelectedItem(object account)
-        {
-            if ((account as OFX.Types.Account) == null)
-                return;
-
-            SelectedAccount = (OFX.Types.Account) account;
-        }
 
         #endregion
 
-        #region [ Helper Commands ]
 
-        private void SelectedAccountChanged()
-        {
-            Statements.Clear();
-            foreach (
-                var statement in
-                    _statementCollection.Where(
-                        statement => statement.OwningAccount.AccountId == SelectedAccount.AccountId)
-                        )
-            {
-                Statements.Add(statement);
-            }
-            
-        }
-
-        #endregion
     }
 }

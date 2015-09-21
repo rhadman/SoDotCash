@@ -31,20 +31,10 @@ namespace SoDotCash.ViewModels
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
-            ////if (ViewModelBase.IsInDesignModeStatic)
-            ////{
-            ////    // Create design time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DesignDataService>();
-            ////}
-            ////else
-            ////{
-            ////    // Create run time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DataService>();
-            ////}
-
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<AccountsViewModel>();
             SimpleIoc.Default.Register<AddAccountViewModel>();
+            SimpleIoc.Default.Register<TransactionsViewModel>();
         }
 
         /// <summary>
@@ -61,6 +51,13 @@ namespace SoDotCash.ViewModels
         /// The single add account view model - backing the single AddAccountView
         /// </summary>
         public AddAccountViewModel AddAccount => ServiceLocator.Current.GetInstance<AddAccountViewModel>();
+
+        /// <summary>
+        /// The single transactions view model. The transactions view populates from the parent's DataContext, so this VM is a
+        ///   shell that assists with navigation
+        /// </summary>
+        public TransactionsViewModel Transactions => ServiceLocator.Current.GetInstance<TransactionsViewModel>();
+
 
         public static void Cleanup()
         {
