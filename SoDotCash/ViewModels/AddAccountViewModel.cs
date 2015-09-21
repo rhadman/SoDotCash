@@ -15,17 +15,9 @@ namespace SoDotCash.ViewModels
     public class AddAccountViewModel : ViewModelBase
     {
         /// <summary>
-        /// Name of our view xaml - used for transitions
-        /// </summary>
-        public static readonly string ViewXaml = "AddAccountView.xaml";
-
-        /// <summary>
         /// Retrieve all account types for populating a selection list
         /// </summary>
-        public IEnumerable<AccountType> AllAccountTypes
-        {
-            get { return AccountType.All(); }
-        }
+        public IEnumerable<AccountType> AllAccountTypes => AccountType.All();
 
         /// <summary>
         /// The selected account type

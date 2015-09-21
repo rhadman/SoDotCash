@@ -16,22 +16,13 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class AccountsViewModel : ViewModelBase
     {
+        public AccountsViewModel()
+        {
+            // Start on Overview tab
+            ActiveTabIndex = 0;
+        }
 
         #region [ Public Bound Properties ]
-
-        /// <summary>
-        /// The ViewModel tied to the currently active view in the GUI
-        /// </summary>
-        private ViewModelBase _activeViewModel;
-        public ViewModelBase ActiveViewModel
-        {
-            get { return _activeViewModel; }
-            set
-            {
-                _activeViewModel = value;
-                RaisePropertyChanged();
-            }
-        }
 
         /// <summary>
         /// Provides the collection of accounts mapped by the account type of each
@@ -80,15 +71,28 @@ namespace SoDotCash.ViewModels
                 // Assign
                 _selectedAccount = value;
 
-                // Ensure we're on the transactions page
-                var locator = new ViewModelLocator();
-                ActiveViewModel = locator.Transactions;
+                // Ensure we're on the transactions tab
+                ActiveTabIndex = 1;
 
                 // Transactions will be updated since this is a different account
                 RaisePropertyChanged("Transactions");
             }
         }
 
+
+        /// <summary>
+        /// Bound index of the active tab in the account data display section
+        /// </summary>
+        private int _activeTabIndex;
+        public int ActiveTabIndex
+        {
+            get { return _activeTabIndex;}
+            set
+            {
+                _activeTabIndex = value;
+                RaisePropertyChanged();
+            }
+        } 
 
         /// <summary>
         /// Provides the collection of transactions for the currently selected account

@@ -17,10 +17,6 @@
         <DataTemplate DataType="{x:Type viewmodels:AddAccountViewModel}">
             <local:AddAccountView/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodels:TransactionsViewModel}">
-            <local:TransactionView/>
-        </DataTemplate>
-
     </Window.Resources>
     <Grid>
         <ContentControl Content="{Binding ActiveViewModel}"/>
