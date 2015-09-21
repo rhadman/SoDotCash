@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
 using OFX;
-using OFX.Protocol;
 using OFX.Types;
 
 namespace SoDotCash.ViewModels
@@ -20,10 +16,13 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class AccountsViewModel : ViewModelBase
     {
-        /// <summary>
-        /// Name of our view xaml - used for transitions
-        /// </summary>
-        public static readonly string ViewXaml = "AccountsView.xaml";
+        public AccountsViewModel()
+        {
+            // Start on Overview tab
+            ActiveTabIndex = 0;
+        }
+
+        #region [ Public Bound Properties ]
 
         /// <summary>
         /// Provides the collection of accounts mapped by the account type of each
@@ -63,8 +62,7 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound current account
         /// </summary>
-        protected Models.Account _selectedAccount;
-
+        private Models.Account _selectedAccount;
         public Models.Account SelectedAccount
         {
             get { return _selectedAccount; }
@@ -73,11 +71,28 @@ namespace SoDotCash.ViewModels
                 // Assign
                 _selectedAccount = value;
 
-                // Update transactions
-                RaisePropertyChanged("Transactions");
+                // Ensure we're on the transactions tab
+                ActiveTabIndex = 1;
 
+                // Transactions will be updated since this is a different account
+                RaisePropertyChanged("Transactions");
             }
         }
+
+
+        /// <summary>
+        /// Bound index of the active tab in the account data display section
+        /// </summary>
+        private int _activeTabIndex;
+        public int ActiveTabIndex
+        {
+            get { return _activeTabIndex;}
+            set
+            {
+                _activeTabIndex = value;
+                RaisePropertyChanged();
+            }
+        } 
 
         /// <summary>
         /// Provides the collection of transactions for the currently selected account
@@ -97,6 +112,9 @@ namespace SoDotCash.ViewModels
             }
         }
 
+
+        #endregion
+
         /// <summary>
         /// Binding for the Add Account button
         /// </summary>
@@ -113,7 +131,7 @@ namespace SoDotCash.ViewModels
         {
             // Transition view
             var locator = new ViewModelLocator();
-            locator.Main.ActiveViewSource = AddAccountViewModel.ViewXaml;
+            locator.Main.ActiveViewModel = locator.AddAccount;
         }
 
 
@@ -192,7 +210,7 @@ namespace SoDotCash.ViewModels
             }
 
             // Update transactions
-            RaisePropertyChanged("Transactions");
+            //ActiveTransactions.RaisePropertyChanged("Transactions");
         }
 
     }

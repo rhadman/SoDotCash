@@ -17,10 +17,5 @@ namespace SoDotCash.Views
             InitializeComponent();
         }
 
-        private void TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            var DC = (MainViewModel) DataContext;
-            DC.SetSelectedItem(e.NewValue);
-        }
     }
 }

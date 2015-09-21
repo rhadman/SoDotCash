@@ -4,39 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="SoDotCash.Views.MainWindow"
+        xmlns:viewmodels="clr-namespace:SoDotCash.ViewModels"
+        xmlns:local="clr-namespace:SoDotCash.Views"
         mc:Ignorable="d"
         Title="So.Cash" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
         >
     <Window.Resources>
-        <XmlDataProvider x:Key="views">
-            <x:XData>
-                <Views xmlns="">
-                    <View Title="Accounts">
-                        <Page Source="Dialogs\AccountsView.xaml"/>
-                    </View>
-                </Views>
-            </x:XData>
-        </XmlDataProvider>
-
-        <Storyboard x:Key="slideLeftToRight"  
-                    TargetProperty="RenderTransform.(TranslateTransform.X)"
-                    AccelerationRatio=".4"
-                    DecelerationRatio=".4">
-            <DoubleAnimation Storyboard.TargetName="viewer" Duration="0:0:0.6" From="950" To="0"/>
-        </Storyboard>
-
-        <Storyboard x:Key="slideRightToLeft" 
-                    TargetProperty="RenderTransform.(TranslateTransform.X)"
-                    AccelerationRatio=".4"
-                    DecelerationRatio=".4">
-            <DoubleAnimation Storyboard.TargetName="viewer" Duration="0:0:0.6" From="-950" To="0"/>
-        </Storyboard>
-
-        <VisualBrush x:Key="VisualBrush1" Visual="{Binding ElementName=frame}"/>
-
+        <DataTemplate DataType="{x:Type viewmodels:AccountsViewModel}">
+            <local:AccountsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:AddAccountViewModel}">
+            <local:AddAccountView/>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
-        <Frame x:Name="frame" Source="{Binding ActiveViewSource}"/>
+        <ContentControl Content="{Binding ActiveViewModel}"/>
     </Grid>
 </Window>

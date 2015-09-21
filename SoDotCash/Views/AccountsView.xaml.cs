@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using SoDotCash.ViewModels;
 
-namespace SoDotCash.Views.Dialogs
+namespace SoDotCash.Views
 {
     /// <summary>
     /// Interaction logic for AccountsView.xaml
