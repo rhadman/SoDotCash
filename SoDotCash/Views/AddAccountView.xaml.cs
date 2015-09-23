@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,5 +27,12 @@ namespace SoDotCash.Views
             InitializeComponent();
         }
 
+        
+        private void textBox_Password_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            // Password box entries can't be bound directly, so we route here
+            if (this.DataContext != null)
+            { ((dynamic)this.DataContext).FinancialInstitutionPassword = ((PasswordBox)sender).Password; }
+        }
     }
 }
