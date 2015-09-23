@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -27,7 +28,12 @@ namespace SoDotCash.Models
         [StringLength(20)]
         public string ofxFinancialUnitId { get; set; }
 
-        public virtual ICollection<FinancialInstitutionUser> users { get; set; }
+        private ICollection<FinancialInstitutionUser> _users;
+        public virtual ICollection<FinancialInstitutionUser> users
+        {
+            get { return _users ?? (_users = new Collection<FinancialInstitutionUser>()); }
+            set { _users = value; }
+        }
     }
 
 }

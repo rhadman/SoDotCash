@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
@@ -9,6 +10,18 @@ namespace SoDotCash.Models
     [Table("Account")]
     public class Account
     {
+        public Account()
+        {
+        }
+
+        public Account(Account other)
+        {
+            fiUserID = other.fiUserID;
+            accountName = other.accountName;
+            accountType = other.accountType;
+            currency = other.currency;
+            fiAccountID = other.fiAccountID;
+        }
 
         [Key]
         public int accountID { get; set; }
@@ -31,6 +44,11 @@ namespace SoDotCash.Models
         [ForeignKey("fiUserID")]
         public virtual FinancialInstitutionUser financialInstitutionUser { get; set; }
 
-        public virtual ICollection<Transaction> transactions { get; set; }
+        private ICollection<Transaction> _transactions;
+        public virtual ICollection<Transaction> transactions
+        {
+            get { return _transactions ?? (_transactions = new Collection<Transaction>()); }
+            set { _transactions = value; }
+        }
     }
 }
