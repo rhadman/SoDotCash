@@ -13,7 +13,7 @@ namespace SoDotCash.Models
         [Key]
         public int accountID { get; set; }
 
-        public int? fiUserId { get; set; }
+        public int? fiUserID { get; set; }
 
         [StringLength(50)]
         public string accountName { get; set; }
@@ -24,8 +24,11 @@ namespace SoDotCash.Models
         [StringLength(3)]
         public string currency { get; set; }
 
+        [StringLength(50)]
+        public string fiAccountID { get; set; }
+        
         [InverseProperty("accounts")]
-        [ForeignKey("fiUserId")]
+        [ForeignKey("fiUserID")]
         public virtual FinancialInstitutionUser financialInstitutionUser { get; set; }
 
         public virtual ICollection<Transaction> transactions { get; set; }
