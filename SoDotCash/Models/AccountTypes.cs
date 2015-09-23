@@ -27,9 +27,8 @@ namespace SoDotCash.Models
         private static readonly Dictionary<string, AccountType> instance = new Dictionary<string, AccountType>();
 
         public static readonly AccountType CHECKING = new AccountType(1, "Checking");
-        public static readonly AccountType SAVINGS = new AccountType(1, "Savings");
-        public static readonly AccountType CREDITCARD = new AccountType(1, "Credit Card");
-        public static readonly AccountType MANUAL = new AccountType(1, "Manual Entry");
+        public static readonly AccountType SAVINGS = new AccountType(2, "Savings");
+        public static readonly AccountType CREDITCARD = new AccountType(3, "Credit Card");
 
 
         private AccountType(int value, String name)
