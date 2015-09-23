@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -27,7 +28,12 @@ namespace SoDotCash.Models
         [ForeignKey("fiId")]
         public virtual FinancialInstitution financialInstitution { get; set; }
 
-        public virtual ICollection<Account> accounts { get; set; }
+        private ICollection<Account> _accounts;
+        public virtual ICollection<Account> accounts
+        {
+            get { return _accounts ?? (_accounts = new Collection<Account>()); }
+            set { _accounts = value; }
+        }
     }
 
 }

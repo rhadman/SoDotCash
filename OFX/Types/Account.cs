@@ -47,10 +47,9 @@ namespace OFX.Types
         public bool Active { get; }
 
         /// <summary>
-        /// The type of account - Checking, Savings, Money Market etc
+        /// The type-specific account ID string for this account.
+        /// May be interpretted differently for different account types.
         /// </summary>
-        public AccountEnum AccountType { get; set; }
-
         public string AccountId { get; private set; }
     }
 }

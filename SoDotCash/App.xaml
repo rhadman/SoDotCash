@@ -14,7 +14,8 @@
                 <ResourceDictionary Source="Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <vm:ViewModelLocator xmlns:vm="clr-namespace:SoDotCash.ViewModels" x:Key="Locator" d:IsDataSource="True" />
-            <conv:BoolToInverseBoolConverter x:Key="BoolToInverseBoolConverter"></conv:BoolToInverseBoolConverter>
+            <conv:BoolToInverseBoolConverter x:Key="BoolToInverseBoolConverter"/>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
