@@ -35,7 +35,8 @@ namespace SoDotCash.Models
         [ForeignKey("accountId")]
         public virtual Account account { get; set; }
 
-
+        // KG: add in ability to track account balance
+        public decimal accountBalance { get; set; }
 
         /// <summary>
         /// Proxy property which converts the amount in dollars into cents

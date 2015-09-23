@@ -173,6 +173,10 @@ namespace SoDotCash.ViewModels
                         // Retrieve account - we need to get an entity in the current db session
                         var updateAccount = db.Accounts.First(account => account.accountID == SelectedAccount.accountID);
 
+                        // KG: temp variable to store last transaction total
+                        decimal bufferAccountBalance = statement.LocalizedAccountBalance;
+                        //
+
                         foreach (var transaction in statement.Transactions)
                         {
                             // See if transaction is already in db
@@ -197,9 +201,16 @@ namespace SoDotCash.ViewModels
                                     currency = statement.Currency,
                                     date = transaction.PostDate.Date,
                                     description = transaction.Name,
-                                    fiTransactionId = transaction.TransactionId
+                                    fiTransactionId = transaction.TransactionId,
+                                    // KG: store account balance in transactions.
+                                    accountBalance = bufferAccountBalance
+                                    
                                 };
                                 updateAccount.transactions.Add(dbTransaction);
+
+                                // KG: subtract from bufferAccountBalance to get new balance, divide by 100m to match 
+                                bufferAccountBalance -= (transaction.Amount / 100m);
+ 
                             }
                         }
 
