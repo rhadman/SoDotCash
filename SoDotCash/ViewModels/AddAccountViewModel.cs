@@ -6,7 +6,6 @@ using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using OFX;
-using OFX.Protocol;
 using SoDotCash.Models;
 
 namespace SoDotCash.ViewModels
@@ -115,12 +114,21 @@ namespace SoDotCash.ViewModels
                 RaisePropertyChanged();
                 RaisePropertyChanged("HasAvailableAccounts");
             }
-        } 
+        }
 
         /// <summary>
         /// The account selected from the list presented by the FI
         /// </summary>
-        public Account SelectedAccount { get; set; }
+        private Account _SelectedAccount;
+        public Account SelectedAccount
+        {
+            get {  return _SelectedAccount; }
+            set
+            {
+                _SelectedAccount = value;
+                //_createAccountCommand.RaiseCanExecuteChanged();
+            }
+        }
 
         /// <summary>
         /// Bound to autoamtic entry grid to control visibility
@@ -156,20 +164,14 @@ namespace SoDotCash.ViewModels
             foreach (var ofxAccount in ofxAccountList)
             {
                 // Convert from OFX account type to db account type
-                AccountType accountType;
-                switch (ofxAccount.AccountType)
-                {
-                    case AccountEnum.SAVINGS:
-                        accountType = AccountType.SAVINGS;
-                        break;
-                    case AccountEnum.CREDITLINE:
-                        accountType = AccountType.CREDITCARD;
-                        break;
-                    default:
-                        accountType = AccountType.CHECKING;
-                        break;
-                }
-                accountList.Add(new Account {accountName=accountType.ToString() + ":" + ofxAccount.AccountId + "(" + ofxAccount.Description+")", accountType=accountType.ToString(),currency="USD", fiAccountID = ofxAccount.AccountId});
+                AccountType accountType = AccountType.CHECKING;
+                if (ofxAccount.GetType() == typeof(OFX.Types.CheckingAccount))
+                    accountType = AccountType.CHECKING;
+                else if (ofxAccount.GetType() == typeof(OFX.Types.SavingsAccount))
+                    accountType = AccountType.SAVINGS;
+                else if (ofxAccount.GetType() == typeof(OFX.Types.CreditCardAccount))
+                    accountType = AccountType.CREDITCARD;
+                accountList.Add(new Account {accountName=accountType.ToString() + ":" + ofxAccount.AccountId, accountType=accountType.ToString(),currency="USD", fiAccountID = ofxAccount.AccountId});
             }
             AvailableAccounts = accountList;
         }
@@ -199,26 +201,92 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Binding for the Create Account button
         /// </summary>
-        private ICommand _createAccountCommand;
+        private RelayCommand _createAccountCommand;
         public ICommand CreateAccountCommand
         {
             get { return _createAccountCommand ?? (_createAccountCommand = new RelayCommand(CreateAccount, CanCreateAccount)); }
+        }
+
+        /// <summary>
+        /// Determine whether enough information has been provided to create a manual-entry account
+        /// </summary>
+        /// <returns>
+        /// True - A manual entry account can be created
+        /// False - A manual entry account cannot be created
+        /// </returns>
+        private bool CanCreateManualAccount()
+        {
+            // Manual entry must be selected
+            if (!IsManualEntry)
+                return false;
+
+            // A name must be provided
+            if (string.IsNullOrEmpty(AccountName))
+                return false;
+
+            // A type must be selected
+            if (SelectedAccountType == null)
+                return false;
+
+            // We can create a manual account!
+            return true;
+        }
+
+        /// <summary>
+        /// Determine whether enough information has been provided to create an automatic-update account
+        /// </summary>
+        /// <returns>
+        /// True - An automatic-update account can be created
+        /// False - An automatic-update account cannot be created
+        /// </returns>
+        private bool CanCreateAutomaticAccount()
+        {
+            // Automatic entry must be selected
+            if (!IsAutomaticEntry)
+                return false;
+
+            // A name must be provided
+            if (string.IsNullOrEmpty(AccountName))
+                return false;
+
+            // A Financial institution must be selected
+            if (SelectedFinancialInstitution == null)
+                return false;
+
+            // A username must be entered
+            if (string.IsNullOrEmpty(FinancialInstitutionUsername))
+                return false;
+
+            // A password must be entered
+            if (string.IsNullOrEmpty(FinancialInstitutionPassword))
+                return false;
+
+            // A financial institution account must be selected
+            if (SelectedAccount == null)
+                return false;
+
+            // We can create an automatic entry account!
+            return true;
+
         }
 
 
         /// <summary>
         /// Called to determine whether there's enough information selected to create an account
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// True - An account can be created
+        /// False - An account cannot be created
+        /// </returns>
         public bool CanCreateAccount()
         {
-            return true;
+            return CanCreateManualAccount() || CanCreateAutomaticAccount();
         }
 
         /// <summary>
-        /// Creates the new account from the information in the form.
+        /// Create a manual-entry account from the provided information
         /// </summary>
-        public void CreateAccount()
+        protected void CreateManualAccount()
         {
             // Add the new account
             using (var db = new SoCashDbContext())
@@ -226,13 +294,64 @@ namespace SoDotCash.ViewModels
                 var newAccount = new Account
                 {
                     accountName = AccountName,
-                    accountID = 0,
                     accountType = SelectedAccountType,
                     currency = "USD"
                 };
                 db.Accounts.Add(newAccount);
                 db.SaveChanges();
             }
+        }
+
+        /// <summary>
+        /// Create an automatic-update account from the provided information
+        /// </summary>
+        protected void CreateAutomaticAccount()
+        {
+            // Add the new account, financial institution and user
+            using (var db = new SoCashDbContext())
+            {
+                // TODO: See if there's an existing FI or user with this info already
+
+                // Create FI
+                var fi = new FinancialInstitution
+                {
+                    name = SelectedFinancialInstitution.Name,
+                    ofxFinancialUnitId = SelectedFinancialInstitution.FinancialId,
+                    ofxOrganizationId = SelectedFinancialInstitution.OrganizationId,
+                    ofxUpdateUrl = SelectedFinancialInstitution.ServiceEndpoint.ToString()
+                };
+                db.FinancialInstitutions.Add(fi);
+
+                // Create FIUser
+                var fiUser = new FinancialInstitutionUser
+                {
+                    userId = FinancialInstitutionUsername,
+                    password = FinancialInstitutionPassword
+                };
+                fi.users.Add(fiUser);
+                db.FinancialInstitutionUsers.Add(fiUser);
+
+                // Create Account
+                var newAccount = new Account(SelectedAccount);
+                // Replace name with the user's chosen name
+                newAccount.accountName = AccountName;
+                fiUser.accounts.Add(newAccount);
+                db.Accounts.Add(newAccount);
+
+                db.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Creates the new account from the information in the form.
+        /// </summary>
+        public void CreateAccount()
+        {
+            // Create the account of the appropriate manual/automatic type
+            if (CanCreateManualAccount())
+                CreateManualAccount();
+            else if (CanCreateAutomaticAccount())
+               CreateAutomaticAccount();
 
             // Transition back to accounts view
             var locator = new ViewModelLocator();
