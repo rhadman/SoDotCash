@@ -107,7 +107,19 @@ namespace SoDotCash.ViewModels
                 {
                     // Retrieve account - we need to get an entity in the current db session
                     var dbAccount = db.Accounts.First(account => account.accountID == SelectedAccount.accountID);
-                    return dbAccount.transactions.ToList();
+                    var transactions = from t in dbAccount.transactions orderby t.date select t;
+
+                    // Calculate running balance
+                    int balance = 0;
+                    foreach (var transaction in transactions)
+                    {
+                        balance += transaction.amount;
+                        transaction.balance = balance;
+                    }
+
+                    // Reverse transactions so newest are listed first
+                    return transactions.Reverse();
+
                 }
             }
         }
@@ -173,10 +185,6 @@ namespace SoDotCash.ViewModels
                         // Retrieve account - we need to get an entity in the current db session
                         var updateAccount = db.Accounts.First(account => account.accountID == SelectedAccount.accountID);
 
-                        // KG: temp variable to store last transaction total
-                        decimal bufferAccountBalance = statement.LocalizedAccountBalance;
-                        //
-
                         foreach (var transaction in statement.Transactions)
                         {
                             // See if transaction is already in db
@@ -202,14 +210,9 @@ namespace SoDotCash.ViewModels
                                     date = transaction.PostDate.Date,
                                     description = transaction.Name,
                                     fiTransactionId = transaction.TransactionId,
-                                    // KG: store account balance in transactions.
-                                    accountBalance = bufferAccountBalance
                                     
                                 };
                                 updateAccount.transactions.Add(dbTransaction);
-
-                                // KG: subtract from bufferAccountBalance to get new balance, divide by 100m to match 
-                                bufferAccountBalance -= (transaction.Amount / 100m);
  
                             }
                         }

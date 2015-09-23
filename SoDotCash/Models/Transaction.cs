@@ -35,11 +35,19 @@ namespace SoDotCash.Models
         [ForeignKey("accountId")]
         public virtual Account account { get; set; }
 
-        // KG: add in ability to track account balance
-        public decimal accountBalance { get; set; }
+        /// <summary>
+        /// Unmapped balance data. Must be filled in on load.
+        /// </summary>
+        [NotMapped]
+        public int balance { get; set; }
 
         /// <summary>
-        /// Proxy property which converts the amount in dollars into cents
+        /// Proxy property which converts the balance in cents into dollars
+        /// </summary>
+        public decimal localizedBalance => balance/100m;
+
+        /// <summary>
+        /// Proxy property which converts the amount in cents into dollars
         /// TODO: Handle different currency types
         /// </summary>
         public decimal localizedAmount => amount / 100m;

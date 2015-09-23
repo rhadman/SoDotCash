@@ -77,7 +77,7 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding fiTransactionId}" />
-                                <GridViewColumn Header="Account Balance" DisplayMemberBinding="{Binding accountBalance, StringFormat=\{0:C2\}}" />
+                                <GridViewColumn Header="Account Balance" DisplayMemberBinding="{Binding localizedBalance, StringFormat=\{0:C2\}}" />
                             </GridView>
                         </ListView.View>
                     </ListView>
