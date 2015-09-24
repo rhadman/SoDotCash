@@ -85,8 +85,13 @@
             </TabItem>
             <TabItem Header="Import">
                 <Grid  Width="740" Height="300">
-                    <Label Content="TODO: Fill this in (Import)"/>
-                    <Button x:Name="button_importTransactions" Content="Import Transactions" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding ImportTransactionsCommand}" Margin="0,24,0,0"/>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="This section allows you to import transactions from an OFX/QFX file. If this account is linked with a supported online financial institution, you may also download transactions." TextWrapping="Wrap"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="button_importTransactions" Content="Import Transactions" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding ImportTransactionsCommand}" />
+                            <Button x:Name="button_downloadTransactions" Content="Download Transactions" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DownloadTransactionsCommand}" Margin="20,0,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
             </TabItem>
             <TabItem Header="Configuration">

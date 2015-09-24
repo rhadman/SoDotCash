@@ -178,5 +178,26 @@ namespace SoDotCash.ViewModels
             RaisePropertyChanged("Transactions");
         }
 
+
+        /// <summary>
+        /// Binding for the Download Transactions button
+        /// </summary>
+        private ICommand _downloadTransactionsCommand;
+        public ICommand DownloadTransactionsCommand
+        {
+            get { return _downloadTransactionsCommand ?? (_downloadTransactionsCommand = new RelayCommand(DownloadTransactions, () => SelectedAccount?.fiUserID != null)); }
+        }
+
+        /// <summary>
+        /// Initiates a download of transactions from the remote financial institution
+        /// </summary>
+        public void DownloadTransactions()
+        {
+            UpdateService.DownloadOfxTransactionsForAccount(SelectedAccount);
+
+            // Update transactions
+            RaisePropertyChanged("Transactions");
+        }
+
     }
 }
