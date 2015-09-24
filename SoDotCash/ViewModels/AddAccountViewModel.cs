@@ -163,15 +163,25 @@ namespace SoDotCash.ViewModels
 
             foreach (var ofxAccount in ofxAccountList)
             {
-                // Convert from OFX account type to db account type
+                // Convert from OFX account type to db account type and encode account id 
                 AccountType accountType = AccountType.CHECKING;
-                if (ofxAccount.GetType() == typeof(OFX.Types.CheckingAccount))
+                string accountId = "";
+                if (ofxAccount.GetType() == typeof (OFX.Types.CheckingAccount))
+                {
                     accountType = AccountType.CHECKING;
-                else if (ofxAccount.GetType() == typeof(OFX.Types.SavingsAccount))
+                    accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
+                }
+                else if (ofxAccount.GetType() == typeof (OFX.Types.SavingsAccount))
+                {
                     accountType = AccountType.SAVINGS;
-                else if (ofxAccount.GetType() == typeof(OFX.Types.CreditCardAccount))
+                    accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
+                }
+                else if (ofxAccount.GetType() == typeof (OFX.Types.CreditCardAccount))
+                {
                     accountType = AccountType.CREDITCARD;
-                accountList.Add(new Account {accountName=accountType.ToString() + ":" + ofxAccount.AccountId, accountType=accountType.ToString(),currency="USD", fiAccountID = ofxAccount.AccountId});
+                    accountId = ofxAccount.AccountId;
+                }
+                accountList.Add(new Account {accountName=accountType.ToString() + ":" + ofxAccount.AccountId.Substring(ofxAccount.AccountId.Length-4), accountType=accountType.ToString(),currency="USD", fiAccountID = accountId});
             }
             AvailableAccounts = accountList;
         }
