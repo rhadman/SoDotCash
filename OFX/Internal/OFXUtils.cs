@@ -51,7 +51,12 @@ namespace OFX.Internal
         public static int DecimalStringToFixedInt(string ofxValue)
         {
             // Remove decimal points and convert to a number
-            return Int32.Parse(ofxValue.Replace(".", ""));
+            var value = Int32.Parse(ofxValue.Replace(".", ""));
+
+            // If there was no decimal point, this is a dollar value: multiply by 100
+            if (!ofxValue.Contains("."))
+                value *= 100;
+            return value;
         }
     }
 }
