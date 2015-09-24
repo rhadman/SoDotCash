@@ -60,7 +60,7 @@
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Date" DisplayMemberBinding="{Binding date, StringFormat=\{0:d\}}" Width="70"/>
-                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding description}" Width="290" />
+                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding description}" Width="280" />
                                 <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding fiTransactionId}" Width="200" />
                                 <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding localizedAmount, StringFormat=\{0:C2\}}" Width="70" />
                                 <GridViewColumn Header="Balance" DisplayMemberBinding="{Binding localizedBalance, StringFormat=\{0:C2\}}" Width="80" />
