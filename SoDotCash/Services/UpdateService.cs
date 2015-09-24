@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using OFX;
 using SoDotCash.Models;
 
@@ -17,9 +19,9 @@ namespace SoDotCash.Services
         /// </summary>
         /// <param name="account">The account into which transactions will be merged</param>
         /// <param name="statement">The statement containing the transactions to merge. The statement owning account ID must match the ID of the passed account.</param>
-        public static void MergeStatementTransactionsIntoAccount(Models.Account account, OFX.Types.Statement statement)
+        public static void MergeStatementTransactionsIntoAccount(Account account, OFX.Types.Statement statement)
         {
-            using (var db = new Models.SoCashDbContext())
+            using (var db = new SoCashDbContext())
             {
                 // Retrieve matching account from DB - we need to get an entity in the current db session
                 var updateAccount = db.Accounts.First(dbAccount => dbAccount.accountID == account.accountID);
@@ -50,7 +52,7 @@ namespace SoDotCash.Services
                         // No such transaction, add entity
 
                         // Create model transaction
-                        var dbTransaction = new Models.Transaction
+                        var dbTransaction = new Transaction
                         {
                             amount = transaction.Amount,
                             category = "",
@@ -75,10 +77,10 @@ namespace SoDotCash.Services
         /// </summary>
         /// <param name="account">The account to merge transactions into</param>
         /// <param name="ofxFileStream">Open and positioned readable stream containing an OFX statement</param>
-        public static void MergeOfxFileIntoAccount(Models.Account account, Stream ofxFileStream)
+        public static void MergeOfxFileIntoAccount(Account account, Stream ofxFileStream)
         {
             // Deserialize the OFX file data to an object form
-            var converter = new OFX.OFX1ToOFX2Converter(ofxFileStream);
+            var converter = new OFX1ToOFX2Converter(ofxFileStream);
             foreach (var statement in OFX.Types.Statement.CreateFromOFXResponse(converter.ConvertToOFX()))
                 MergeStatementTransactionsIntoAccount(account, statement);
         }
@@ -89,7 +91,7 @@ namespace SoDotCash.Services
         /// </summary>
         /// <param name="account">The account to merge transactions into</param>
         /// <param name="ofxFileName">Path and filename of a readable file containing an OFX statement</param>
-        public static void MergeOfxFileIntoAccount(Models.Account account, string ofxFileName)
+        public static void MergeOfxFileIntoAccount(Account account, string ofxFileName)
         {
             // Open the file for reading
             using (var ofxFileStream = File.OpenRead(ofxFileName))
@@ -103,15 +105,15 @@ namespace SoDotCash.Services
         /// Download OFX transactions for an account and merge them into the account transaction list
         /// </summary>
         /// <param name="account">Account configured with financial institution login information</param>
-        public static async void DownloadOfxTransactionsForAccount(Models.Account account)
+        public static async void DownloadOfxTransactionsForAccount(Account account)
         {
             // Default retrieval parameters
-            OFX.OFX2Service ofxService;
+            OFX2Service ofxService;
             OFX.Types.Account ofxAccount;
             var endTime = DateTimeOffset.Now;
             var startTime = new DateTimeOffset(new DateTime(1997,1,1));
 
-            using (var db = new Models.SoCashDbContext())
+            using (var db = new SoCashDbContext())
             {
                 // Retrieve matching account from DB - we need to get an entity in the current db session
                 var updateAccount = db.Accounts.First(dbAccount => dbAccount.accountID == account.accountID);
@@ -134,7 +136,7 @@ namespace SoDotCash.Services
                 ofxService = new OFX2Service(fi, credentials);
 
                 // Create proper account type for this account
-                var accountType = (Models.AccountType) account.accountType;
+                var accountType = (AccountType) account.accountType;
                 if (accountType == AccountType.CHECKING)
                 {
                     // Split routing and account id from combined string
@@ -176,7 +178,68 @@ namespace SoDotCash.Services
 
         }
 
+        /// <summary>
+        /// Retrieve the list of accounts from a financial institution using OFX and return all accounts that are not already present in the database
+        /// </summary>
+        /// <param name="financialInstitution">Financial institution to query</param>
+        /// <param name="fiCredentials">Credentials for financial institution account</param>
+        /// <returns>List of accounts</returns>
+        public static async Task<IEnumerable<Account>> EnumerateNewAccounts(OFX.Types.FinancialInstitution financialInstitution, OFX.Types.Credentials fiCredentials)
+        {
+            var ofxService = new OFX2Service(financialInstitution, fiCredentials);
+            var accountList = new List<Account>();
+            var ofxAccountList = await ofxService.ListAccounts();
+
+            // TODO: If ofxAccountList is null, raise an exception
+
+            using (var db = new SoCashDbContext())
+            {
+
+
+                foreach (var ofxAccount in ofxAccountList)
+                {
+                    // Convert from OFX account type to db account type and encode account id 
+                    AccountType accountType = AccountType.CHECKING;
+                    string accountId = "";
+                    if (ofxAccount.GetType() == typeof (OFX.Types.CheckingAccount))
+                    {
+                        accountType = AccountType.CHECKING;
+                        accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
+                    }
+                    else if (ofxAccount.GetType() == typeof (OFX.Types.SavingsAccount))
+                    {
+                        accountType = AccountType.SAVINGS;
+                        accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
+                    }
+                    else if (ofxAccount.GetType() == typeof (OFX.Types.CreditCardAccount))
+                    {
+                        accountType = AccountType.CREDITCARD;
+                        accountId = ofxAccount.AccountId;
+                    }
+
+                    // Look for a matching account in the database
+                    if (!db.Accounts.Any(a => a.fiAccountID == accountId))
+                    {
+                        // This account is not already in the DB, add to new account list
+                        accountList.Add(new Account
+                        {
+                            accountName =
+                                accountType + ":" +
+                                ofxAccount.AccountId.Substring(ofxAccount.AccountId.Length - 4),
+                            accountType = accountType.ToString(),
+                            currency = "USD",
+                            fiAccountID = accountId
+                        });
+                    }
+                }
+            }
+
+            // Return the finalized list of new accounts
+            return accountList;
+        }
     }
+
+
 
 
 }

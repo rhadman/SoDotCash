@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security;
-using System.Windows;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using OFX;
 using SoDotCash.Models;
+using SoDotCash.Services;
 
 namespace SoDotCash.ViewModels
 {
@@ -154,36 +152,12 @@ namespace SoDotCash.ViewModels
 
             // TODO: Spinner/progress indicator
 
+            // Form Credentials
+            var fiCredentials = new OFX.Types.Credentials(FinancialInstitutionUsername,
+                FinancialInstitutionPassword.ToString());
+
             // Retrieve accounts from fI
-            var ofxService = new OFX2Service(SelectedFinancialInstitution, new OFX.Types.Credentials(FinancialInstitutionUsername, FinancialInstitutionPassword.ToString()));
-            var accountList = new List<Account>();
-            var ofxAccountList = await ofxService.ListAccounts();
-
-            // TODO: If ofxAccountList is null, display error message
-
-            foreach (var ofxAccount in ofxAccountList)
-            {
-                // Convert from OFX account type to db account type and encode account id 
-                AccountType accountType = AccountType.CHECKING;
-                string accountId = "";
-                if (ofxAccount.GetType() == typeof (OFX.Types.CheckingAccount))
-                {
-                    accountType = AccountType.CHECKING;
-                    accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
-                }
-                else if (ofxAccount.GetType() == typeof (OFX.Types.SavingsAccount))
-                {
-                    accountType = AccountType.SAVINGS;
-                    accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
-                }
-                else if (ofxAccount.GetType() == typeof (OFX.Types.CreditCardAccount))
-                {
-                    accountType = AccountType.CREDITCARD;
-                    accountId = ofxAccount.AccountId;
-                }
-                accountList.Add(new Account {accountName=accountType.ToString() + ":" + ofxAccount.AccountId.Substring(ofxAccount.AccountId.Length-4), accountType=accountType.ToString(),currency="USD", fiAccountID = accountId});
-            }
-            AvailableAccounts = accountList;
+            AvailableAccounts = await UpdateService.EnumerateNewAccounts(SelectedFinancialInstitution, fiCredentials);
         }
 
         #endregion
