@@ -63,7 +63,7 @@
                     <ListView ItemsSource="{Binding Transactions}" Grid.ColumnSpan="2">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Date" DisplayMemberBinding="{Binding date, StringFormat=\{0:dd/MMM/yyyy-hh:mm:ss tt\}}" />
+                                <GridViewColumn Header="Date" DisplayMemberBinding="{Binding date, StringFormat=\{0:d\}}" />
                                 <GridViewColumn Header="Name" DisplayMemberBinding="{Binding description}" />
                                 <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding localizedAmount, StringFormat=\{0:C2\}}" >
                                     <GridViewColumn.CellTemplate>
