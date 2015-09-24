@@ -32,9 +32,9 @@ namespace OFX
                 // Look for end of headers
                 if (!headersDone)
                 {
-                    if (line.Length == 0)
+                    if (line.StartsWith("<"))
                         headersDone = true;
-                    continue;
+                    else continue;
                 }
 
                 // Process tags in line
