@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
@@ -295,25 +296,42 @@ namespace SoDotCash.ViewModels
             using (var db = new SoCashDbContext())
             {
                 // TODO: See if there's an existing FI or user with this info already
-
-                // Create FI
-                var fi = new FinancialInstitution
+                // Look for existing FI entry with the same name
+                FinancialInstitution fi;
+                try
                 {
-                    name = SelectedFinancialInstitution.Name,
-                    ofxFinancialUnitId = SelectedFinancialInstitution.FinancialId,
-                    ofxOrganizationId = SelectedFinancialInstitution.OrganizationId,
-                    ofxUpdateUrl = SelectedFinancialInstitution.ServiceEndpoint.ToString()
-                };
-                db.FinancialInstitutions.Add(fi);
-
-                // Create FIUser
-                var fiUser = new FinancialInstitutionUser
+                    fi = db.FinancialInstitutions.First(i => i.name == SelectedFinancialInstitution.Name);
+                }
+                catch (InvalidOperationException)
                 {
-                    userId = FinancialInstitutionUsername,
-                    password = FinancialInstitutionPassword
-                };
-                fi.users.Add(fiUser);
-                db.FinancialInstitutionUsers.Add(fiUser);
+                    // FI Doesn't exist, add a new one
+                    fi = new FinancialInstitution
+                    {
+                        name = SelectedFinancialInstitution.Name,
+                        ofxFinancialUnitId = SelectedFinancialInstitution.FinancialId,
+                        ofxOrganizationId = SelectedFinancialInstitution.OrganizationId,
+                        ofxUpdateUrl = SelectedFinancialInstitution.ServiceEndpoint.ToString()
+                    };
+                    db.FinancialInstitutions.Add(fi);
+                }
+
+                // Look for existing user under this FI with same userId
+                FinancialInstitutionUser fiUser;
+                try
+                {
+                    fiUser = fi.users.First(u => u.userId == FinancialInstitutionUsername && u.password == FinancialInstitutionPassword);
+                }
+                catch (Exception)
+                {
+                    // User doesn't exist, add a new one
+                    fiUser = new FinancialInstitutionUser
+                    {
+                        userId = FinancialInstitutionUsername,
+                        password = FinancialInstitutionPassword
+                    };
+                    fi.users.Add(fiUser);
+                    db.FinancialInstitutionUsers.Add(fiUser);
+                }
 
                 // Create Account
                 var newAccount = new Account(SelectedAccount);
