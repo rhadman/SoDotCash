@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
-using OFX;
-using OFX.Types;
+using SoDotCash.Services;
 
 namespace SoDotCash.ViewModels
 {
@@ -169,62 +167,15 @@ namespace SoDotCash.ViewModels
                 return;
             }
 
-            // TODO: Move the logic below to a service
-
-
-            // Read and convert
+            // Open the file the user selected for read
             using (var ofxFileStream = fileDialog.OpenFile())
             {
-                // Deserialize the OFX file data to an object form
-                var converter = new OFX1ToOFX2Converter(ofxFileStream);
-                foreach (var statement in Statement.CreateFromOFXResponse(converter.ConvertToOFX()))
-                {
-                    using (var db = new Models.SoCashDbContext())
-                    {
-
-                        // Retrieve account - we need to get an entity in the current db session
-                        var updateAccount = db.Accounts.First(account => account.accountID == SelectedAccount.accountID);
-
-                        foreach (var transaction in statement.Transactions)
-                        {
-                            // See if transaction is already in db
-                            try
-                            {
-                                var existingTransaction =
-                                    updateAccount.transactions.First(t => t.fiTransactionId == transaction.TransactionId);
-
-                                // Ensure amount and date of transaction match
-                                existingTransaction.amount = transaction.Amount;
-                                existingTransaction.date = transaction.PostDate.Date;
-                            }
-                            catch (InvalidOperationException)
-                            {
-                                // No such transaction, add entity
-
-                                // Create model transaction
-                                var dbTransaction = new Models.Transaction
-                                {
-                                    amount = transaction.Amount,
-                                    category = "",
-                                    currency = statement.Currency,
-                                    date = transaction.PostDate.Date,
-                                    description = transaction.Name,
-                                    fiTransactionId = transaction.TransactionId,
-                                    
-                                };
-                                updateAccount.transactions.Add(dbTransaction);
- 
-                            }
-                        }
-
-                        //db.Accounts.Add(newAccount);
-                        db.SaveChanges();
-                    }
-                }
+                // Parse the file and merge transactions into the current account
+                UpdateService.MergeOfxFileIntoAccount(SelectedAccount, ofxFileStream);
             }
 
             // Update transactions
-            //ActiveTransactions.RaisePropertyChanged("Transactions");
+            RaisePropertyChanged("Transactions");
         }
 
     }

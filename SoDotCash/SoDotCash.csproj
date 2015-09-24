@@ -152,6 +152,7 @@
     <Compile Include="Models\FinancialInstitutionUser.cs" />
     <Compile Include="Models\SoCashDbContext.cs" />
     <Compile Include="Models\Transaction.cs" />
+    <Compile Include="Services\UpdateService.cs" />
     <Compile Include="SoCash.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -235,7 +236,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Services\" />
     <Folder Include="Views\Dialogs\" />
   </ItemGroup>
   <ItemGroup>
