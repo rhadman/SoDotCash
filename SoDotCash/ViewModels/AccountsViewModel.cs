@@ -176,6 +176,9 @@ namespace SoDotCash.ViewModels
 
             // Update transactions
             RaisePropertyChanged("Transactions");
+
+            // Move to transactions tab
+            ActiveTabIndex = 1;
         }
 
 
@@ -197,7 +200,36 @@ namespace SoDotCash.ViewModels
 
             // Update transactions
             RaisePropertyChanged("Transactions");
+
+            // Move to transactions tab
+            ActiveTabIndex = 1;
         }
 
+        /// <summary>
+        /// Binding for the Delete Account button
+        /// </summary>
+        private ICommand _deleteAccountCommand;
+        public ICommand DeleteAccountCommand
+        {
+            get { return _deleteAccountCommand ?? (_deleteAccountCommand = new RelayCommand(DeleteSelectedAccount, () => true)); }
+        }
+
+        /// <summary>
+        /// Deletes the selected account from the database
+        /// </summary>
+        public void DeleteSelectedAccount()
+        {
+            // Delete the account
+            UpdateService.DeleteAccount(SelectedAccount);
+            
+            // Set to no account
+            SelectedAccount = null;
+
+            // Return to Overview tab
+            ActiveTabIndex = 0;
+
+            // Notify that the list of accounts has changed
+            RaisePropertyChanged("AccountsView");
+        }
     }
 }

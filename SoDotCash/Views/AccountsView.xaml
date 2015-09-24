@@ -96,7 +96,10 @@
             </TabItem>
             <TabItem Header="Configuration">
                 <Grid  Width="740" Height="300">
-                    <Label Content="TODO: Fill this in (Configuration)"/>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="TODO: Fill this in (Configuration)"  TextWrapping="Wrap"/>
+                        <Button x:Name="button_deleteAccount" Content="Delete Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DeleteAccountCommand}" />
+                    </StackPanel>
                 </Grid>
             </TabItem>
         </TabControl>

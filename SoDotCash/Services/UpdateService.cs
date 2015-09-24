@@ -111,7 +111,7 @@ namespace SoDotCash.Services
             OFX2Service ofxService;
             OFX.Types.Account ofxAccount;
             var endTime = DateTimeOffset.Now;
-            var startTime = new DateTimeOffset(new DateTime(1997,1,1));
+            var startTime = new DateTimeOffset(new DateTime(1997, 1, 1));
 
             using (var db = new SoCashDbContext())
             {
@@ -159,8 +159,8 @@ namespace SoDotCash.Services
                 {
                     var lastTransaction =
                         (from transaction in updateAccount.transactions
-                         orderby transaction.date descending
-                         select transaction).First();
+                            orderby transaction.date descending
+                            select transaction).First();
                     startTime = new DateTimeOffset(lastTransaction.date);
 
                 }
@@ -174,7 +174,7 @@ namespace SoDotCash.Services
             // Retrieve statement(s) (should only be one per protocol, but we can handle any number)
             var ofxStatments = await ofxService.GetStatement(ofxAccount, startTime, endTime);
             foreach (var ofxStatement in ofxStatments)
-                    MergeStatementTransactionsIntoAccount(account, ofxStatement);
+                MergeStatementTransactionsIntoAccount(account, ofxStatement);
 
         }
 
@@ -184,7 +184,8 @@ namespace SoDotCash.Services
         /// <param name="financialInstitution">Financial institution to query</param>
         /// <param name="fiCredentials">Credentials for financial institution account</param>
         /// <returns>List of accounts</returns>
-        public static async Task<IEnumerable<Account>> EnumerateNewAccounts(OFX.Types.FinancialInstitution financialInstitution, OFX.Types.Credentials fiCredentials)
+        public static async Task<IEnumerable<Account>> EnumerateNewAccounts(
+            OFX.Types.FinancialInstitution financialInstitution, OFX.Types.Credentials fiCredentials)
         {
             var ofxService = new OFX2Service(financialInstitution, fiCredentials);
             var accountList = new List<Account>();
@@ -237,9 +238,35 @@ namespace SoDotCash.Services
             // Return the finalized list of new accounts
             return accountList;
         }
-    }
+
+
+        /// <summary>
+        /// Delete the specified account from the database.
+        /// Deletes all transactions and removes the FIUser if there are no other accounts attached.
+        /// </summary>
+        /// <param name="account">Account to delete</param>
+        public static void DeleteAccount(Account account)
+        {
+            using (var db = new SoCashDbContext())
+            {
+                // Retrieve matching account from DB - we need to get an entity in the current db session
+                var deleteAccount = db.Accounts.First(dbAccount => dbAccount.accountID == account.accountID);
+
+                // Delete fiUser if this is the only account referencing it
+                if (deleteAccount.financialInstitutionUser != null &&
+                    deleteAccount.financialInstitutionUser.accounts.Count == 1)
+                    db.FinancialInstitutionUsers.Remove(deleteAccount.financialInstitutionUser);
+
+                // Remove the account
+                db.Accounts.Remove(deleteAccount);
+
+                // Commit to db
+                db.SaveChanges();
+            }
+        }
 
 
 
+    } // class
 
-}
+} // namespace

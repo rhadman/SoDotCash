@@ -33,6 +33,7 @@ namespace SoDotCash.Models
 
         [InverseProperty("transactions")]
         [ForeignKey("accountId")]
+        [Required]
         public virtual Account account { get; set; }
 
         /// <summary>
