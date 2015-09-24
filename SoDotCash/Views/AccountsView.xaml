@@ -50,41 +50,27 @@
         </Grid>
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Margin="206,5,10,21" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndex}">
             <TabItem Header="Overview">
-                <Grid  Width="740" Height="300">
+                <Grid  Width="730" Height="300">
                     <Label Content="TODO: Fill this in (Overview)"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Ledger">
-                <Grid  Width="740" Height="300">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="71*"/>
-                        <ColumnDefinition Width="114*"/>
-                    </Grid.ColumnDefinitions>
-                    <ListView ItemsSource="{Binding Transactions}" Grid.ColumnSpan="2">
+                <Grid  Width="730" Height="300">
+                    <ListView ItemsSource="{Binding Transactions}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Date" DisplayMemberBinding="{Binding date, StringFormat=\{0:d\}}" />
-                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding description}" />
-                                <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding localizedAmount, StringFormat=\{0:C2\}}" >
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding}">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="{x:Type TextBlock}"/>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding fiTransactionId}" />
-                                <GridViewColumn Header="Account Balance" DisplayMemberBinding="{Binding localizedBalance, StringFormat=\{0:C2\}}" />
+                                <GridViewColumn Header="Date" DisplayMemberBinding="{Binding date, StringFormat=\{0:d\}}" Width="70"/>
+                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding description}" Width="290" />
+                                <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding fiTransactionId}" Width="200" />
+                                <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding localizedAmount, StringFormat=\{0:C2\}}" Width="70" />
+                                <GridViewColumn Header="Balance" DisplayMemberBinding="{Binding localizedBalance, StringFormat=\{0:C2\}}" Width="80" />
                             </GridView>
                         </ListView.View>
                     </ListView>
                 </Grid>
             </TabItem>
             <TabItem Header="Import">
-                <Grid  Width="740" Height="300">
+                <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="This section allows you to import transactions from an OFX/QFX file. If this account is linked with a supported online financial institution, you may also download transactions." TextWrapping="Wrap"/>
                         <StackPanel Orientation="Horizontal">
@@ -95,7 +81,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Configuration">
-                <Grid  Width="740" Height="300">
+                <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="TODO: Fill this in (Configuration)"  TextWrapping="Wrap"/>
                         <Button x:Name="button_deleteAccount" Content="Delete Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DeleteAccountCommand}" />
