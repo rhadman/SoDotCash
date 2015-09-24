@@ -34,9 +34,17 @@ namespace SoDotCash.Services
                     // TODO: Raise an error - this statement does not match the specified account.
                 }
 
-
+                // Add each transaction, and keep track of the earliest and latest dates
+                DateTimeOffset earliestTransaction = DateTimeOffset.MaxValue;
+                DateTimeOffset latestTransaction = DateTimeOffset.MinValue;
                 foreach (var transaction in statement.Transactions)
                 {
+                    // Update date of earliest and latest transaction
+                    if (earliestTransaction > transaction.PostDate)
+                        earliestTransaction = transaction.PostDate;
+                    if (latestTransaction < transaction.PostDate)
+                        latestTransaction = transaction.PostDate;
+
                     // See if transaction is already in db
                     try
                     {
@@ -66,6 +74,47 @@ namespace SoDotCash.Services
 
                     }
                 }
+
+                // Sum all transactions in the data set and ensure the balance on the date of the end of the statement matches the reported balance
+                var dbBalance = updateAccount.transactions.Where(t => t.date <= latestTransaction).Sum(t => t.amount);
+                if (dbBalance != statement.AccountBalance)
+                {
+                    // Need to add or modify a filler transaction
+                    try
+                    {
+                        // Look for a pre-existing filler transaction as the transaction prior to the start of this statement
+                        var fillerTransaction =
+                            updateAccount.transactions.Where(t => t.date < earliestTransaction)
+                                .OrderByDescending(t => t.date)
+                                .First();
+                        // If this is not a balance adjustment transaction, move to creating a new transaction to adjust
+                        if (fillerTransaction.description != "Balance Adjustment")
+                            throw new InvalidOperationException();
+
+                        // An existing balance adjustment is in place. Modify;
+                        fillerTransaction.amount += (statement.AccountBalance - dbBalance);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // Determine date of filler - don't use a date in the future
+                        var fillerDate = (earliestTransaction - new TimeSpan(1, 0, 0, 0)).DateTime;
+                        if (fillerDate > DateTime.Now)
+                            fillerDate = DateTime.Now;
+
+                        // No existing balance adjustment transaction exists. Add one.
+                        var fillerTransaction = new Transaction
+                        {
+                            amount = (statement.AccountBalance - dbBalance),
+                            category = "BALADJUST",
+                            description = "Balance Adjustment",
+                            currency = statement.Currency,
+                            fiTransactionId = System.Guid.NewGuid().ToString(),
+                            date = fillerDate
+                        };
+                        updateAccount.transactions.Add(fillerTransaction);
+                    }
+                }
+
 
                 db.SaveChanges();
             }
