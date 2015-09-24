@@ -105,7 +105,7 @@ namespace SoDotCash.Services
         /// Download OFX transactions for an account and merge them into the account transaction list
         /// </summary>
         /// <param name="account">Account configured with financial institution login information</param>
-        public static async void DownloadOfxTransactionsForAccount(Account account)
+        public static async Task DownloadOfxTransactionsForAccount(Account account)
         {
             // Default retrieval parameters
             OFX2Service ofxService;

@@ -194,9 +194,10 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Initiates a download of transactions from the remote financial institution
         /// </summary>
-        public void DownloadTransactions()
+        public async void DownloadTransactions()
         {
-            UpdateService.DownloadOfxTransactionsForAccount(SelectedAccount);
+            // Download transactions asynchronously and wait for response
+            await UpdateService.DownloadOfxTransactionsForAccount(SelectedAccount);
 
             // Update transactions
             RaisePropertyChanged("Transactions");
