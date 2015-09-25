@@ -152,6 +152,7 @@
     <Compile Include="Models\FinancialInstitutionUser.cs" />
     <Compile Include="Models\SoCashDbContext.cs" />
     <Compile Include="Models\Transaction.cs" />
+    <Compile Include="Services\BackgroundTaskTracker.cs" />
     <Compile Include="Services\UpdateService.cs" />
     <Compile Include="SoCash.Designer.cs">
       <AutoGen>True</AutoGen>
