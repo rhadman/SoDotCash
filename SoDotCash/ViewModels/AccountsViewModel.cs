@@ -197,7 +197,7 @@ namespace SoDotCash.ViewModels
         public async void DownloadTransactions()
         {
             // Download transactions asynchronously and wait for response
-            await UpdateService.DownloadOfxTransactionsForAccount(SelectedAccount);
+            await UpdateService.DownloadOfxTransactionsForAccount(SelectedAccount).ConfigureAwait(false);
 
             // Update transactions
             RaisePropertyChanged("Transactions");

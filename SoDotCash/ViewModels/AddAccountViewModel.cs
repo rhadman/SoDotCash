@@ -158,7 +158,7 @@ namespace SoDotCash.ViewModels
                 FinancialInstitutionPassword.ToString());
 
             // Retrieve accounts from fI
-            AvailableAccounts = await UpdateService.EnumerateNewAccounts(SelectedFinancialInstitution, fiCredentials);
+            AvailableAccounts = await UpdateService.EnumerateNewAccounts(SelectedFinancialInstitution, fiCredentials).ConfigureAwait(false);
         }
 
         #endregion
