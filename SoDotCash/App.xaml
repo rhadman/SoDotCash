@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
              xmlns:conv="clr-namespace:SoDotCash.Converters"
              StartupUri="Views/MainWindow.xaml" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:utility="clr-namespace:SoDotCash.Utility"
              d1p1:Ignorable="d" 
              xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
              >
@@ -16,6 +17,7 @@
             <vm:ViewModelLocator xmlns:vm="clr-namespace:SoDotCash.ViewModels" x:Key="Locator" d:IsDataSource="True" />
             <conv:BoolToInverseBoolConverter x:Key="BoolToInverseBoolConverter"/>
             <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <utility:InverterConverter x:Key="InverterConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
