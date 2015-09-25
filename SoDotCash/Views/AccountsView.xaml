@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:SoDotCash.Views"
              xmlns:utility="clr-namespace:SoDotCash.Utility"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
+             xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
@@ -51,7 +53,24 @@
         <TabControl x:Name="tabControl" HorizontalAlignment="Left" Margin="206,5,10,21" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndex}">
             <TabItem Header="Overview">
                 <Grid  Width="730" Height="300">
-                    <Label Content="TODO: Fill this in (Overview)"/>
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid Margin="0,20,0,0">
+                                <charting:Chart x:Name="chart" Width="550" Height="250">
+                                    <charting:Chart.Axes>
+                                        <charting:DateTimeAxis Name="xAxis" ShowGridLines="True" Orientation="X" />
+                                        <charting:LinearAxis Orientation="Y" ShowGridLines="True"/>
+                                    </charting:Chart.Axes>
+                                    <charting:Chart.Series>
+                                        <charting:LineSeries ItemsSource="{Binding Transactions}"
+                    DependentValueBinding="{Binding Path=localizedBalance}"
+                    IndependentValuePath="date"
+                    Title="Historical Balance" IsSelectionEnabled="True" />
+                                    </charting:Chart.Series>
+                                </charting:Chart>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
             </TabItem>
             <TabItem Header="Ledger">
