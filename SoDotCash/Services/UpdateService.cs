@@ -246,56 +246,61 @@ namespace SoDotCash.Services
         public static async Task<IEnumerable<Account>> EnumerateNewAccounts(
             OFX.Types.FinancialInstitution financialInstitution, OFX.Types.Credentials fiCredentials)
         {
-            var ofxService = new OFX2Service(financialInstitution, fiCredentials);
-            var accountList = new List<Account>();
-            var ofxAccountList = await ofxService.ListAccounts().ConfigureAwait(false);
 
-            // TODO: If ofxAccountList is null, raise an exception
-
-            using (var db = new SoCashDbContext())
+            using (BackgroundTaskTracker.BeginTask("Retrieving Account Information"))
             {
 
+                var ofxService = new OFX2Service(financialInstitution, fiCredentials);
+                var accountList = new List<Account>();
+                var ofxAccountList = await ofxService.ListAccounts().ConfigureAwait(false);
 
-                foreach (var ofxAccount in ofxAccountList)
+                // TODO: If ofxAccountList is null, raise an exception
+
+                using (var db = new SoCashDbContext())
                 {
-                    // Convert from OFX account type to db account type and encode account id 
-                    AccountType accountType = AccountType.CHECKING;
-                    string accountId = "";
-                    if (ofxAccount.GetType() == typeof (OFX.Types.CheckingAccount))
-                    {
-                        accountType = AccountType.CHECKING;
-                        accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
-                    }
-                    else if (ofxAccount.GetType() == typeof (OFX.Types.SavingsAccount))
-                    {
-                        accountType = AccountType.SAVINGS;
-                        accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
-                    }
-                    else if (ofxAccount.GetType() == typeof (OFX.Types.CreditCardAccount))
-                    {
-                        accountType = AccountType.CREDITCARD;
-                        accountId = ofxAccount.AccountId;
-                    }
 
-                    // Look for a matching account in the database
-                    if (!db.Accounts.Any(a => a.fiAccountID == accountId))
+
+                    foreach (var ofxAccount in ofxAccountList)
                     {
-                        // This account is not already in the DB, add to new account list
-                        accountList.Add(new Account
+                        // Convert from OFX account type to db account type and encode account id 
+                        AccountType accountType = AccountType.CHECKING;
+                        string accountId = "";
+                        if (ofxAccount.GetType() == typeof (OFX.Types.CheckingAccount))
                         {
-                            accountName =
-                                accountType + ":" +
-                                ofxAccount.AccountId.Substring(ofxAccount.AccountId.Length - 4),
-                            accountType = accountType.ToString(),
-                            currency = "USD",
-                            fiAccountID = accountId
-                        });
+                            accountType = AccountType.CHECKING;
+                            accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
+                        }
+                        else if (ofxAccount.GetType() == typeof (OFX.Types.SavingsAccount))
+                        {
+                            accountType = AccountType.SAVINGS;
+                            accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
+                        }
+                        else if (ofxAccount.GetType() == typeof (OFX.Types.CreditCardAccount))
+                        {
+                            accountType = AccountType.CREDITCARD;
+                            accountId = ofxAccount.AccountId;
+                        }
+
+                        // Look for a matching account in the database
+                        if (!db.Accounts.Any(a => a.fiAccountID == accountId))
+                        {
+                            // This account is not already in the DB, add to new account list
+                            accountList.Add(new Account
+                            {
+                                accountName =
+                                    accountType + ":" +
+                                    ofxAccount.AccountId.Substring(ofxAccount.AccountId.Length - 4),
+                                accountType = accountType.ToString(),
+                                currency = "USD",
+                                fiAccountID = accountId
+                            });
+                        }
                     }
                 }
-            }
 
-            // Return the finalized list of new accounts
-            return accountList;
+                // Return the finalized list of new accounts
+                return accountList;
+            }
         }
 
 
