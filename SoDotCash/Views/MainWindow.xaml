@@ -7,6 +7,7 @@
         xmlns:viewmodels="clr-namespace:SoDotCash.ViewModels"
         xmlns:local="clr-namespace:SoDotCash.Views"
         xmlns:services="clr-namespace:SoDotCash.Services"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="So.Cash" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
@@ -20,15 +21,8 @@
         </DataTemplate>
     </Window.Resources>
     <StackPanel Orientation="Vertical">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Height="20">
-            <DockPanel Visibility="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=ActionsPending, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Hidden}">
-                <TextBlock Text="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=CurrentActionDescription}" />
-                <Grid Margin="10,0,0,0">
-                    <ProgressBar Width="400" DockPanel.Dock="Right" HorizontalAlignment="Right" Value="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=CompletionProgress, Mode=OneWay}" Foreground="Green" Background="Beige"/>
-                    <TextBlock Text="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=CompletionProgress, StringFormat={}{0}%}" HorizontalAlignment="Center" />
-                </Grid>
-            </DockPanel>
-        </StackPanel>
-        <ContentControl Content="{Binding ActiveViewModel}"/>
+        <xctk:BusyIndicator IsBusy="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=ActionsPending}" BusyContent="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=CurrentActionDescription}">
+            <ContentControl Content="{Binding ActiveViewModel}"/>
+        </xctk:BusyIndicator>
     </StackPanel>
 </Window>
