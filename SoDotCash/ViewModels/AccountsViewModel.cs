@@ -73,7 +73,7 @@ namespace SoDotCash.ViewModels
                 ActiveTabIndex = 1;
 
                 // Transactions will be updated since this is a different account
-                RaisePropertyChanged("Transactions");
+                RaisePropertyChanged(() => Transactions);
             }
         }
 
@@ -121,7 +121,6 @@ namespace SoDotCash.ViewModels
                 }
             }
         }
-
 
         #endregion
 
@@ -175,7 +174,7 @@ namespace SoDotCash.ViewModels
             }
 
             // Update transactions
-            RaisePropertyChanged("Transactions");
+            RaisePropertyChanged(() => Transactions);
 
             // Move to transactions tab
             ActiveTabIndex = 1;
@@ -200,7 +199,7 @@ namespace SoDotCash.ViewModels
             await UpdateService.DownloadOfxTransactionsForAccount(SelectedAccount).ConfigureAwait(false);
 
             // Update transactions
-            RaisePropertyChanged("Transactions");
+            RaisePropertyChanged(() => Transactions);
 
             // Move to transactions tab
             ActiveTabIndex = 1;
@@ -230,7 +229,7 @@ namespace SoDotCash.ViewModels
             ActiveTabIndex = 0;
 
             // Notify that the list of accounts has changed
-            RaisePropertyChanged("AccountsView");
+            RaisePropertyChanged(() => AccountsView);
         }
     }
 }
