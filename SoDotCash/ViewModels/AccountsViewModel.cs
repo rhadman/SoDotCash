@@ -14,11 +14,24 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class AccountsViewModel : ViewModelBase
     {
+
         public AccountsViewModel()
         {
             // Start on Overview tab
-            ActiveTabIndex = 0;
+            ActiveTabIndex = TabIndex.Overview;
         }
+
+        /// <summary>
+        /// Enumeration providing names to the tabs on the view
+        /// </summary>
+        public enum TabIndex
+        {
+            Overview = 0,
+            Ledger,
+            Import,
+            Configuration
+        };
+
 
         #region [ Public Bound Properties ]
 
@@ -70,7 +83,7 @@ namespace SoDotCash.ViewModels
                 _selectedAccount = value;
 
                 // Ensure we're on the transactions tab
-                ActiveTabIndex = 1;
+                ActiveTabIndex = TabIndex.Ledger;
 
                 // Transactions will be updated since this is a different account
                 RaisePropertyChanged(() => Transactions);
@@ -81,16 +94,27 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound index of the active tab in the account data display section
         /// </summary>
-        private int _activeTabIndex;
-        public int ActiveTabIndex
+        private TabIndex _activeTabIndex;
+        public TabIndex ActiveTabIndex
         {
             get { return _activeTabIndex;}
             set
             {
                 _activeTabIndex = value;
                 RaisePropertyChanged();
+                RaisePropertyChanged(() => ActiveTabIndexAsInt);
             }
-        } 
+        }
+        public int ActiveTabIndexAsInt
+        {
+            get { return (int) _activeTabIndex; }
+            set
+            {
+                _activeTabIndex = (TabIndex) value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(() => ActiveTabIndex);
+            }
+        }
 
         /// <summary>
         /// Provides the collection of transactions for the currently selected account
@@ -177,7 +201,7 @@ namespace SoDotCash.ViewModels
             RaisePropertyChanged(() => Transactions);
 
             // Move to transactions tab
-            ActiveTabIndex = 1;
+            ActiveTabIndex = TabIndex.Ledger;
         }
 
 
@@ -202,7 +226,7 @@ namespace SoDotCash.ViewModels
             RaisePropertyChanged(() => Transactions);
 
             // Move to transactions tab
-            ActiveTabIndex = 1;
+            ActiveTabIndex = TabIndex.Ledger;
         }
 
         /// <summary>

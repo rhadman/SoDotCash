@@ -50,7 +50,7 @@
             </TreeView>
 
         </Grid>
-        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Margin="206,5,10,21" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndex}">
+        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Margin="206,5,10,21" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndexAsInt}">
             <TabItem Header="Overview">
                 <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
