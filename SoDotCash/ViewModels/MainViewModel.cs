@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.IO;
 using GalaSoft.MvvmLight;
 using OFX.Types;
+using SoDotCash.Services;
 
 //using SoDotCash.Models;
 
@@ -63,10 +64,18 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public MainViewModel()
         {
-            var locator = new ViewModelLocator();
-            ActiveViewModel = locator.Accounts;
-
             InitDB();
+
+            // Determing initial view
+            var locator = new ViewModelLocator();
+
+            // If there are accounts, start in the accounts view
+            if (DataService.AnyExistAccounts())
+                ActiveViewModel = locator.Accounts;
+            else
+                // No existing accounts, show welcome screen
+                ActiveViewModel = locator.Welcome;
+
         }
 
         #endregion
