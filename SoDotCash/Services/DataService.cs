@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Deployment.Application;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,8 +22,24 @@ namespace SoDotCash.Services
         public static void InitDB()
         {
             // Set the root directory where the database file will be placed
-            // NOTE: In the future this would ideally be set to the application data path of the installed application for the current user
-            AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
+            if (ApplicationDeployment.IsNetworkDeployed)
+            {
+                // End-user install, create and use the application data directory for this user and application
+                var appStoragePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "SoDotCash");
+
+                // Create the directory if it does not exist
+                if (!Directory.Exists(appStoragePath))
+                    Directory.CreateDirectory(appStoragePath);
+
+                AppDomain.CurrentDomain.SetData("DataDirectory", appStoragePath);
+            }
+            else
+            {
+                // Developer. Use the directory of the application executable
+                AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
+            }
+
 
             // TODO: FIXME: For now we drop and recreate the database if the model changes. This is fine for development, but not
             //   for production
