@@ -193,6 +193,7 @@
     <Compile Include="Models\SoCashDbContext.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Services\BackgroundTaskTracker.cs" />
+    <Compile Include="Services\DataService.cs" />
     <Compile Include="Services\UpdateService.cs" />
     <Compile Include="SoCash.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -205,6 +206,10 @@
     <Compile Include="ViewModels\AddAccountViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
+    <Compile Include="ViewModels\WelcomeViewModel.cs" />
+    <Compile Include="Views\WelcomeView.xaml.cs">
+      <DependentUpon>WelcomeView.xaml</DependentUpon>
+    </Compile>
     <Page Include="Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -235,6 +240,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\WelcomeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -277,9 +286,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\Dialogs\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\OFX\OFX.csproj">
       <Project>{0F035134-E200-41C5-B324-3023ED8DEFF7}</Project>
