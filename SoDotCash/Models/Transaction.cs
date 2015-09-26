@@ -26,7 +26,7 @@ namespace SoDotCash.Models
         [StringLength(3)]
         public string currency { get; set; }
 
-        [Column(TypeName="Date")]
+        [Column(TypeName="datetime")]
         public DateTime date { get; set; }
 
         public int amount { get; set; }
