@@ -12,7 +12,6 @@
   See http://www.galasoft.ch/mvvm
 */
 
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 
@@ -34,6 +33,7 @@ namespace SoDotCash.ViewModels
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<AccountsViewModel>();
             SimpleIoc.Default.Register<AddAccountViewModel>();
+            SimpleIoc.Default.Register<WelcomeViewModel>();
         }
 
         /// <summary>
@@ -50,6 +50,11 @@ namespace SoDotCash.ViewModels
         /// The single add account view model - backing the single AddAccountView
         /// </summary>
         public AddAccountViewModel AddAccount => ServiceLocator.Current.GetInstance<AddAccountViewModel>();
+
+        /// <summary>
+        /// The single welcome view model - backing the single WelcomeView
+        /// </summary>
+        public WelcomeViewModel Welcome => ServiceLocator.Current.GetInstance<WelcomeViewModel>();
 
         public static void Cleanup()
         {

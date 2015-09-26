@@ -13,6 +13,9 @@
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
         >
     <Window.Resources>
+        <DataTemplate DataType="{x:Type viewmodels:WelcomeViewModel}">
+            <local:WelcomeView/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type viewmodels:AccountsViewModel}">
             <local:AccountsView/>
         </DataTemplate>
