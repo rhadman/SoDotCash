@@ -10,6 +10,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="So.Cash" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+        Icon="../cash-flow.ico"
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
         >
     <Window.Resources>
