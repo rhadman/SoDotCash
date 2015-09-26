@@ -64,7 +64,8 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public MainViewModel()
         {
-            InitDB();
+            // Initialize the databas
+            DataService.InitDB();
 
             // Determing initial view
             var locator = new ViewModelLocator();
@@ -76,21 +77,6 @@ namespace SoDotCash.ViewModels
                 // No existing accounts, show welcome screen
                 ActiveViewModel = locator.Welcome;
 
-        }
-
-        #endregion
-
-        #region [ Database Init ]
-
-        private void InitDB()
-        {
-            AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ""));
-
-            //Database.SetInitializer(new DropCreateDatabaseAlways<SoCashDbContext>());
-
-            // TODO: FIXME: For now we drop and recreate the database if the model changes. This is fine for development, but not
-            //   for production
-            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<Models.SoCashDbContext>());
         }
 
         #endregion
