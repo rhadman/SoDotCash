@@ -1,4 +1,6 @@
 ﻿using System.Data.Entity;
+using System.Data.Entity.Core;
+using System.Data.Entity.Core.Objects.DataClasses;
 
 namespace SoDotCash.Models
 {
@@ -6,7 +8,7 @@ namespace SoDotCash.Models
     /// The DbContest provides transparent transaction wrappers around access to the database
     ///  using EntityFramework bound classes representing tables in the database.
     /// </summary>
-    class SoCashDbContext : DbContext
+    public class SoCashDbContext : DbContext
     {
         public SoCashDbContext() :
             base("name=SoCash")

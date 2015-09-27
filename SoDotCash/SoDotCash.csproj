@@ -213,6 +213,7 @@
     <Compile Include="Converters\BoolToInverseBoolConverter.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\AccountTypes.cs" />
+    <Compile Include="Models\EditableEntity.cs" />
     <Compile Include="Models\FinancialInstitution.cs" />
     <Compile Include="Models\FinancialInstitutionUser.cs" />
     <Compile Include="Models\SoCashDbContext.cs" />
