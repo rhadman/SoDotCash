@@ -3,14 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:SoDotCash.Views"
              xmlns:utility="clr-namespace:SoDotCash.Utility"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
              xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
+             x:Name="uc"
              >
     <Grid>
 
@@ -75,17 +74,24 @@
             </TabItem>
             <TabItem Header="Ledger">
                 <Grid  Width="730" Height="300">
-                    <ListView ItemsSource="{Binding Transactions}">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="Date" DisplayMemberBinding="{Binding date, StringFormat=\{0:d\}}" Width="70"/>
-                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding description}" Width="280" />
-                                <GridViewColumn Header="Transaction ID" DisplayMemberBinding="{Binding fiTransactionId}" Width="200" />
-                                <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding localizedAmount, StringFormat=\{0:C2\}}" Width="70" />
-                                <GridViewColumn Header="Balance" DisplayMemberBinding="{Binding localizedBalance, StringFormat=\{0:C2\}}" Width="80" />
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
+                    <Grid.Resources>
+                        <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
+                    </Grid.Resources>
+                    <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
+                    <DataGrid Name="datagrid_Transactions" ItemsSource="{Binding Transactions}" CanUserAddRows="{Binding IsManualAccount}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Date" Binding="{Binding date, StringFormat=\{0:d\}, UpdateSourceTrigger=PropertyChanged}" Width="70"
+                                                IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding description, UpdateSourceTrigger=PropertyChanged}" Width="200"
+                                                IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
+                            <DataGridTextColumn Header="Transaction ID" Binding="{Binding fiTransactionId, UpdateSourceTrigger=PropertyChanged}" Width="200" 
+                                                IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
+                            <DataGridTextColumn Header="Category" Binding="{Binding category, UpdateSourceTrigger=PropertyChanged}" Width="80" />
+                            <DataGridTextColumn Header="Amount" Binding="{Binding localizedAmount, StringFormat=\{0:C2\}, UpdateSourceTrigger=PropertyChanged}" Width="70" 
+                                                IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
+                            <DataGridTextColumn Header="Balance" Binding="{Binding localizedBalance, StringFormat=\{0:C2\}}" Width="80" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </TabItem>
             <TabItem Header="Import">

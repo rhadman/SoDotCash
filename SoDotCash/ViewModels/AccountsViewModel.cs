@@ -1,10 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Data.Entity;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
+using SoDotCash.Models;
 using SoDotCash.Services;
 
 namespace SoDotCash.ViewModels
@@ -85,6 +92,9 @@ namespace SoDotCash.ViewModels
                 // Ensure we're on the transactions tab
                 ActiveTabIndex = TabIndex.Ledger;
 
+                // Update indicator of whether this account allows the user to add transactions manually
+                RaisePropertyChanged(() => IsManualAccount);
+
                 // Transactions will be updated since this is a different account
                 RaisePropertyChanged(() => Transactions);
             }
@@ -119,7 +129,8 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Provides the collection of transactions for the currently selected account
         /// </summary>
-        public IEnumerable<Models.Transaction> Transactions
+        private ObservableCollection<Models.Transaction>_transactions ; 
+        public ObservableCollection<Models.Transaction> Transactions
         {
             get
             {
@@ -131,22 +142,101 @@ namespace SoDotCash.ViewModels
                     var dbAccount = db.Accounts.First(account => account.accountID == SelectedAccount.accountID);
                     var transactions = from t in dbAccount.transactions orderby t.date select t;
 
-                    // Calculate running balance
+                    // Calculate running balance and attach edit notifications
                     int balance = 0;
                     foreach (var transaction in transactions)
                     {
+                        // Calculate balance
                         balance += transaction.amount;
                         transaction.balance = balance;
+
+                        // Attach notifications for edit events
+                        transaction.EditEnded += OnTransactionEditEnded;
                     }
 
                     // Reverse transactions so newest are listed first
-                    return transactions.Reverse();
+                    _transactions = new ObservableCollection<Transaction>(transactions.Reverse());
+
+                    // Ensure the new item row is at the top of the view
+                    ((IEditableCollectionView) CollectionViewSource.GetDefaultView(_transactions)).NewItemPlaceholderPosition = NewItemPlaceholderPosition.AtBeginning;
+                    //CollectionViewSource.GetDefaultView(_transactions).CurrentChanging += OnCurrentChanging;
+                   // Get notified when the user modifies entries in the datagrid
+
+                    _transactions.CollectionChanged += TransactionsOnCollectionChanged;
+                    return _transactions;
 
                 }
             }
         }
 
+        /// <summary>
+        /// Determination of whether the user should be able to add transactions to the ledger
+        /// </summary>
+        public bool IsManualAccount
+        {
+            get
+            {
+                // If there is no selected account, transactions cannot be added
+                if (SelectedAccount == null)
+                    return false;
+                // If the account is associated with a financial institution user, it is an auto-update account
+                //  and users may not add transactions manually
+                return (!SelectedAccount.IsAssociatedWithFinancialInstitution);
+            }
+        }
+
         #endregion
+
+
+        /// <summary>
+        /// Handle modification events from the DataGrid containing transactions
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="notifyCollectionChangedEventArgs"></param>
+        private void TransactionsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            switch (notifyCollectionChangedEventArgs.Action)
+            {
+                // Handle a new transaction in the collection
+                case NotifyCollectionChangedAction.Add:
+                    {
+                        // Attach notification event handlers for this transaction
+                        var transaction = (Models.Transaction)notifyCollectionChangedEventArgs.NewItems[0];
+                        transaction.EditBegun += OnNewTransactionEditBegun;
+                        transaction.EditEnded += OnTransactionEditEnded;
+
+                        break;
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Called after the DB context has been opened for editing a new transaction
+        /// </summary>
+        /// <param name="sender">Always a Transaction</param>
+        /// <param name="eventArgs">Not used</param>
+        private void OnNewTransactionEditBegun(object sender, EventArgs eventArgs)
+        {
+            var transaction = (Transaction)sender;
+
+            // Ensure the Account is attached to the same context as the transaction
+            transaction.EditContext.Entry(SelectedAccount).State = EntityState.Unchanged;
+            transaction.account = SelectedAccount;
+
+            // This is a new transaction. Ensure it is being ADDED to the database
+            transaction.EditContext.Entry(transaction).State = EntityState.Added;
+        }
+
+        /// <summary>
+        /// Called after the transaction is saved to the database
+        /// </summary>
+        /// <param name="sender">Always a Transaction</param>
+        /// <param name="eventArgs">Not used</param>
+        private void OnTransactionEditEnded(object sender, EventArgs eventArgs)
+        {
+            // Need to re-sort the data and recalculate balances
+            RaisePropertyChanged(() => Transactions);
+        }
 
         /// <summary>
         /// Binding for the Add Account button
