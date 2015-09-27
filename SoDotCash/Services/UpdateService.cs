@@ -66,7 +66,6 @@ namespace SoDotCash.Services
                             {
                                 amount = transaction.Amount,
                                 category = "",
-                                currency = statement.Currency,
                                 date = transaction.PostDate.Date,
                                 description = transaction.Name,
                                 fiTransactionId = transaction.TransactionId,
@@ -110,7 +109,6 @@ namespace SoDotCash.Services
                                 amount = (statement.AccountBalance - dbBalance),
                                 category = "BALADJUST",
                                 description = "Balance Adjustment",
-                                currency = statement.Currency,
                                 fiTransactionId = System.Guid.NewGuid().ToString(),
                                 date = fillerDate
                             };
