@@ -78,7 +78,8 @@
                         <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
                     </Grid.Resources>
                     <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
-                    <DataGrid Name="datagrid_Transactions" ItemsSource="{Binding Transactions}" CanUserAddRows="{Binding IsManualAccount}" AutoGenerateColumns="False">
+                    <DataGrid Name="datagrid_Transactions" ItemsSource="{Binding Transactions}" CanUserAddRows="{Binding IsManualAccount}" SelectionUnit="FullRow" SelectionMode="Single"
+                              CanUserDeleteRows="{Binding IsManualAccount}" AutoGenerateColumns="False" SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Date" Binding="{Binding date, StringFormat=\{0:d\}, UpdateSourceTrigger=PropertyChanged}" Width="70"
                                                 IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
@@ -91,6 +92,9 @@
                                                 IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
                             <DataGridTextColumn Header="Balance" Binding="{Binding localizedBalance, StringFormat=\{0:C2\}}" Width="80" IsReadOnly="True"/>
                         </DataGrid.Columns>
+                        <DataGrid.InputBindings>
+                            <KeyBinding Key="Delete" Command="{Binding DeleteTransactionCommand}" />
+                        </DataGrid.InputBindings>
                     </DataGrid>
                 </Grid>
             </TabItem>

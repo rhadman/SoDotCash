@@ -100,6 +100,21 @@ namespace SoDotCash.ViewModels
             }
         }
 
+        /// <summary>
+        /// Bound current transaction
+        /// </summary>
+        private Models.Transaction _selectedTransaction;
+        public Models.Transaction SelectedTransaction
+        {
+            get { return _selectedTransaction; }
+            set
+            {
+                // Assign
+                _selectedTransaction = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
         /// <summary>
         /// Bound index of the active tab in the account data display section
@@ -257,6 +272,26 @@ namespace SoDotCash.ViewModels
             locator.Main.ActiveViewModel = locator.AddAccount;
         }
 
+        /// <summary>
+        /// Binding for the Delete Transaction action (delete key from ledger)
+        /// </summary>
+        private ICommand _deleteTransactionCommand;
+        public ICommand DeleteTransactionCommand
+        {
+            get { return _deleteTransactionCommand ?? (_deleteTransactionCommand = new RelayCommand(DeleteTransaction, () => IsManualAccount)); }
+        }
+
+        /// <summary>
+        /// Deletes the transaction currently selected in the datagrid
+        /// </summary>
+        public void DeleteTransaction()
+        {
+            // Delete the transaction
+            DataService.DeleteTransaction(SelectedTransaction);
+
+            // Need to re-sort the data and recalculate balances
+            RaisePropertyChanged(() => Transactions);
+        }
 
         /// <summary>
         /// Binding for the Import Transactions button
