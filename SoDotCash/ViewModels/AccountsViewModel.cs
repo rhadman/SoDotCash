@@ -89,9 +89,6 @@ namespace SoDotCash.ViewModels
                 // Assign
                 _selectedAccount = value;
 
-                // Ensure we're on the transactions tab
-                ActiveTabIndex = TabIndex.Ledger;
-
                 // Update indicator of whether this account allows the user to add transactions manually
                 RaisePropertyChanged(() => IsManualAccount);
 
