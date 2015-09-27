@@ -39,6 +39,11 @@ namespace SoDotCash.Models
 
         [StringLength(50)]
         public string fiAccountID { get; set; }
+
+        /// <summary>
+        /// Shortcut accessor for determining if an account is associated with a FI
+        /// </summary>
+        public bool IsAssociatedWithFinancialInstitution => fiUserID != null;
         
         [InverseProperty("accounts")]
         [ForeignKey("fiUserID")]
