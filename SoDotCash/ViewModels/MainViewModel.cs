@@ -1,15 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Entity;
-using System.IO;
 using GalaSoft.MvvmLight;
 using OFX.Types;
 using SoDotCash.Services;
-
-//using SoDotCash.Models;
-
-//using SoDotCash.Models;
+using SoDotCash.Models;
 
 namespace SoDotCash.ViewModels
 {
@@ -46,16 +39,6 @@ namespace SoDotCash.ViewModels
 
         #endregion
 
-        #region [ Private Backing Fields ]
-
-        #endregion
-
-        #region [ Private fields ]
-
-        private IEnumerable<Statement> _statementCollection = new Collection<Statement>();
-
-        #endregion
-
         #region [ Constructors ]
 
 
@@ -65,7 +48,7 @@ namespace SoDotCash.ViewModels
         public MainViewModel()
         {
             // Initialize the databas
-            DataService.InitDB();
+            DataService.InitDb();
 
             // Determing initial view
             var locator = new ViewModelLocator();
@@ -80,69 +63,5 @@ namespace SoDotCash.ViewModels
         }
 
         #endregion
-
-        #region [ Relay Commands ]
-
-        /*
-        private async void LoadTransactionsCommand(int counter = 0)
-        {
-            RetrievingTransactions = true;
-            
-            var fi = new OFX.Types.FinancialInstitution("State Employees Credit Union",
-                new Uri("https://onlineaccess.ncsecu.org/secuofx/secu.ofx"),
-                "SECU", "1001");
-            var creds = new Credentials("username", "password");
-            var service = new OFX2Service(fi, creds);
-            try
-            {
-                var acts = await service.ListAccounts();
-                var endTime = DateTimeOffset.Now;
-                var startTime = endTime - new TimeSpan(30, 0, 0, 0);
-
-
-                //TODO: IMPLEMENT ITERATING OVER ACCOUNTS AND HANDLE EXCEPTIONS MORE GRACIOUSLY
-                //var stmts = new List<OFX.Types.Statement>();
-
-                //foreach (var account in acts)
-                //{
-                //    stmts.AddRange(await service.GetStatement(account, startTime, endTime));
-                //}
-
-                //_statementCollection = stmts;
-
-                _statementCollection = await service.GetStatement(acts.First(), startTime, endTime);
-
-                //Statements = new ObservableCollection<Statement>(statements);
-                RaisePropertyChanged("Statements");
-
-                var accountList = acts.GroupBy(act => act.AccountType);
-
-                AccountsView = new Dictionary<AccountEnum, ObservableCollection<OFX.Types.Account>>();
-
-                foreach (var act in accountList)
-                {
-                    AccountsView.Add(act.Key, new ObservableCollection<OFX.Types.Account>(act.ToList()));
-                }
-                RaisePropertyChanged("AccountsView");
-            }
-            catch (Exception ex)
-            {
-                if (counter > 5)
-                {
-                    MessageBox.Show($"An Error Occured When Retrieved your account info.  Please Try Again\n{ex.Message}\n{ex.StackTrace}", "Error");
-                    return;
-                }
-                LoadTransactionsCommand(++counter);
-            }
-
-
-            RetrievingTransactions = false;
-        }
-        */
-
-
-        #endregion
-
-
     }
 }

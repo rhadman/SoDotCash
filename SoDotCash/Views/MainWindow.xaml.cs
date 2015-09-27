@@ -1,10 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Windows;
-using SoDotCash.ViewModels;
-
-
+﻿
 namespace SoDotCash.Views
 {
     /// <summary>

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoDotCash.Models
 {
@@ -14,34 +11,33 @@ namespace SoDotCash.Models
         /// <summary>
         /// String name of enum value
         /// </summary>
-        private readonly String name;
+        private readonly string _name;
 
         /// <summary>
         /// Unique integer value of enum
         /// </summary>
-        private readonly int value;
+        public int Value { get; }
 
         /// <summary>
         /// Mapping from string to enum entry. Also used for enumeration of all values
         /// </summary>
-        private static readonly Dictionary<string, AccountType> instance = new Dictionary<string, AccountType>();
+        private static readonly Dictionary<string, AccountType> Instance = new Dictionary<string, AccountType>();
 
-        public static readonly AccountType CHECKING = new AccountType(1, "Checking");
-        public static readonly AccountType SAVINGS = new AccountType(2, "Savings");
-        public static readonly AccountType CREDITCARD = new AccountType(3, "Credit Card");
+        public static readonly AccountType Checking = new AccountType(1, "Checking");
+        public static readonly AccountType Savings = new AccountType(2, "Savings");
+        public static readonly AccountType Creditcard = new AccountType(3, "Credit Card");
 
-
-        private AccountType(int value, String name)
+        private AccountType(int value, string name)
         {
-            this.value = value;
-            this.name = name;
+            Value = value;
+            _name = name;
             // Add to mapping
-            instance[name] = this;
+            Instance[name] = this;
         }
 
-        public override String ToString()
+        public override string ToString()
         {
-            return name;
+            return _name;
         }
 
         /// <summary>
@@ -51,7 +47,7 @@ namespace SoDotCash.Models
         public static explicit operator AccountType(string str)
         {
             AccountType result;
-            if (instance.TryGetValue(str, out result))
+            if (Instance.TryGetValue(str, out result))
                 return result;
             throw new InvalidCastException();
         }
@@ -62,7 +58,7 @@ namespace SoDotCash.Models
         /// <returns>Enumerable over the </returns>
         public static IEnumerable<AccountType> All()
         {
-            return instance.Values;
+            return Instance.Values;
         }
 
     }

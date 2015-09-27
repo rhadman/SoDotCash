@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Deployment.Application;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SoDotCash.Models;
 
 namespace SoDotCash.Services
@@ -19,7 +16,7 @@ namespace SoDotCash.Services
         /// <summary>
         /// Initialize the database for first use by the application
         /// </summary>
-        public static void InitDB()
+        public static void InitDb()
         {
             // Set the root directory where the database file will be placed
             if (ApplicationDeployment.IsNetworkDeployed)
@@ -43,7 +40,7 @@ namespace SoDotCash.Services
 
             // TODO: FIXME: For now we drop and recreate the database if the model changes. This is fine for development, but not
             //   for production
-            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<Models.SoCashDbContext>());
+            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<SoCashDbContext>());
 
             //Database.SetInitializer(new DropCreateDatabaseAlways<Models.SoCashDbContext>());
 
@@ -81,9 +78,9 @@ namespace SoDotCash.Services
             using (var db = new SoCashDbContext())
             {
                 // Retrieve matching account from DB - we need to get an entity in the current db session
-                var updateAccount = db.Accounts.First(dbAccount => dbAccount.accountID == account.accountID);
+                var updateAccount = db.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
 
-                updateAccount.transactions.Add(transaction);
+                updateAccount.Transactions.Add(transaction);
 
                 db.SaveChanges();
             }

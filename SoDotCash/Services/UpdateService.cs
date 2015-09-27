@@ -26,12 +26,12 @@ namespace SoDotCash.Services
                 using (var db = new SoCashDbContext())
                 {
                     // Retrieve matching account from DB - we need to get an entity in the current db session
-                    var updateAccount = db.Accounts.First(dbAccount => dbAccount.accountID == account.accountID);
+                    var updateAccount = db.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
 
                     // If the account has no account ID set, set it from the imported statement
-                    if (updateAccount.fiAccountID == null)
-                        updateAccount.fiAccountID = statement.OwningAccount.AccountId;
-                    else if (updateAccount.fiAccountID != statement.OwningAccount.AccountId)
+                    if (updateAccount.FiAccountId == null)
+                        updateAccount.FiAccountId = statement.OwningAccount.AccountId;
+                    else if (updateAccount.FiAccountId != statement.OwningAccount.AccountId)
                     {
                         // TODO: Raise an error - this statement does not match the specified account.
                     }
@@ -51,11 +51,11 @@ namespace SoDotCash.Services
                         try
                         {
                             var existingTransaction =
-                                updateAccount.transactions.First(t => t.fiTransactionId == transaction.TransactionId);
+                                updateAccount.Transactions.First(t => t.FiTransactionId == transaction.TransactionId);
 
                             // Ensure amount and date of transaction match
-                            existingTransaction.amount = transaction.Amount;
-                            existingTransaction.date = transaction.PostDate.Date;
+                            existingTransaction.Amount = transaction.Amount;
+                            existingTransaction.Date = transaction.PostDate.Date;
                         }
                         catch (InvalidOperationException)
                         {
@@ -64,21 +64,21 @@ namespace SoDotCash.Services
                             // Create model transaction
                             var dbTransaction = new Transaction
                             {
-                                amount = transaction.Amount,
-                                category = "",
-                                date = transaction.PostDate.Date,
-                                description = transaction.Name,
-                                fiTransactionId = transaction.TransactionId,
+                                Amount = transaction.Amount,
+                                CategoryName = "",
+                                Date = transaction.PostDate.Date,
+                                Description = transaction.Name,
+                                FiTransactionId = transaction.TransactionId,
 
                             };
-                            updateAccount.transactions.Add(dbTransaction);
+                            updateAccount.Transactions.Add(dbTransaction);
 
                         }
                     }
 
                     // Sum all transactions in the data set and ensure the balance on the date of the end of the statement matches the reported balance
-                    var dbBalance = updateAccount.transactions.Where(t => t.date <= latestTransaction)
-                        .Sum(t => t.amount);
+                    var dbBalance = updateAccount.Transactions.Where(t => t.Date <= latestTransaction)
+                        .Sum(t => t.Amount);
                     if (dbBalance != statement.AccountBalance)
                     {
                         // Need to add or modify a filler transaction
@@ -86,15 +86,15 @@ namespace SoDotCash.Services
                         {
                             // Look for a pre-existing filler transaction as the transaction prior to the start of this statement
                             var fillerTransaction =
-                                updateAccount.transactions.Where(t => t.date < earliestTransaction)
-                                    .OrderByDescending(t => t.date)
+                                updateAccount.Transactions.Where(t => t.Date < earliestTransaction)
+                                    .OrderByDescending(t => t.Date)
                                     .First();
                             // If this is not a balance adjustment transaction, move to creating a new transaction to adjust
-                            if (fillerTransaction.description != "Balance Adjustment")
+                            if (fillerTransaction.Description != "Balance Adjustment")
                                 throw new InvalidOperationException();
 
                             // An existing balance adjustment is in place. Modify;
-                            fillerTransaction.amount += (statement.AccountBalance - dbBalance);
+                            fillerTransaction.Amount += (statement.AccountBalance - dbBalance);
                         }
                         catch (InvalidOperationException)
                         {
@@ -106,13 +106,13 @@ namespace SoDotCash.Services
                             // No existing balance adjustment transaction exists. Add one.
                             var fillerTransaction = new Transaction
                             {
-                                amount = (statement.AccountBalance - dbBalance),
-                                category = "BALADJUST",
-                                description = "Balance Adjustment",
-                                fiTransactionId = System.Guid.NewGuid().ToString(),
-                                date = fillerDate
+                                Amount = (statement.AccountBalance - dbBalance),
+                                CategoryName = "BALADJUST",
+                                Description = "Balance Adjustment",
+                                FiTransactionId = Guid.NewGuid().ToString(),
+                                Date = fillerDate
                             };
-                            updateAccount.transactions.Add(fillerTransaction);
+                            updateAccount.Transactions.Add(fillerTransaction);
                         }
                     }
 
@@ -169,55 +169,55 @@ namespace SoDotCash.Services
                 using (var db = new SoCashDbContext())
                 {
                     // Retrieve matching account from DB - we need to get an entity in the current db session
-                    var updateAccount = db.Accounts.First(dbAccount => dbAccount.accountID == account.accountID);
+                    var updateAccount = db.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
 
                     // Form FI connection properties for transaction retrieval
                     var fi = new OFX.Types.FinancialInstitution(
-                        updateAccount.financialInstitutionUser.financialInstitution.name,
-                        new Uri(updateAccount.financialInstitutionUser.financialInstitution.ofxUpdateUrl),
-                        updateAccount.financialInstitutionUser.financialInstitution.ofxOrganizationId,
-                        updateAccount.financialInstitutionUser.financialInstitution.ofxFinancialUnitId
+                        updateAccount.FinancialInstitutionUser.FinancialInstitution.Name,
+                        new Uri(updateAccount.FinancialInstitutionUser.FinancialInstitution.OfxUpdateUrl),
+                        updateAccount.FinancialInstitutionUser.FinancialInstitution.OfxOrganizationId,
+                        updateAccount.FinancialInstitutionUser.FinancialInstitution.OfxFinancialUnitId
                         );
 
                     // Form credentials for login
                     var credentials = new OFX.Types.Credentials(
-                        updateAccount.financialInstitutionUser.userId,
-                        updateAccount.financialInstitutionUser.password
+                        updateAccount.FinancialInstitutionUser.UserId,
+                        updateAccount.FinancialInstitutionUser.Password
                         );
 
                     // Create service
                     ofxService = new OFX2Service(fi, credentials);
 
                     // Create proper account type for this account
-                    var accountType = (AccountType) account.accountType;
-                    if (accountType == AccountType.CHECKING)
+                    var accountType = (AccountType) account.AccountType;
+                    if (accountType == AccountType.Checking)
                     {
                         // Split routing and account id from combined string
-                        var accountIdComponents = account.fiAccountID.Split(':');
+                        var accountIdComponents = account.FiAccountId.Split(':');
                         ofxAccount = new OFX.Types.CheckingAccount(accountIdComponents[0], accountIdComponents[1],
                             "",
                             true);
                     }
-                    else if (accountType == AccountType.SAVINGS)
+                    else if (accountType == AccountType.Savings)
                     {
                         // Split routing and account id from combined string
-                        var accountIdComponents = account.fiAccountID.Split(':');
+                        var accountIdComponents = account.FiAccountId.Split(':');
                         ofxAccount = new OFX.Types.SavingsAccount(accountIdComponents[0], accountIdComponents[1], "",
                             true);
                     }
                     else //if (accountType == AccountType.CREDITCARD)
                     {
-                        ofxAccount = new OFX.Types.CreditCardAccount(account.fiAccountID, "", true);
+                        ofxAccount = new OFX.Types.CreditCardAccount(account.FiAccountId, "", true);
                     }
 
                     // Use the start time of the latest transaction if we have any
                     try
                     {
                         var lastTransaction =
-                            (from transaction in updateAccount.transactions
-                                orderby transaction.date descending
+                            (from transaction in updateAccount.Transactions
+                                orderby transaction.Date descending
                                 select transaction).First();
-                        startTime = new DateTimeOffset(lastTransaction.date);
+                        startTime = new DateTimeOffset(lastTransaction.Date);
 
                     }
                     catch (InvalidOperationException)
@@ -261,36 +261,36 @@ namespace SoDotCash.Services
                     foreach (var ofxAccount in ofxAccountList)
                     {
                         // Convert from OFX account type to db account type and encode account id 
-                        AccountType accountType = AccountType.CHECKING;
+                        AccountType accountType = AccountType.Checking;
                         string accountId = "";
                         if (ofxAccount.GetType() == typeof (OFX.Types.CheckingAccount))
                         {
-                            accountType = AccountType.CHECKING;
+                            accountType = AccountType.Checking;
                             accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
                         }
                         else if (ofxAccount.GetType() == typeof (OFX.Types.SavingsAccount))
                         {
-                            accountType = AccountType.SAVINGS;
+                            accountType = AccountType.Savings;
                             accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
                         }
                         else if (ofxAccount.GetType() == typeof (OFX.Types.CreditCardAccount))
                         {
-                            accountType = AccountType.CREDITCARD;
+                            accountType = AccountType.Creditcard;
                             accountId = ofxAccount.AccountId;
                         }
 
                         // Look for a matching account in the database
-                        if (!db.Accounts.Any(a => a.fiAccountID == accountId))
+                        if (!db.Accounts.Any(a => a.FiAccountId == accountId))
                         {
                             // This account is not already in the DB, add to new account list
                             accountList.Add(new Account
                             {
-                                accountName =
+                                AccountName =
                                     accountType + ":" +
                                     ofxAccount.AccountId.Substring(ofxAccount.AccountId.Length - 4),
-                                accountType = accountType.ToString(),
-                                currency = "USD",
-                                fiAccountID = accountId
+                                AccountType = accountType.ToString(),
+                                Currency = "USD",
+                                FiAccountId = accountId
                             });
                         }
                     }
@@ -312,12 +312,12 @@ namespace SoDotCash.Services
             using (var db = new SoCashDbContext())
             {
                 // Retrieve matching account from DB - we need to get an entity in the current db session
-                var deleteAccount = db.Accounts.First(dbAccount => dbAccount.accountID == account.accountID);
+                var deleteAccount = db.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
 
                 // Delete fiUser if this is the only account referencing it
-                if (deleteAccount.financialInstitutionUser != null &&
-                    deleteAccount.financialInstitutionUser.accounts.Count == 1)
-                    db.FinancialInstitutionUsers.Remove(deleteAccount.financialInstitutionUser);
+                if (deleteAccount.FinancialInstitutionUser != null &&
+                    deleteAccount.FinancialInstitutionUser.Accounts.Count == 1)
+                    db.FinancialInstitutionUsers.Remove(deleteAccount.FinancialInstitutionUser);
 
                 // Remove the account
                 db.Accounts.Remove(deleteAccount);

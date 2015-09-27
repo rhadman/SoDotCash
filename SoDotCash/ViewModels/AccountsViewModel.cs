@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -45,28 +44,28 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Provides the collection of accounts mapped by the account type of each
         /// </summary>
-        public Dictionary<string, ObservableCollection<Models.Account>> AccountsView
+        public Dictionary<string, ObservableCollection<Account>> AccountsView
         {
             get
             {
-                var accountsByType = new Dictionary<string, ObservableCollection<Models.Account>>();
+                var accountsByType = new Dictionary<string, ObservableCollection<Account>>();
 
                 // Retrieve the accounts from the database
-                using (var db = new Models.SoCashDbContext())
+                using (var db = new SoCashDbContext())
                 {
                     // Map all accounts by type
                     foreach (var account in db.Accounts)
                     {
                         // Add category if needed
-                        ObservableCollection<Models.Account> accountList;
-                        if (!accountsByType.ContainsKey(account.accountType))
+                        ObservableCollection<Account> accountList;
+                        if (!accountsByType.ContainsKey(account.AccountType))
                         {
-                            accountList = new ObservableCollection<Models.Account>();
-                            accountsByType.Add(account.accountType, accountList);
+                            accountList = new ObservableCollection<Account>();
+                            accountsByType.Add(account.AccountType, accountList);
                         }
                         else
                         {
-                            accountList = accountsByType[account.accountType];
+                            accountList = accountsByType[account.AccountType];
                         }
 
                         // Add to the list under this type
@@ -80,8 +79,8 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound current account
         /// </summary>
-        private Models.Account _selectedAccount;
-        public Models.Account SelectedAccount
+        private Account _selectedAccount;
+        public Account SelectedAccount
         {
             get { return _selectedAccount; }
             set
@@ -100,8 +99,8 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound current transaction
         /// </summary>
-        private Models.Transaction _selectedTransaction;
-        public Models.Transaction SelectedTransaction
+        private Transaction _selectedTransaction;
+        public Transaction SelectedTransaction
         {
             get { return _selectedTransaction; }
             set
@@ -141,26 +140,26 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Provides the collection of transactions for the currently selected account
         /// </summary>
-        private ObservableCollection<Models.Transaction>_transactions ; 
-        public ObservableCollection<Models.Transaction> Transactions
+        private ObservableCollection<Transaction>_transactions ; 
+        public ObservableCollection<Transaction> Transactions
         {
             get
             {
                 if (SelectedAccount == null)
                     return null;
-                using (var db = new Models.SoCashDbContext())
+                using (var db = new SoCashDbContext())
                 {
                     // Retrieve account - we need to get an entity in the current db session
-                    var dbAccount = db.Accounts.First(account => account.accountID == SelectedAccount.accountID);
-                    var transactions = from t in dbAccount.transactions orderby t.date select t;
+                    var dbAccount = db.Accounts.First(account => account.AccountId == SelectedAccount.AccountId);
+                    var transactions = from t in dbAccount.Transactions orderby t.Date select t;
 
                     // Calculate running balance and attach edit notifications
                     int balance = 0;
                     foreach (var transaction in transactions)
                     {
                         // Calculate balance
-                        balance += transaction.amount;
-                        transaction.balance = balance;
+                        balance += transaction.Amount;
+                        transaction.Balance = balance;
 
                         // Attach notifications for edit events
                         transaction.EditEnded += OnTransactionEditEnded;
@@ -171,10 +170,9 @@ namespace SoDotCash.ViewModels
 
                     // Ensure the new item row is at the top of the view
                     ((IEditableCollectionView) CollectionViewSource.GetDefaultView(_transactions)).NewItemPlaceholderPosition = NewItemPlaceholderPosition.AtBeginning;
-                    //CollectionViewSource.GetDefaultView(_transactions).CurrentChanging += OnCurrentChanging;
-                   // Get notified when the user modifies entries in the datagrid
 
-                    _transactions.CollectionChanged += TransactionsOnCollectionChanged;
+                    // Get notified when the user modifies entries in the datagrid
+                   _transactions.CollectionChanged += TransactionsOnCollectionChanged;
                     return _transactions;
 
                 }
@@ -213,7 +211,7 @@ namespace SoDotCash.ViewModels
                 case NotifyCollectionChangedAction.Add:
                     {
                         // Attach notification event handlers for this transaction
-                        var transaction = (Models.Transaction)notifyCollectionChangedEventArgs.NewItems[0];
+                        var transaction = (Transaction)notifyCollectionChangedEventArgs.NewItems[0];
                         transaction.EditBegun += OnNewTransactionEditBegun;
                         transaction.EditEnded += OnTransactionEditEnded;
 
@@ -233,7 +231,7 @@ namespace SoDotCash.ViewModels
 
             // Ensure the Account is attached to the same context as the transaction
             transaction.EditContext.Entry(SelectedAccount).State = EntityState.Unchanged;
-            transaction.account = SelectedAccount;
+            transaction.Account = SelectedAccount;
 
             // This is a new transaction. Ensure it is being ADDED to the database
             transaction.EditContext.Entry(transaction).State = EntityState.Added;
@@ -304,8 +302,7 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public void ImportTransactions()
         {
-            var fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Bank Statements (*.ofx, *.qfx)|*.ofx;*.qfx";
+            var fileDialog = new OpenFileDialog {Filter = "Bank Statements (*.ofx, *.qfx)|*.ofx;*.qfx"};
             if (fileDialog.ShowDialog() != true)
             {
                 // Cancel selected, ignore
@@ -333,7 +330,7 @@ namespace SoDotCash.ViewModels
         private ICommand _downloadTransactionsCommand;
         public ICommand DownloadTransactionsCommand
         {
-            get { return _downloadTransactionsCommand ?? (_downloadTransactionsCommand = new RelayCommand(DownloadTransactions, () => SelectedAccount?.fiUserID != null)); }
+            get { return _downloadTransactionsCommand ?? (_downloadTransactionsCommand = new RelayCommand(DownloadTransactions, () => SelectedAccount?.FiUserId != null)); }
         }
 
         /// <summary>

@@ -1,7 +1,6 @@
 ﻿using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using SoDotCash.Services;
 
 namespace SoDotCash.ViewModels
 {
@@ -10,13 +9,6 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class WelcomeViewModel : ViewModelBase
     {
-        /// <summary>
-        /// Initializes a new instance of the WelcomeViewModel class.
-        /// </summary>
-        public WelcomeViewModel()
-        {
-        }
-
         /// <summary>
         /// Binding for the Download Transactions button
         /// </summary>

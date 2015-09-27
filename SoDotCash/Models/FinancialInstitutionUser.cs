@@ -6,30 +6,29 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SoDotCash.Models
 {
-    using System;
-    using System.Data.Entity;
-    using System.Linq;
-
+    /// <summary>
+    /// Describes an account at a financual institution, including authentication credentials
+    /// </summary>
     [Table("FIUser")]
     public class FinancialInstitutionUser
     {
         [Key]
-        public int fiUserId { get; set; }
+        public int FiUserId { get; set; }
 
-        public int fiId { get; set; }
-
-        [StringLength(50)]
-        public string userId { get; set; }
+        public int FiId { get; set; }
 
         [StringLength(50)]
-        public string password { get; set; }
+        public string UserId { get; set; }
 
-        [InverseProperty("users")]
-        [ForeignKey("fiId")]
-        public virtual FinancialInstitution financialInstitution { get; set; }
+        [StringLength(50)]
+        public string Password { get; set; }
+
+        [InverseProperty("Users")]
+        [ForeignKey("FiId")]
+        public virtual FinancialInstitution FinancialInstitution { get; set; }
 
         private ICollection<Account> _accounts;
-        public virtual ICollection<Account> accounts
+        public virtual ICollection<Account> Accounts
         {
             get { return _accounts ?? (_accounts = new Collection<Account>()); }
             set { _accounts = value; }

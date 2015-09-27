@@ -1,6 +1,4 @@
 ﻿using System.Data.Entity;
-using System.Data.Entity.Core;
-using System.Data.Entity.Core.Objects.DataClasses;
 
 namespace SoDotCash.Models
 {

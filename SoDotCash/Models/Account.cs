@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
 
 namespace SoDotCash.Models
 {
@@ -16,41 +15,41 @@ namespace SoDotCash.Models
 
         public Account(Account other)
         {
-            fiUserID = other.fiUserID;
-            accountName = other.accountName;
-            accountType = other.accountType;
-            currency = other.currency;
-            fiAccountID = other.fiAccountID;
+            FiUserId = other.FiUserId;
+            AccountName = other.AccountName;
+            AccountType = other.AccountType;
+            Currency = other.Currency;
+            FiAccountId = other.FiAccountId;
         }
 
         [Key]
-        public int accountID { get; set; }
+        public int AccountId { get; set; }
 
-        public int? fiUserID { get; set; }
+        public int? FiUserId { get; set; }
 
         [StringLength(50)]
-        public string accountName { get; set; }
+        public string AccountName { get; set; }
 
         [StringLength(15)]
-        public string accountType { get; set; }
+        public string AccountType { get; set; }
 
         [StringLength(3)]
-        public string currency { get; set; }
+        public string Currency { get; set; }
 
         [StringLength(50)]
-        public string fiAccountID { get; set; }
+        public string FiAccountId { get; set; }
 
         /// <summary>
         /// Shortcut accessor for determining if an account is associated with a FI
         /// </summary>
-        public bool IsAssociatedWithFinancialInstitution => fiUserID != null;
+        public bool IsAssociatedWithFinancialInstitution => FiUserId != null;
         
-        [InverseProperty("accounts")]
-        [ForeignKey("fiUserID")]
-        public virtual FinancialInstitutionUser financialInstitutionUser { get; set; }
+        [InverseProperty("Accounts")]
+        [ForeignKey("FiUserId")]
+        public virtual FinancialInstitutionUser FinancialInstitutionUser { get; set; }
 
         private ICollection<Transaction> _transactions;
-        public virtual ICollection<Transaction> transactions
+        public virtual ICollection<Transaction> Transactions
         {
             get { return _transactions ?? (_transactions = new Collection<Transaction>()); }
             set { _transactions = value; }

@@ -5,8 +5,8 @@
              StartupUri="Views/MainWindow.xaml" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:utility="clr-namespace:SoDotCash.Utility"
-             d1p1:Ignorable="d" 
-             xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d1P1:Ignorable="d" 
+             xmlns:d1P1="http://schemas.openxmlformats.org/markup-compatibility/2006"
              >
 
     <Application.Resources>

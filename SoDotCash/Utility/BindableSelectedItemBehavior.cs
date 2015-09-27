@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
 
@@ -24,7 +19,7 @@ namespace SoDotCash.Utility
         /// </summary>
         public object SelectedItem
         {
-            get { return (object)GetValue(SelectedItemProperty); }
+            get { return GetValue(SelectedItemProperty); }
             set { SetValue(SelectedItemProperty, value); }
         }
 
@@ -55,7 +50,7 @@ namespace SoDotCash.Utility
         {
             base.OnAttached();
 
-            this.AssociatedObject.SelectedItemChanged += OnTreeViewSelectedItemChanged;
+            AssociatedObject.SelectedItemChanged += OnTreeViewSelectedItemChanged;
         }
 
         /// <summary>
@@ -65,9 +60,9 @@ namespace SoDotCash.Utility
         {
             base.OnDetaching();
 
-            if (this.AssociatedObject != null)
+            if (AssociatedObject != null)
             {
-                this.AssociatedObject.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
+                AssociatedObject.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
             }
         }
 
@@ -76,7 +71,7 @@ namespace SoDotCash.Utility
         /// </summary>
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            this.SelectedItem = e.NewValue;
+            SelectedItem = e.NewValue;
         }
     }
 }
