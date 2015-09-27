@@ -69,5 +69,40 @@ namespace SoDotCash.Services
                 return db.Accounts.Any();
             }
         }
+
+        /// <summary>
+        /// Add a new transaction to an account.
+        /// Called from the UI for manual entry
+        /// </summary>
+        /// <param name="account">Account to add transactions to</param>
+        /// <param name="transaction">Transaction to add</param>
+        public static void AddTransaction(Account account, Transaction transaction)
+        {
+            using (var db = new SoCashDbContext())
+            {
+                // Retrieve matching account from DB - we need to get an entity in the current db session
+                var updateAccount = db.Accounts.First(dbAccount => dbAccount.accountID == account.accountID);
+
+                updateAccount.transactions.Add(transaction);
+
+                db.SaveChanges();
+            }
+        }
+
+
+        /// <summary>
+        /// Update values of an existing transaction
+        /// Called from the UI for edits
+        /// </summary>
+        /// <param name="transaction">Modified transaction</param>
+        public static void UpdateTransaction(Transaction transaction)
+        {
+            using (var db = new SoCashDbContext())
+            {
+                // Attach to context and mark as modified
+                db.Entry(transaction).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
     }
 }
