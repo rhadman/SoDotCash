@@ -259,26 +259,35 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Create a manual-entry account from the provided information
         /// </summary>
-        protected void CreateManualAccount()
+        /// <returns>Created account</returns>
+        protected Account CreateManualAccount()
         {
             // Add the new account
             using (var db = new SoCashDbContext())
             {
+                // Fill in account data
                 var newAccount = new Account
                 {
                     AccountName = AccountName,
                     AccountType = SelectedAccountType,
                     Currency = "USD"
                 };
+
+                // Add to database
                 db.Accounts.Add(newAccount);
+
+                // Commit changes
                 db.SaveChanges();
+
+                return newAccount;
             }
         }
 
         /// <summary>
         /// Create an automatic-update account from the provided information
         /// </summary>
-        protected void CreateAutomaticAccount()
+        /// <returns>Created account</returns>
+        protected Account CreateAutomaticAccount()
         {
             // Add the new account, financial institution and user
             using (var db = new SoCashDbContext())
@@ -329,6 +338,8 @@ namespace SoDotCash.ViewModels
                 db.Accounts.Add(newAccount);
 
                 db.SaveChanges();
+
+                return newAccount;
             }
         }
 
@@ -338,14 +349,24 @@ namespace SoDotCash.ViewModels
         public void CreateAccount()
         {
             // Create the account of the appropriate manual/automatic type
+            Account newAccount;
             if (CanCreateManualAccount())
-                CreateManualAccount();
+                newAccount = CreateManualAccount();
             else if (CanCreateAutomaticAccount())
-               CreateAutomaticAccount();
+            {
+                // Create the automatic account
+                newAccount = CreateAutomaticAccount();
+
+                // Start an automatic retrieval of transactions
+                UpdateService.DownloadOfxTransactionsForAccount(newAccount);
+            }
+            else
+                return; // TODO: Should be unreachable
 
             // Transition back to accounts view
             var locator = new ViewModelLocator();
             locator.Main.ActiveViewModel = locator.Accounts;
+            locator.Accounts.SelectedAccount = newAccount;
         }
 
 
