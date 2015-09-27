@@ -89,6 +89,23 @@ namespace SoDotCash.Services
             }
         }
 
+        /// <summary>
+        /// Delete a transaction from the database
+        /// Called from the UI for manual entry
+        /// </summary>
+        /// <param name="transaction">Transaction to delete</param>
+        public static void DeleteTransaction(Transaction transaction)
+        {
+            using (var db = new SoCashDbContext())
+            {
+                // Add the transaction to the context in unchanged state creating a current reference
+                db.Entry(transaction).State = EntityState.Unchanged;
+                // Delete from database
+                db.Set<Transaction>().Remove(transaction);
+                // Commit
+                db.SaveChanges();
+            }
+        }
 
         /// <summary>
         /// Update values of an existing transaction
