@@ -33,6 +33,9 @@
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="FontWeight" Value="Bold"/>
                             </Trigger>
+                            <Trigger Property="HasItems" Value="True">
+                                <Setter Property="Focusable" Value="False" />
+                            </Trigger>
                         </Style.Triggers>
                     </Style>
                 </TreeView.ItemContainerStyle>
