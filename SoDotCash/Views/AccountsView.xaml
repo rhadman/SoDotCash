@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="SoDotCash.Views.AccountsView"
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,6 +7,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:models="clr-namespace:SoDotCash.Models"
+             xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid" x:Class="SoDotCash.Views.AccountsView"
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
@@ -27,7 +28,7 @@
                     <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
                 </i:Interaction.Behaviors>
                 <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:TypeExtension TreeViewItem}">
+                    <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                         <Style.Triggers>
                             <Trigger Property="IsSelected" Value="True">
@@ -40,11 +41,11 @@
                     </Style>
                 </TreeView.ItemContainerStyle>
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Value}">
-                        <TextBlock Text="{Binding Path=Key}" />
+                    <HierarchicalDataTemplate ItemsSource="{Binding Value}">
+                        <TextBlock Text="{Binding Key}" />
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate DataType="models:Account">
-                                <TextBlock Text="{Binding Path=AccountName}"/>
+                                <TextBlock Text="{Binding AccountName}"/>
                             </DataTemplate>
                         </HierarchicalDataTemplate.ItemTemplate>
                     </HierarchicalDataTemplate>
@@ -60,15 +61,13 @@
                             <Grid Margin="0,20,0,0">
                                 <charting:Chart x:Name="Chart" Width="550" Height="250">
                                     <charting:Chart.Axes>
-                                        <charting:DateTimeAxis Name="XAxis" ShowGridLines="True" Orientation="X" />
+                                        <charting:DateTimeAxis x:Name="XAxis" ShowGridLines="True" Orientation="X" />
                                         <charting:LinearAxis Orientation="Y" ShowGridLines="True"/>
                                     </charting:Chart.Axes>
-                                    <charting:Chart.Series>
-                                        <charting:LineSeries ItemsSource="{Binding Transactions}"
-                    DependentValueBinding="{Binding Path=LocalizedBalance}"
-                    IndependentValuePath="Date"
-                    Title="Historical Balance" IsSelectionEnabled="True" />
-                                    </charting:Chart.Series>
+                                    <charting:LineSeries ItemsSource="{Binding Transactions}"
+										DependentValueBinding="{Binding LocalizedBalance}"
+										IndependentValuePath="Date"
+										Title="Historical Balance" IsSelectionEnabled="True" />
                                 </charting:Chart>
                             </Grid>
                         </StackPanel>
@@ -80,24 +79,42 @@
                     <Grid.Resources>
                         <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
                     </Grid.Resources>
+
                     <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
-                    <DataGrid Name="DatagridTransactions" ItemsSource="{Binding Transactions}" CanUserAddRows="{Binding IsManualAccount}" SelectionUnit="FullRow" SelectionMode="Single"
-                              CanUserDeleteRows="{Binding IsManualAccount}" AutoGenerateColumns="False" SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}">
+
+                    <DataGrid x:Name="DatagridTransactions" ItemsSource="{Binding Transactions}" CanUserAddRows="{Binding IsManualAccount}" SelectionUnit="FullRow" SelectionMode="Single"
+						CanUserDeleteRows="{Binding IsManualAccount}" AutoGenerateColumns="False" SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}"
+						AlternatingRowBackground="Beige">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:d\}, UpdateSourceTrigger=PropertyChanged}" Width="70"
-                                                IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
+								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
                             <DataGridTextColumn Header="Description" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Width="200"
-                                                IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
+								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
                             <DataGridTextColumn Header="Transaction ID" Binding="{Binding FiTransactionId, UpdateSourceTrigger=PropertyChanged}" Width="200" 
-                                                IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
+								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
                             <DataGridTextColumn Header="CategoryName" Binding="{Binding CategoryName, UpdateSourceTrigger=PropertyChanged}" Width="80" />
                             <DataGridTextColumn Header="Amount" Binding="{Binding LocalizedAmount, StringFormat=\{0:C2\}, UpdateSourceTrigger=PropertyChanged}" Width="70" 
-                                                IsReadOnly="{Binding DataContext.IsManualAccount, Source={StaticResource ProxyElement}, Converter={StaticResource BoolToInverseBoolConverter}}"/>
-                            <DataGridTextColumn Header="Balance" Binding="{Binding LocalizedBalance, StringFormat=\{0:C2\}}" Width="80" IsReadOnly="True"/>
+								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}" CellStyle="{StaticResource Balanace}" />
+                            <DataGridTextColumn Header="Balance" Binding="{Binding LocalizedBalance, StringFormat=\{0:C2\}}" Width="80" IsReadOnly="True"  />
                         </DataGrid.Columns>
                         <DataGrid.InputBindings>
                             <KeyBinding Key="Delete" Command="{Binding DeleteTransactionCommand}" />
                         </DataGrid.InputBindings>
+
+
+                        <!--<DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <Trigger Property="AlternationIndex" Value="0">
+                                        <Setter Property="Background" Value="White" />
+                                    </Trigger>
+                                    <Trigger Property="AlternationIndex" Value="1">
+                                        <Setter Property="Background" Value="WhiteSmoke"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>-->
+
                     </DataGrid>
                 </Grid>
             </TabItem>

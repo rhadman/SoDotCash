@@ -61,6 +61,11 @@ namespace SoDotCash.Models
             set { Amount = (int) (value*100m); }
         }
 
+        /// <summary>
+        /// Property used in style templete to determine if the ammount is positive or negitive
+        /// </summary>
+        public bool IsAmountPositive { get { return LocalizedAmount >= 0; } }
+
 
     }
 

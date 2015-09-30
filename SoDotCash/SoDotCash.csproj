@@ -105,7 +105,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>cash-flow.ico</ApplicationIcon>
@@ -211,6 +211,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\BoolToInverseBoolConverter.cs" />
+    <Compile Include="Converters\NumberToIsPositiveConverter.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\AccountTypes.cs" />
     <Compile Include="Models\EditableEntity.cs" />

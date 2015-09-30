@@ -1,6 +1,10 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:SoDotCash">
+                    xmlns:local="clr-namespace:SoDotCash"
+                    xmlns:conv="clr-namespace:SoDotCash.Converters"
+                    >
+    
+    <conv:NumberToIsPositiveConverter x:Key="NumberToIsPositive" />
     
     <Style x:Key="TreeViewItemFocusVisual">
         <Setter Property="Control.Template">
@@ -180,5 +184,15 @@
         </Setter>
     </Style>
 
+    <!-- DataGridCell Style used to set the text colors of balances -->
+    <Style TargetType="DataGridCell" x:Key="Balanace">
+        <Setter Property="Foreground" Value="Black" />
+
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding LocalizedAmount, Converter={StaticResource NumberToIsPositive}}" Value="False">
+                <Setter Property="Foreground" Value="Red" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 
 </ResourceDictionary>

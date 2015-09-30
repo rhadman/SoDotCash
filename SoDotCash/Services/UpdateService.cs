@@ -271,7 +271,7 @@ namespace SoDotCash.Services
                         else if (ofxAccount.GetType() == typeof (OFX.Types.SavingsAccount))
                         {
                             accountType = AccountType.Savings;
-                            accountId = ((OFX.Types.CheckingAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
+                            accountId = ((OFX.Types.SavingsAccount) ofxAccount).RoutingId + ":" + ofxAccount.AccountId;
                         }
                         else if (ofxAccount.GetType() == typeof (OFX.Types.CreditCardAccount))
                         {

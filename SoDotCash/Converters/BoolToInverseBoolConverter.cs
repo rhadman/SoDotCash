@@ -4,6 +4,7 @@ using System.Windows.Data;
 
 namespace SoDotCash.Converters
 {
+    [ValueConversion(typeof(bool), typeof(bool))]
     public class BoolToInverseBoolConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
