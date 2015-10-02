@@ -118,5 +118,118 @@ namespace SoDotCash.Services
                 db.SaveChanges();
             }
         }
+
+        /// <summary>
+        /// Add an account to the database
+        /// </summary>
+        /// <param name="account">Populated account entity to add to database</param>
+        /// <returns>Created account</returns>
+        public static Account AddAccount(Account account)
+        {
+            // Add the new account
+            using (var db = new SoCashDbContext())
+            {
+                // Add to database
+                db.Accounts.Add(account);
+
+                // Commit changes
+                db.SaveChanges();
+            }
+
+            return account;
+        }
+
+        /// <summary>
+        /// Add an account to the database - Using OFX data specification
+        /// </summary>
+        /// <param name="account">Populated account object to add to database</param>
+        /// <param name="financialInstitution">OFX financial institution to link in database. Will be created if necessary.</param>
+        /// <param name="fiUser">User credentials for the financial institution</param>
+        /// <returns>Created account</returns>
+        public static Account AddAccount(Account account, OFX.Types.FinancialInstitution financialInstitution, FinancialInstitutionUser fiUser)
+        {
+            // Add the new account, financial institution and user
+            using (var db = new SoCashDbContext())
+            {
+                // TODO: See if there's an existing FI or user with this info already
+                // Look for existing FI entry with the same name
+                FinancialInstitution fi;
+                try
+                {
+                    fi = db.FinancialInstitutions.First(i => i.Name == financialInstitution.Name);
+                }
+                catch (InvalidOperationException)
+                {
+                    // FI Doesn't exist, add a new one
+                    fi = new FinancialInstitution
+                    {
+                        Name = financialInstitution.Name,
+                        OfxFinancialUnitId = financialInstitution.FinancialId,
+                        OfxOrganizationId = financialInstitution.OrganizationId,
+                        OfxUpdateUrl = financialInstitution.ServiceEndpoint.ToString()
+                    };
+                    db.FinancialInstitutions.Add(fi);
+                }
+
+                // Look for existing user under this FI with same userId
+                try
+                {
+                    fiUser = fi.Users.First(u => u.UserId == fiUser.UserId && u.Password == fiUser.Password);
+                }
+                catch (Exception)
+                {
+                    // User doesn't exist, add as new
+                    fi.Users.Add(fiUser);
+                    db.FinancialInstitutionUsers.Add(fiUser);
+                }
+
+                fiUser.Accounts.Add(account);
+                db.Accounts.Add(account);
+
+                db.SaveChanges();
+
+                return account;
+            }
+        }
+
+
+        /// <summary>
+        /// Delete the specified account from the database.
+        /// Deletes all transactions and removes the FIUser if there are no other accounts attached.
+        /// </summary>
+        /// <param name="account">Account to delete</param>
+        public static void DeleteAccount(Account account)
+        {
+            using (var db = new SoCashDbContext())
+            {
+                // Retrieve matching account from DB - we need to get an entity in the current db session
+                var deleteAccount = db.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
+
+                // Delete fiUser if this is the only account referencing it
+                if (deleteAccount.FinancialInstitutionUser != null &&
+                    deleteAccount.FinancialInstitutionUser.Accounts.Count == 1)
+                    db.FinancialInstitutionUsers.Remove(deleteAccount.FinancialInstitutionUser);
+
+                // Remove the account
+                db.Accounts.Remove(deleteAccount);
+
+                // Commit to db
+                db.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Update an account in the database with the provided data
+        /// </summary>
+        /// <param name="account">Account to update</param>
+        public static void UpdateAccount(Account account)
+        {
+            using (var db = new SoCashDbContext())
+            {
+                // Attach to context and mark as modified
+                db.Entry(account).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
     }
 }

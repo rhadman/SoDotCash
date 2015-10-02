@@ -302,31 +302,6 @@ namespace SoDotCash.Services
         }
 
 
-        /// <summary>
-        /// Delete the specified account from the database.
-        /// Deletes all transactions and removes the FIUser if there are no other accounts attached.
-        /// </summary>
-        /// <param name="account">Account to delete</param>
-        public static void DeleteAccount(Account account)
-        {
-            using (var db = new SoCashDbContext())
-            {
-                // Retrieve matching account from DB - we need to get an entity in the current db session
-                var deleteAccount = db.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
-
-                // Delete fiUser if this is the only account referencing it
-                if (deleteAccount.FinancialInstitutionUser != null &&
-                    deleteAccount.FinancialInstitutionUser.Accounts.Count == 1)
-                    db.FinancialInstitutionUsers.Remove(deleteAccount.FinancialInstitutionUser);
-
-                // Remove the account
-                db.Accounts.Remove(deleteAccount);
-
-                // Commit to db
-                db.SaveChanges();
-            }
-        }
-
 
 
     } // class

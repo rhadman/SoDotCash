@@ -132,8 +132,39 @@
             <TabItem Header="Configuration">
                 <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="TODO: Fill this in (Configuration)"  TextWrapping="Wrap"/>
-                        <Button x:Name="ButtonDeleteAccount" Content="Delete Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DeleteAccountCommand}" />
+                        <GroupBox Header="Overview" Margin="0,10,0,0">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Account Name:"  TextWrapping="Wrap"/>
+                                    <TextBox Text="{Binding SelectedAccountName}" Margin="10,0,0,0" Width="300"  TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Account Type:"  TextWrapping="Wrap"/>
+                                    <TextBlock Text="Checking" Margin="10,0,0,0"  TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Update Mechanism" Margin="0,10,0,0">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Account Update Mechanism:" TextWrapping="Wrap"/>
+                                    <TextBlock FontWeight="Bold" Text="Automatic" Margin="10,0,0,0" TextWrapping="Wrap" Visibility="{Binding SelectedAccount.IsAssociatedWithFinancialInstitution, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                    <TextBlock FontWeight="Bold" Text="Manual" Margin="10,0,0,0" TextWrapping="Wrap" Visibility="{Binding IsManualAccount, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding SelectedAccount.IsAssociatedWithFinancialInstitution, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Button Content="Unlink Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding UnlinkAccountCommand}" />
+                                    <TextBlock Text="This will change the account into a manual update account." Margin="10,0,0,0"  TextWrapping="Wrap"/>
+                                    <TextBlock FontWeight="Bold" Text="This cannot be undone!" Margin="10,0,0,0"  TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <StackPanel Orientation="Horizontal"/>
+                        <GroupBox Header="Account Deletion" Margin="0,10,0,0">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="If you no longer wish to track finances in this account, you may use the button below to permanently remove it from So.Cash."  TextWrapping="Wrap"/>
+                                <Button x:Name="ButtonDeleteAccount" Content="Delete Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DeleteAccountCommand}" />
+                            </StackPanel>
+                        </GroupBox>
                     </StackPanel>
                 </Grid>
             </TabItem>

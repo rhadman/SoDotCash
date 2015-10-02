@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
@@ -262,25 +261,18 @@ namespace SoDotCash.ViewModels
         /// <returns>Created account</returns>
         protected Account CreateManualAccount()
         {
-            // Add the new account
-            using (var db = new SoCashDbContext())
+            // Fill in account data
+            var newAccount = new Account
             {
-                // Fill in account data
-                var newAccount = new Account
-                {
-                    AccountName = AccountName,
-                    AccountType = SelectedAccountType,
-                    Currency = "USD"
-                };
+                AccountName = AccountName,
+                AccountType = SelectedAccountType,
+                Currency = "USD"
+            };
 
-                // Add to database
-                db.Accounts.Add(newAccount);
+            // Add to database
+            DataService.AddAccount(newAccount);
 
-                // Commit changes
-                db.SaveChanges();
-
-                return newAccount;
-            }
+            return newAccount;
         }
 
         /// <summary>
@@ -289,58 +281,22 @@ namespace SoDotCash.ViewModels
         /// <returns>Created account</returns>
         protected Account CreateAutomaticAccount()
         {
-            // Add the new account, financial institution and user
-            using (var db = new SoCashDbContext())
-            {
-                // TODO: See if there's an existing FI or user with this info already
-                // Look for existing FI entry with the same name
-                FinancialInstitution fi;
-                try
-                {
-                    fi = db.FinancialInstitutions.First(i => i.Name == SelectedFinancialInstitution.Name);
-                }
-                catch (InvalidOperationException)
-                {
-                    // FI Doesn't exist, add a new one
-                    fi = new FinancialInstitution
-                    {
-                        Name = SelectedFinancialInstitution.Name,
-                        OfxFinancialUnitId = SelectedFinancialInstitution.FinancialId,
-                        OfxOrganizationId = SelectedFinancialInstitution.OrganizationId,
-                        OfxUpdateUrl = SelectedFinancialInstitution.ServiceEndpoint.ToString()
-                    };
-                    db.FinancialInstitutions.Add(fi);
-                }
+            // Attach account name to account
+            SelectedAccount.AccountName = AccountName;
 
-                // Look for existing user under this FI with same userId
-                FinancialInstitutionUser fiUser;
-                try
+            // Add to database
+            var newAccount = DataService.AddAccount(SelectedAccount, SelectedFinancialInstitution,
+                new FinancialInstitutionUser
                 {
-                    fiUser = fi.Users.First(u => u.UserId == FinancialInstitutionUsername && u.Password == FinancialInstitutionPassword);
+                    UserId = FinancialInstitutionUsername,
+                    Password = FinancialInstitutionPassword
                 }
-                catch (Exception)
-                {
-                    // User doesn't exist, add a new one
-                    fiUser = new FinancialInstitutionUser
-                    {
-                        UserId = FinancialInstitutionUsername,
-                        Password = FinancialInstitutionPassword
-                    };
-                    fi.Users.Add(fiUser);
-                    db.FinancialInstitutionUsers.Add(fiUser);
-                }
+                );
 
-                // Create Account
-                var newAccount = new Account(SelectedAccount);
-                // Replace name with the user's chosen name
-                newAccount.AccountName = AccountName;
-                fiUser.Accounts.Add(newAccount);
-                db.Accounts.Add(newAccount);
+            // Start an automatic retrieval of transactions
+            UpdateService.DownloadOfxTransactionsForAccount(newAccount);
 
-                db.SaveChanges();
-
-                return newAccount;
-            }
+            return newAccount;
         }
 
         /// <summary>
@@ -353,15 +309,10 @@ namespace SoDotCash.ViewModels
             if (CanCreateManualAccount())
                 newAccount = CreateManualAccount();
             else if (CanCreateAutomaticAccount())
-            {
                 // Create the automatic account
                 newAccount = CreateAutomaticAccount();
-
-                // Start an automatic retrieval of transactions
-                UpdateService.DownloadOfxTransactionsForAccount(newAccount);
-            }
             else
-                return; // TODO: Should be unreachable
+                return; // Unreachable
 
             // Transition back to accounts view
             var locator = new ViewModelLocator();

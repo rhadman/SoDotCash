@@ -93,7 +93,37 @@ namespace SoDotCash.ViewModels
 
                 // Transactions will be updated since this is a different account
                 RaisePropertyChanged(() => Transactions);
+
+                // Selected account name is changed
+                RaisePropertyChanged(() => SelectedAccountName);
+
+
+                RaisePropertyChanged();
             }
+        }
+
+        /// <summary>
+        /// Bound to selected account name. Used for configuration tab.
+        /// </summary>
+        public string SelectedAccountName
+        {
+            get
+            {
+                if (SelectedAccount == null)
+                    return "";
+                return SelectedAccount.AccountName;
+            }
+            set
+            {
+                // Update in account object
+                SelectedAccount.AccountName = value;
+
+                // Save to database
+                DataService.UpdateAccount(SelectedAccount);
+
+                RaisePropertyChanged();
+            }
+            
         }
 
         /// <summary>
@@ -189,8 +219,25 @@ namespace SoDotCash.ViewModels
                 // If there is no selected account, transactions cannot be added
                 if (SelectedAccount == null)
                     return false;
+
                 // If the account is associated with a financial institution user, it is an auto-update account
                 //  and users may not add transactions manually
+                return (!SelectedAccount.IsAssociatedWithFinancialInstitution);
+            }
+        }
+
+        /// <summary>
+        /// Determination of whether this is an automatic account - used for configuration field visibility check
+        /// </summary>
+        public bool IsAutomaticAccount
+        {
+            get
+            {
+                // If there is no selected account, the account is not automatic
+                if (SelectedAccount == null)
+                    return false;
+
+                // If the account is associated with a financial institution user, it is an auto-update account
                 return (!SelectedAccount.IsAssociatedWithFinancialInstitution);
             }
         }
@@ -363,7 +410,7 @@ namespace SoDotCash.ViewModels
         public void DeleteSelectedAccount()
         {
             // Delete the account
-            UpdateService.DeleteAccount(SelectedAccount);
+            DataService.DeleteAccount(SelectedAccount);
             
             // Set to no account
             SelectedAccount = null;
