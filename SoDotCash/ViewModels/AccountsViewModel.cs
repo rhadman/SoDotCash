@@ -76,6 +76,7 @@ namespace SoDotCash.ViewModels
 
                 // Transactions will be updated since this is a different account
                 RaisePropertyChanged(() => Transactions);
+                RaisePropertyChanged(() => SummaryTransactions);
 
                 // Selected account name is changed
                 RaisePropertyChanged(() => SelectedAccountName);
@@ -194,6 +195,39 @@ namespace SoDotCash.ViewModels
 
                 }
             }
+        }
+
+        /// <summary>
+        /// Bound abbridged transactions for charting
+        /// </summary>
+        public ObservableCollection<Transaction> SummaryTransactions
+        {
+            get
+            {
+                // Retrieve transactions
+                var transactions = _transactions ?? Transactions;
+                if (transactions == null)
+                    return null;
+
+                // Include values every 3 days
+                ObservableCollection<Transaction> summary = new ObservableCollection<Transaction>();
+                DateTime lastDate = DateTime.MinValue;
+                var maxTimeSpan = new TimeSpan(3,0,0,0); // 3 days
+                foreach (var transaction in transactions.Reverse())
+                {
+                    // If this transaction isn't longer than the minimum number of days since the last included, skip
+                    if ((transaction.Date - lastDate) < maxTimeSpan)
+                        continue;
+
+                    // Include transaction
+                    summary.Add(transaction);
+
+                    // Update the last date used for inclusion testing
+                    lastDate = transaction.Date;
+                }
+                return summary;
+            }
+            
         }
 
         /// <summary>
@@ -368,6 +402,7 @@ namespace SoDotCash.ViewModels
         {
             // Need to re-sort the data and recalculate balances
             RaisePropertyChanged(() => Transactions);
+            RaisePropertyChanged(() => SummaryTransactions);
         }
 
         /// <summary>
@@ -408,6 +443,7 @@ namespace SoDotCash.ViewModels
 
             // Need to re-sort the data and recalculate balances
             RaisePropertyChanged(() => Transactions);
+            RaisePropertyChanged(() => SummaryTransactions);
         }
 
         /// <summary>
@@ -440,6 +476,7 @@ namespace SoDotCash.ViewModels
 
             // Update transactions
             RaisePropertyChanged(() => Transactions);
+            RaisePropertyChanged(() => SummaryTransactions);
 
             // Move to transactions tab
             ActiveTabIndex = TabIndex.Ledger;
@@ -465,6 +502,7 @@ namespace SoDotCash.ViewModels
 
             // Update transactions
             RaisePropertyChanged(() => Transactions);
+            RaisePropertyChanged(() => SummaryTransactions);
 
             // Move to transactions tab
             ActiveTabIndex = TabIndex.Ledger;

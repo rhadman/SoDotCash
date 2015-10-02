@@ -5,14 +5,29 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:utility="clr-namespace:SoDotCash.Utility"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:models="clr-namespace:SoDotCash.Models"
-             xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid" x:Class="SoDotCash.Views.AccountsView"
+             xmlns:primitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+             x:Class="SoDotCash.Views.AccountsView"
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
              >
     <Grid>
+        <Grid.Resources>
+            <Style x:Key="DateTimeAxisLabelStyle" TargetType="{x:Type charting:DateTimeAxisLabel}">
+                <Setter Property="IsTabStop" Value="False" />
+                <Setter Property="StringFormat" Value="{}{0:MMM d}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type charting:DateTimeAxisLabel}">
+                            <TextBlock Text="{TemplateBinding FormattedContent}" FontSize="10"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
 
         <Grid Grid.Column="0" Margin="10,5,752,10">
             <Grid.RowDefinitions>
@@ -57,20 +72,57 @@
             <TabItem Header="Overview">
                 <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
-                        <StackPanel Orientation="Horizontal">
-                            <Grid Margin="0,20,0,0">
-                                <charting:Chart x:Name="Chart" Width="550" Height="250">
-                                    <charting:Chart.Axes>
-                                        <charting:DateTimeAxis x:Name="XAxis" ShowGridLines="True" Orientation="X" />
-                                        <charting:LinearAxis Orientation="Y" ShowGridLines="True"/>
-                                    </charting:Chart.Axes>
-                                    <charting:LineSeries ItemsSource="{Binding Transactions}"
-										DependentValueBinding="{Binding LocalizedBalance}"
-										IndependentValuePath="Date"
-										Title="Historical Balance" IsSelectionEnabled="True" />
-                                </charting:Chart>
+                        <DockPanel>
+                            <Grid Width="180" DockPanel.Dock="Left">
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <TextBlock Text="High Balance:"/>
+                                        <TextBlock Text="$0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <TextBlock Text="Low Balance:"/>
+                                        <TextBlock Text="$0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <TextBlock Text="Average Balance:"/>
+                                        <TextBlock Text="$0"/>
+                                    </StackPanel>
+                                </StackPanel>
                             </Grid>
-                        </StackPanel>
+                            <charting:Chart x:Name="Chart" Width="550" Height="130" DockPanel.Dock="Right">
+                                <charting:Chart.LegendStyle>
+                                    <Style TargetType="datavis:Legend">
+                                        <Setter Property="Width" Value="0" />
+                                    </Style>
+                                </charting:Chart.LegendStyle>
+                                <charting:LineSeries ItemsSource="{Binding SummaryTransactions}"
+									DependentValueBinding="{Binding LocalizedBalance}"
+									IndependentValuePath="Date"
+									Title="Historical Balance"
+                                    IsSelectionEnabled="True">
+                                    <charting:LineSeries.IndependentAxis>
+                                        <charting:DateTimeAxis Orientation="X"
+                                            ShowGridLines="True"
+                                            AxisLabelStyle="{StaticResource DateTimeAxisLabelStyle}"/>
+                                    </charting:LineSeries.IndependentAxis>
+                                </charting:LineSeries>
+                                <charting:Chart.Template>
+                                    <ControlTemplate TargetType="charting:Chart">
+                                        <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            Padding="{TemplateBinding Padding}">
+                                            <Grid>
+                                                <primitives:EdgePanel x:Name="ChartArea" Style="{TemplateBinding ChartAreaStyle}">
+                                                    <Grid Canvas.ZIndex="-1" Style="{TemplateBinding PlotAreaStyle}" />
+                                                    <Border Canvas.ZIndex="10" BorderBrush="#FF919191" BorderThickness="1" />
+                                                </primitives:EdgePanel>
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </charting:Chart.Template>
+                            </charting:Chart>
+                        </DockPanel>
                     </StackPanel>
                 </Grid>
             </TabItem>
