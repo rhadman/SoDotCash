@@ -74,6 +74,9 @@ namespace SoDotCash.ViewModels
                 RaisePropertyChanged(() => IsManualAccount);
                 RaisePropertyChanged(() => IsAutomaticAccount);
 
+                // Update indicator of whether any account is selected
+                RaisePropertyChanged(() => HasSelectedAccount);
+
                 // Transactions will be updated since this is a different account
                 RaisePropertyChanged(() => Transactions);
                 RaisePropertyChanged(() => SummaryTransactions);
@@ -87,6 +90,11 @@ namespace SoDotCash.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        /// <summary>
+        /// Bindable indicator of whether any account is selected
+        /// </summary>
+        public bool HasSelectedAccount => SelectedAccount != null;
 
         /// <summary>
         /// Bound to selected account name. Used for configuration tab.

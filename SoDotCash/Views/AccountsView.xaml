@@ -69,7 +69,7 @@
 
         </Grid>
         <TabControl x:Name="TabControl" HorizontalAlignment="Left" Margin="206,5,10,21" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndexAsInt}">
-            <TabItem Header="Overview">
+            <TabItem Header="Overview" IsEnabled="{Binding HasSelectedAccount}">
                 <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
                         <DockPanel>
@@ -126,7 +126,7 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Ledger">
+            <TabItem Header="Ledger" IsEnabled="{Binding HasSelectedAccount}">
                 <Grid  Width="730" Height="300">
                     <Grid.Resources>
                         <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
@@ -170,7 +170,7 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Import">
+            <TabItem Header="Import" IsEnabled="{Binding HasSelectedAccount}">
                 <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="This section allows you to import transactions from an OFX/QFX file. If this account is linked with a supported online financial institution, you may also download transactions." TextWrapping="Wrap"/>
@@ -181,7 +181,7 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Configuration">
+            <TabItem Header="Configuration" IsEnabled="{Binding HasSelectedAccount}">
                 <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
                         <GroupBox Header="Overview" Margin="0,10,0,0">
