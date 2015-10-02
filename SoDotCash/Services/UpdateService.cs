@@ -301,9 +301,29 @@ namespace SoDotCash.Services
             }
         }
 
+        /// <summary>
+        /// Verify the provided account credentials. Raises an exception if validation fails
+        /// </summary>
+        /// <param name="financialInstitution">Financial institution to query</param>
+        /// <param name="fiCredentials">Credentials for financial institution account</param>
+        /// <returns>List of accounts</returns>
+        public static async Task VerifyAccountCredentials(FinancialInstitution financialInstitution,
+            OFX.Types.Credentials fiCredentials)
+        {
+            using (BackgroundTaskTracker.BeginTask("Verifying Credentials"))
+            {
 
+                // Convert from data model FI into OFX FI
+                var ofxFinancialInstitition = new OFX.Types.FinancialInstitution(financialInstitution.Name,
+                    new Uri(financialInstitution.OfxUpdateUrl), financialInstitution.OfxOrganizationId,
+                    financialInstitution.OfxFinancialUnitId);
 
+                var ofxService = new OFX2Service(ofxFinancialInstitition, fiCredentials);
 
+                // Call list accounts to validate credentials
+                await ofxService.ListAccounts().ConfigureAwait(false);
+            }
+        }
     } // class
 
 } // namespace

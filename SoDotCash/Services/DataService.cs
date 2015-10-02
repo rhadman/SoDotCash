@@ -258,5 +258,19 @@ namespace SoDotCash.Services
             }
         }
 
+        /// <summary>
+        /// Update a FI user in the database with the provided data
+        /// </summary>
+        /// <param name="user">FI User data to update</param>
+        public static void UpdateFiUser(FinancialInstitutionUser user)
+        {
+            using (var db = new SoCashDbContext())
+            {
+                // Attach to context and mark as modified
+                db.Entry(user).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
     }
 }

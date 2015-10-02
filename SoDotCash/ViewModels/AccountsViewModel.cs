@@ -5,6 +5,8 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
@@ -78,6 +80,8 @@ namespace SoDotCash.ViewModels
                 // Selected account name is changed
                 RaisePropertyChanged(() => SelectedAccountName);
 
+                // Name of account is changed
+                RaisePropertyChanged(() => FiUserName);
 
                 RaisePropertyChanged();
             }
@@ -227,6 +231,58 @@ namespace SoDotCash.ViewModels
 
         #endregion
 
+        #region [Account Configuration Bindings]
+
+        /// <summary>
+        /// Bound userid for FI account
+        /// </summary>
+        public string FiUserName
+        {
+            get
+            {
+                return SelectedAccount?.FinancialInstitutionUser?.UserId;
+            }
+            set
+            {
+                SelectedAccount.FinancialInstitutionUser.UserId = value;
+
+                // Clear credentials verification status
+                CredentialsFailed = false;
+                CredentialsVerified = false;
+
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Bound indicator of whether the current credentials have been validated 
+        /// </summary>
+        private bool _credentialsVerified;
+        public bool CredentialsVerified
+        {
+            get { return _credentialsVerified;  }
+            set
+            {
+                _credentialsVerified = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Bound indicator of whether the current credentials failed validation 
+        /// </summary>
+        private bool _credentialsFailed;
+        public bool CredentialsFailed
+        {
+            get { return _credentialsFailed; }
+            set
+            {
+                _credentialsFailed = value;
+                RaisePropertyChanged();
+            }
+        }
+        #endregion
+
         /// <summary>
         /// Called to refresh the list of accounts from the database
         /// </summary>
@@ -238,7 +294,7 @@ namespace SoDotCash.ViewModels
             using (var db = new SoCashDbContext())
             {
                 // Map all accounts by type
-                foreach (var account in db.Accounts)
+                foreach (var account in db.Accounts.Include("FinancialInstitutionUser").Include("FinancialInstitutionUser.FinancialInstitution"))
                 {
                     // Add category if needed
                     ObservableCollection<Account> accountList;
@@ -461,6 +517,82 @@ namespace SoDotCash.ViewModels
             // Manual and automatic account properties changed 
             RaisePropertyChanged(() => IsAutomaticAccount);
             RaisePropertyChanged(() => IsManualAccount);
+        }
+
+        /// <summary>
+        /// Binding for the Unlink Account button
+        /// </summary>
+        private ICommand _verifyAndSaveCredentialsCommand;
+        public ICommand VerifyAndSaveCredentialsCommand
+        {
+            get { return _verifyAndSaveCredentialsCommand ?? (_verifyAndSaveCredentialsCommand = new RelayCommand<object>(async p => await VerifyAndSaveCredentials(p), CanVerifyCredentials)); }
+        }
+
+        /// <summary>
+        /// Logic for determining whether the Verify and Save action should be available
+        /// </summary>
+        /// <param name="passwordEntry">Password entry box</param>
+        /// <returns>True - Can verify  False - Not enough information to verify</returns>
+        private bool CanVerifyCredentials(object passwordEntry)
+        {
+            // Can only verify for automatic update accounts
+            if (!IsAutomaticAccount)
+                return false;
+
+            // Cannot have a null or empty user name
+            if (string.IsNullOrEmpty(FiUserName))
+                return false;
+
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            return !string.IsNullOrEmpty(passwordBox?.Password);
+        }
+
+
+        /// <summary>
+        /// Verify the user provided credentials against the configured FI. If they verify
+        /// </summary>
+        public async Task VerifyAndSaveCredentials(object passwordEntry)
+        {
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
+
+            // Store the account we're updating in case it changes while we're validating
+            var updateAccount = SelectedAccount;
+
+            // Form credentials into proper type for verification
+            var credentials = new OFX.Types.Credentials(FiUserName, password);
+
+            // Verify credentials and update if verification fails
+            try
+            {
+                
+                await
+                    UpdateService.VerifyAccountCredentials(
+                        SelectedAccount.FinancialInstitutionUser.FinancialInstitution,
+                        credentials).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // Verify failed
+                CredentialsFailed = true;
+                CredentialsVerified = false;
+                return;
+            }
+
+            // Verification OK
+            CredentialsFailed = false;
+
+            // Update FI user
+            updateAccount.FinancialInstitutionUser.UserId = credentials.UserId;
+            updateAccount.FinancialInstitutionUser.Password = credentials.Password;
+
+            // Save to DB
+            DataService.UpdateFiUser(updateAccount.FinancialInstitutionUser);
+
+            // Saved
+            CredentialsVerified = true;
         }
 
     }
