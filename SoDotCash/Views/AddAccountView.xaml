@@ -39,9 +39,13 @@
                             <Label Content="Username" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <TextBox HorizontalAlignment="Left" Text="{Binding FinancialInstitutionUsername}" VerticalAlignment="Center" Width="120"/>
                             <Label Content="Password" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <PasswordBox x:Name="TextBoxPassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" PasswordChanged="textBox_Password_PasswordChanged"/>
+                            <PasswordBox x:Name="PasswordEntry" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120"/>
                         </StackPanel>
-                        <Button Content="Retrieve Accounts" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Height="22" Command="{Binding RetrieveAccountsCommand}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Retrieve Accounts" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Height="22" Command="{Binding RetrieveAccountsCommand}" CommandParameter="{Binding ElementName=PasswordEntry}"/>
+                            <TextBlock Foreground="Red" FontWeight="Bold" Text="Invalid Credentials" Margin="10,3,0,0" Visibility="{Binding AccountRetrievalFailed, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <TextBlock Foreground="Green" FontWeight="SemiBold" Text="All accounts from this bank are already added!" Margin="10,3,0,0" Visibility="{Binding NoAccountsRetrieved, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal" IsEnabled="{Binding HasAvailableAccounts}">
                             <Label Content="Attach To" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <ComboBox SelectedValue="{Binding SelectedAccount}" ItemsSource="{Binding AvailableAccounts}" DisplayMemberPath="AccountName" Width="200" Height="22"/>
@@ -52,7 +56,7 @@
 
 
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="ButtonCreate" Content="Add Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Height="22" Command="{Binding CreateAccountCommand}"/>
+            <Button x:Name="ButtonCreate" Content="Add Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Height="22" Command="{Binding CreateAccountCommand}"  CommandParameter="{Binding ElementName=PasswordEntry}"/>
         </StackPanel>
     </StackPanel>
 </UserControl>

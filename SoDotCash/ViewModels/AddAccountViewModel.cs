@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -17,12 +19,6 @@ namespace SoDotCash.ViewModels
         Manual
     };
 
-    /// <summary>
-    /// This class contains properties that a View can data bind to.
-    /// <para>
-    /// See http://www.galasoft.ch/mvvm
-    /// </para>
-    /// </summary>
     public class AddAccountViewModel : ViewModelBase
     {
 
@@ -87,17 +83,31 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound to the user selection of financial institution
         /// </summary>
-        public OFX.Types.FinancialInstitution SelectedFinancialInstitution { get; set; }
+        private OFX.Types.FinancialInstitution _selectedFinancialInstitution;
+        public OFX.Types.FinancialInstitution SelectedFinancialInstitution
+        {
+            get { return _selectedFinancialInstitution; }
+            set
+            {
+                _selectedFinancialInstitution = value;
+                RaisePropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Username used to authenticate with the financial institution
         /// </summary>
-        public string FinancialInstitutionUsername { get; set; }
+        private string _financialInstitutionUsername;
+        public string FinancialInstitutionUsername
+        {
+            get { return _financialInstitutionUsername;}
+            set
+            {
+                _financialInstitutionUsername = value;
+                RaisePropertyChanged();
+            }
+        }
 
-        /// <summary>
-        /// Password used to authenticate with the financial institution
-        /// </summary>
-        public string FinancialInstitutionPassword { get; set; }
 
         /// <summary>
         /// List of accounts available from financial institution using the provided credentials
@@ -125,27 +135,96 @@ namespace SoDotCash.ViewModels
         public bool HasAvailableAccounts => AvailableAccounts!=null && AvailableAccounts.Any();
 
         /// <summary>
+        /// Bound indicator of whether account retrieval failed (invalid credentials)
+        /// </summary>
+        private bool _accountRetrievalFailed;
+        public bool AccountRetrievalFailed
+        {
+            get { return _accountRetrievalFailed; }
+            set
+            {
+                _accountRetrievalFailed = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Bound indicator of whether the account retrieval succeded but no new accounts were retrieved
+        /// </summary>
+        private bool _noAccountsRetrieved;
+        public bool NoAccountsRetrieved
+        {
+            get { return _noAccountsRetrieved; }
+            set
+            {
+                _noAccountsRetrieved = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Binding for the Retrieve Accounts button
         /// </summary>
         private ICommand _retrieveAccountsCommand;
-        public ICommand RetrieveAccountsCommand
+        public ICommand RetrieveAccountsCommand => _retrieveAccountsCommand ?? (_retrieveAccountsCommand = new RelayCommand<object>(PopulateAccounts, CanPopulateAccounts));
+
+        /// <summary>
+        /// Called to determine whether the user has provided enough information to populate FI account list
+        /// </summary>
+        /// <param name="passwordEntry">Reference to password entry box</param>
+        /// <returns>True - enough information is present.  False - Insufficient information entered</returns>
+        private bool CanPopulateAccounts(object passwordEntry)
         {
-            get { return _retrieveAccountsCommand ?? (_retrieveAccountsCommand = new RelayCommand(PopulateAccounts, () => FinancialInstitutionUsername!=null && SelectedFinancialInstitution!=null && FinancialInstitutionPassword!=null)); }
+            // Must have a username
+            if (string.IsNullOrEmpty(FinancialInstitutionUsername))
+                return false;
+
+            // Must have a selected FI
+            if (SelectedFinancialInstitution == null)
+                return false;
+
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
+
+            // Must have a password entered
+            return !string.IsNullOrEmpty(password);
         }
 
         /// <summary>
         /// Cancels action. Returns to previous view.
         /// </summary>
-        public async void PopulateAccounts()
+        public async void PopulateAccounts(object passwordEntry)
         {
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
+
+            // Reset account retrieval failed indicator
+            AccountRetrievalFailed = false;
+
             // Clear current list of accounts
             AvailableAccounts = null;
 
             // Form Credentials
-            var fiCredentials = new OFX.Types.Credentials(FinancialInstitutionUsername, FinancialInstitutionPassword);
+            var fiCredentials = new OFX.Types.Credentials(FinancialInstitutionUsername, password);
 
-            // Retrieve accounts from fI
-            AvailableAccounts = await UpdateService.EnumerateNewAccounts(SelectedFinancialInstitution, fiCredentials).ConfigureAwait(false);
+            try
+            {
+                // Retrieve accounts from fI
+                AvailableAccounts =
+                    await
+                        UpdateService.EnumerateNewAccounts(SelectedFinancialInstitution, fiCredentials)
+                            .ConfigureAwait(false);
+
+                // If no accounts were retrieved, notify user
+                NoAccountsRetrieved = !AvailableAccounts.Any();
+            }
+            catch (Exception)
+            {
+                // Error retrieving accounts
+                AccountRetrievalFailed = true;
+            }
         }
 
         #endregion
@@ -173,11 +252,8 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Binding for the Create Account button
         /// </summary>
-        private RelayCommand _createAccountCommand;
-        public ICommand CreateAccountCommand
-        {
-            get { return _createAccountCommand ?? (_createAccountCommand = new RelayCommand(CreateAccount, CanCreateAccount)); }
-        }
+        private ICommand _createAccountCommand;
+        public ICommand CreateAccountCommand => _createAccountCommand ?? (_createAccountCommand = new RelayCommand<object>(CreateAccount, CanCreateAccount));
 
         /// <summary>
         /// Determine whether enough information has been provided to create a manual-entry account
@@ -211,7 +287,7 @@ namespace SoDotCash.ViewModels
         /// True - An automatic-update account can be created
         /// False - An automatic-update account cannot be created
         /// </returns>
-        private bool CanCreateAutomaticAccount()
+        private bool CanCreateAutomaticAccount(object passwordEntry)
         {
             // Automatic entry must be selected
             if (!IsAutomaticEntry)
@@ -229,8 +305,12 @@ namespace SoDotCash.ViewModels
             if (string.IsNullOrEmpty(FinancialInstitutionUsername))
                 return false;
 
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
+
             // A password must be entered
-            if (string.IsNullOrEmpty(FinancialInstitutionPassword))
+            if (string.IsNullOrEmpty(password))
                 return false;
 
             // A financial institution account must be selected
@@ -250,9 +330,9 @@ namespace SoDotCash.ViewModels
         /// True - An account can be created
         /// False - An account cannot be created
         /// </returns>
-        public bool CanCreateAccount()
+        public bool CanCreateAccount(object passwordEntry)
         {
-            return CanCreateManualAccount() || CanCreateAutomaticAccount();
+            return CanCreateManualAccount() || CanCreateAutomaticAccount(passwordEntry);
         }
 
         /// <summary>
@@ -279,8 +359,12 @@ namespace SoDotCash.ViewModels
         /// Create an automatic-update account from the provided information
         /// </summary>
         /// <returns>Created account</returns>
-        protected Account CreateAutomaticAccount()
+        protected Account CreateAutomaticAccount(object passwordEntry)
         {
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
+
             // Attach account name to account
             SelectedAccount.AccountName = AccountName;
 
@@ -289,7 +373,7 @@ namespace SoDotCash.ViewModels
                 new FinancialInstitutionUser
                 {
                     UserId = FinancialInstitutionUsername,
-                    Password = FinancialInstitutionPassword
+                    Password = password
                 }
                 );
 
@@ -302,15 +386,15 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Creates the new account from the information in the form.
         /// </summary>
-        public void CreateAccount()
+        public void CreateAccount(object passwordEntry)
         {
             // Create the account of the appropriate manual/automatic type
             Account newAccount;
             if (CanCreateManualAccount())
                 newAccount = CreateManualAccount();
-            else if (CanCreateAutomaticAccount())
+            else if (CanCreateAutomaticAccount(passwordEntry))
                 // Create the automatic account
-                newAccount = CreateAutomaticAccount();
+                newAccount = CreateAutomaticAccount(passwordEntry);
             else
                 return; // Unreachable
 
