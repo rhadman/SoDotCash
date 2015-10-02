@@ -231,5 +231,32 @@ namespace SoDotCash.Services
                 db.SaveChanges();
             }
         }
+
+        /// <summary>
+        /// Unlink an account from its associated financial institution and user
+        /// </summary>
+        /// <param name="account">Account to unlink</param>
+        public static void UnlinkAccount(Account account)
+        {
+            using (var db = new SoCashDbContext())
+            {
+                // Attach to context and mark as modified
+                db.Entry(account).State = EntityState.Modified;
+
+                // Hold reference to associated FiUser
+                var fiUser = account.FinancialInstitutionUser;
+
+                // Remove account
+                fiUser.Accounts.Remove(account);
+
+                // If the fiUser is no longer attached to any accounts, remove fiUser
+                if (!fiUser.Accounts.Any())
+                    db.FinancialInstitutionUsers.Remove(fiUser);
+
+                // Save changes to db
+                db.SaveChanges();
+            }
+        }
+
     }
 }

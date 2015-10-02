@@ -440,5 +440,28 @@ namespace SoDotCash.ViewModels
             // Update the list of accounts
             UpdateAccounts();
         }
+
+        /// <summary>
+        /// Binding for the Unlink Account button
+        /// </summary>
+        private ICommand _unlinkAccountCommand;
+        public ICommand UnlinkAccountCommand
+        {
+            get { return _unlinkAccountCommand ?? (_unlinkAccountCommand = new RelayCommand(UnlinkSelectedAccount, () => IsAutomaticAccount)); }
+        }
+
+        /// <summary>
+        /// Unlink the selected automatic update account, turning it into a manual update account
+        /// </summary>
+        public void UnlinkSelectedAccount()
+        {
+            // Unlink from fiUser
+            DataService.UnlinkAccount(SelectedAccount);
+
+            // Manual and automatic account properties changed 
+            RaisePropertyChanged(() => IsAutomaticAccount);
+            RaisePropertyChanged(() => IsManualAccount);
+        }
+
     }
 }
