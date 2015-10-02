@@ -140,7 +140,7 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Account Type:"  TextWrapping="Wrap"/>
-                                    <TextBlock Text="Checking" Margin="10,0,0,0"  TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding SelectedAccount.AccountType}" Margin="10,0,0,0"  TextWrapping="Wrap"/>
                                 </StackPanel>
                             </StackPanel>
                         </GroupBox>
