@@ -148,10 +148,10 @@
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Account Update Mechanism:" TextWrapping="Wrap"/>
-                                    <TextBlock FontWeight="Bold" Text="Automatic" Margin="10,0,0,0" TextWrapping="Wrap" Visibility="{Binding SelectedAccount.IsAssociatedWithFinancialInstitution, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                    <TextBlock FontWeight="Bold" Text="Automatic" Margin="10,0,0,0" TextWrapping="Wrap" Visibility="{Binding IsAutomaticAccount, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                     <TextBlock FontWeight="Bold" Text="Manual" Margin="10,0,0,0" TextWrapping="Wrap" Visibility="{Binding IsManualAccount, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Visibility="{Binding SelectedAccount.IsAssociatedWithFinancialInstitution, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding IsAutomaticAccount, Converter={StaticResource BoolToVisibilityConverter}}">
                                     <Button Content="Unlink Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding UnlinkAccountCommand}" />
                                     <TextBlock Text="This will change the account into a manual update account." Margin="10,0,0,0"  TextWrapping="Wrap"/>
                                     <TextBlock FontWeight="Bold" Text="This cannot be undone!" Margin="10,0,0,0"  TextWrapping="Wrap"/>

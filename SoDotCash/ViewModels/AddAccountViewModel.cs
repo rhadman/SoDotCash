@@ -314,10 +314,17 @@ namespace SoDotCash.ViewModels
             else
                 return; // Unreachable
 
-            // Transition back to accounts view
             var locator = new ViewModelLocator();
-            locator.Main.ActiveViewModel = locator.Accounts;
+
+            // Update accounts on accounts view
+            locator.Accounts.UpdateAccounts();
+
+            // Set selected
             locator.Accounts.SelectedAccount = newAccount;
+
+            // Transition back to accounts view
+            locator.Main.ActiveViewModel = locator.Accounts;
+            
         }
 
 

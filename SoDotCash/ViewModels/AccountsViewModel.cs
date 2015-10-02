@@ -44,37 +44,17 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Provides the collection of accounts mapped by the account type of each
         /// </summary>
+        private Dictionary<string, ObservableCollection<Account>> _accountsView;
         public Dictionary<string, ObservableCollection<Account>> AccountsView
         {
             get
             {
-                var accountsByType = new Dictionary<string, ObservableCollection<Account>>();
-
-                // Retrieve the accounts from the database
-                using (var db = new SoCashDbContext())
-                {
-                    // Map all accounts by type
-                    foreach (var account in db.Accounts)
-                    {
-                        // Add category if needed
-                        ObservableCollection<Account> accountList;
-                        if (!accountsByType.ContainsKey(account.AccountType))
-                        {
-                            accountList = new ObservableCollection<Account>();
-                            accountsByType.Add(account.AccountType, accountList);
-                        }
-                        else
-                        {
-                            accountList = accountsByType[account.AccountType];
-                        }
-
-                        // Add to the list under this type
-                        accountList.Add(account);
-                    }
-                }
-                return accountsByType;
+                // If there are no accounts, fill in collection on first attempt to retrieve
+                if (_accountsView == null)
+                    UpdateAccounts();
+                return _accountsView;
             }
-        }
+        } 
 
         /// <summary>
         /// Bound current account
@@ -90,6 +70,7 @@ namespace SoDotCash.ViewModels
 
                 // Update indicator of whether this account allows the user to add transactions manually
                 RaisePropertyChanged(() => IsManualAccount);
+                RaisePropertyChanged(() => IsAutomaticAccount);
 
                 // Transactions will be updated since this is a different account
                 RaisePropertyChanged(() => Transactions);
@@ -120,6 +101,8 @@ namespace SoDotCash.ViewModels
 
                 // Save to database
                 DataService.UpdateAccount(SelectedAccount);
+
+                RaisePropertyChanged(() => SelectedAccount.AccountName);
 
                 RaisePropertyChanged();
             }
@@ -222,7 +205,7 @@ namespace SoDotCash.ViewModels
 
                 // If the account is associated with a financial institution user, it is an auto-update account
                 //  and users may not add transactions manually
-                return (!SelectedAccount.IsAssociatedWithFinancialInstitution);
+                return (!IsAutomaticAccount);
             }
         }
 
@@ -238,12 +221,48 @@ namespace SoDotCash.ViewModels
                     return false;
 
                 // If the account is associated with a financial institution user, it is an auto-update account
-                return (!SelectedAccount.IsAssociatedWithFinancialInstitution);
+                return (SelectedAccount.IsAssociatedWithFinancialInstitution);
             }
         }
 
         #endregion
 
+        /// <summary>
+        /// Called to refresh the list of accounts from the database
+        /// </summary>
+        public void UpdateAccounts()
+        {
+            var accountsByType = new Dictionary<string, ObservableCollection<Account>>();
+
+            // Retrieve the accounts from the database
+            using (var db = new SoCashDbContext())
+            {
+                // Map all accounts by type
+                foreach (var account in db.Accounts)
+                {
+                    // Add category if needed
+                    ObservableCollection<Account> accountList;
+                    if (!accountsByType.ContainsKey(account.AccountType))
+                    {
+                        accountList = new ObservableCollection<Account>();
+                        accountsByType.Add(account.AccountType, accountList);
+                    }
+                    else
+                    {
+                        accountList = accountsByType[account.AccountType];
+                    }
+
+                    // Add to the list under this type
+                    accountList.Add(account);
+                }
+            }
+
+            // Store in cached view
+            _accountsView = accountsByType;
+
+            // Notify of property update
+            RaisePropertyChanged(() => AccountsView);
+        }
 
         /// <summary>
         /// Handle modification events from the DataGrid containing transactions
@@ -418,8 +437,8 @@ namespace SoDotCash.ViewModels
             // Return to Overview tab
             ActiveTabIndex = 0;
 
-            // Notify that the list of accounts has changed
-            RaisePropertyChanged(() => AccountsView);
+            // Update the list of accounts
+            UpdateAccounts();
         }
     }
 }
