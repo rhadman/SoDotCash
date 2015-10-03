@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
@@ -308,6 +309,50 @@ namespace SoDotCashTest
 
             // Verify that the service attached the account on the mock db exactly once
             mockContext.Verify(m => m.SetModified(It.IsAny<Account>()), Times.Once());
+
+            // Verify that the transaction ended properly
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
+
+        /// <summary>
+        /// Test unlinking a FI from an account
+        /// </summary>
+        [TestMethod]
+        public void TestUnlinkAccount()
+        {
+            // Mocked FI User
+            var mockFiUser = new Mock<FinancialInstitutionUser>();
+            mockFiUser.SetupAllProperties();
+
+            // Account for test
+            var account = new Account
+            {
+                AccountName = "Test Account",
+                AccountType = AccountType.Checking.ToString(),
+                Currency = "USD",
+                FinancialInstitutionUser = mockFiUser.Object
+            };
+
+            // Mock setup for DataService
+            var data = new List<Account> { account };
+            var dataMock = new Mock<IList<Account>>();
+            dataMock.As<IQueryable<Account>>().Setup(m => m.Provider).Returns(data.AsQueryable().Provider);
+            dataMock.As<IQueryable<Account>>().Setup(m => m.Expression).Returns(data.AsQueryable().Expression);
+            dataMock.As<IQueryable<Account>>().Setup(m => m.ElementType).Returns(data.AsQueryable().ElementType);
+            dataMock.As<IQueryable<Account>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
+
+            var mockContext = new Mock<SoCashDbContext>();
+            mockFiUser.Setup(m => m.Accounts).Returns(dataMock.Object);
+
+            // Unlink the account
+            using (var service = new DataService(mockContext.Object))
+                service.UnlinkAccount(account);
+
+            // Verify that the service attached the account on the mock db exactly once
+            mockContext.Verify(m => m.SetModified(account), Times.Once());
+
+            // Verify that the account has the FiUser removed
+            dataMock.Verify(m => m.Remove(account), Times.Once());
 
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
