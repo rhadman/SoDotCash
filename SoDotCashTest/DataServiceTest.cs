@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Entity;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using SoDotCash.Models;
@@ -95,5 +97,44 @@ namespace SoDotCashTest
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
         }
+
+        /// <summary>
+        /// Test functionality for determining if any accounts exist
+        /// </summary>
+        [TestMethod]
+        public void TestAnyExistingAccount()
+        {
+            // Mock setup for DataService
+            var mockSet = new Mock<DbSet<Account>>();
+            var mockContext = new Mock<SoCashDbContext>(MockBehavior.Loose);
+            mockContext.Setup(m => m.Accounts).Returns(mockSet.Object);
+            mockContext.Setup(m => m.Set<Account>()).Returns(mockSet.Object);
+
+            // Start with empty account list
+            var data = new List<Account>();
+            mockSet.As<IQueryable<Account>>().Setup(m => m.Provider).Returns(data.AsQueryable().Provider);
+            mockSet.As<IQueryable<Account>>().Setup(m => m.Expression).Returns(data.AsQueryable().Expression);
+            mockSet.As<IQueryable<Account>>().Setup(m => m.ElementType).Returns(data.AsQueryable().ElementType);
+            mockSet.As<IQueryable<Account>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
+
+            // No accounts in DB
+            using (var service = new DataService(mockContext.Object))
+                Assert.IsFalse(service.AnyExistingAccounts());
+
+            // Add some records
+            data.Add(new Account {AccountName = "Acct1", AccountType = AccountType.Checking.ToString(),Currency = "USD"});
+            data.Add(new Account {AccountName = "Acct2", AccountType = AccountType.Savings.ToString(), Currency = "USD"});
+            data.Add(new Account {AccountName = "Acct3", AccountType = AccountType.Creditcard.ToString(), Currency = "USD"});
+
+            // There are now accounts in the db
+            using (var service = new DataService(mockContext.Object))
+                Assert.IsTrue(service.AnyExistingAccounts());
+
+            // Verify that both transactions ended properly
+            mockContext.Verify(m => m.SaveChanges(), Times.Exactly(2));
+        }
+
+
+
     }
 }
