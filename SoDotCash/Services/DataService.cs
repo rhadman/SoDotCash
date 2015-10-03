@@ -84,7 +84,7 @@ namespace SoDotCash.Services
         /// True - There are existing accounts
         /// False - There are no accounts
         /// </returns>
-        public bool AnyExistAccounts()
+        public bool AnyExistingAccounts()
         {
             return DbContext.Accounts.Any();
         }

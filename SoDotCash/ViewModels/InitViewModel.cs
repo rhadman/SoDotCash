@@ -43,7 +43,7 @@ namespace SoDotCash.ViewModels
             // If there are accounts, start in the accounts view
             using (var dataService = new DataService())
             {
-                if (dataService.AnyExistAccounts())
+                if (dataService.AnyExistingAccounts())
                     _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
                 else
                     // No existing accounts, show welcome screen
