@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -183,6 +184,41 @@ namespace SoDotCashTest
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
         }
 
+        /// <summary>
+        /// Test adding a transaction
+        /// </summary>
+        [TestMethod]
+        public void TestDeleteTransaction()
+        {
+            // Transaction to delete
+            var transaction = new Transaction
+            {
+                Amount = 100,
+                CategoryName = "TestCat",
+                Description = "TestDesc",
+                FiTransactionId = "TRN1"
+            };
+
+            // Mock for Entity() call on context
+            var mockEntityEntry = new Mock<DbEntityEntry<Transaction>>();
+            mockEntityEntry.SetupAllProperties();
+
+            // Mock setup for DataService
+            var mockTransactionSet = new Mock<DbSet<Transaction>>();
+            var mockContext = new Mock<SoCashDbContext>();
+            mockContext.Setup(m => m.Set<Transaction>()).Returns(mockTransactionSet.Object);
+
+
+            // Delete the transaction
+            using (var service = new DataService(mockContext.Object))
+                service.DeleteTransaction(transaction);
+
+            // Verify that the service removed the transaction on the mock db exactly once
+            mockTransactionSet.Verify(m => m.Remove(It.IsAny<Transaction>()), Times.Once());
+
+            // Verify that the transaction ended properly
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
 
     }
 }
