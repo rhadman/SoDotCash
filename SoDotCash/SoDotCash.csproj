@@ -238,6 +238,7 @@
     <Compile Include="Utility\InverterConverter.cs" />
     <Compile Include="ViewModels\AccountsViewModel.cs" />
     <Compile Include="ViewModels\AddAccountViewModel.cs" />
+    <Compile Include="ViewModels\InitViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
@@ -253,6 +254,9 @@
     </Compile>
     <Compile Include="Views\AccountsViewTabs\AccountLedger.xaml.cs">
       <DependentUpon>AccountLedger.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Initializing.xaml.cs">
+      <DependentUpon>Initializing.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
@@ -281,6 +285,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\AccountsViewTabs\AccountLedger.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Initializing.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

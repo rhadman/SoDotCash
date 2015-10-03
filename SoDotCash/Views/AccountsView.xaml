@@ -36,6 +36,7 @@
                 <i:Interaction.Behaviors>
                     <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
                 </i:Interaction.Behaviors>
+                
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Value}">
                         <TextBlock Text="{Binding Key}" />
@@ -46,11 +47,21 @@
                         </HierarchicalDataTemplate.ItemTemplate>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                        <!--So.Cash Added properties-->
+                        <Style.Triggers>
+                            <Trigger Property="HasItems" Value="True">
+                                <Setter Property="Focusable" Value="False" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TreeView.ItemContainerStyle>
             </TreeView>
 
         </Grid>
 
-        <mui:ModernTab Grid.Column="1">
+        <mui:ModernTab Grid.Column="1" x:Name="TabControl">
             <mui:ModernTab.Links>
                 <mui:Link DisplayName="Graph" Source="/Views/AccountsViewTabs/AccountGraph.xaml" />
                 <mui:Link DisplayName="Ledger" Source="/Views/AccountsViewTabs/AccountLedger.xaml" />

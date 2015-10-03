@@ -6,9 +6,11 @@ using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using FirstFloor.ModernUI.Windows.Navigation;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
@@ -583,7 +585,10 @@ namespace SoDotCash.ViewModels
             RaisePropertyChanged(() => SelectedAccountDailyBalances);
 
             // Move to transactions tab
-            ActiveTabIndex = TabIndex.Ledger;
+            Application.Current.Dispatcher.BeginInvoke((Action) (() =>
+                NavigationCommands.GoToPage.Execute("/Views/AccountsViewTabs/AccountLedger.xaml",
+                    NavigationService.GetDescendantFromName(Application.Current.MainWindow, "TabFrame"))
+                ));
         }
 
 
@@ -607,9 +612,12 @@ namespace SoDotCash.ViewModels
             // Update transactions
             RaisePropertyChanged(() => Transactions);
             RaisePropertyChanged(() => SelectedAccountDailyBalances);
-
             // Move to transactions tab
-            ActiveTabIndex = TabIndex.Ledger;
+
+            await Application.Current.Dispatcher.BeginInvoke((Action) (() =>
+                NavigationCommands.GoToPage.Execute("/Views/AccountsViewTabs/AccountLedger.xaml",
+                    NavigationService.GetDescendantFromName(Application.Current.MainWindow, "TabFrame"))
+                ));
         }
 
         /// <summary>

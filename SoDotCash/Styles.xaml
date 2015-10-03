@@ -3,7 +3,7 @@
                     xmlns:local="clr-namespace:SoDotCash"
                     xmlns:conv="clr-namespace:SoDotCash.Converters"
                     >
-    
+
     <conv:NumberToIsPositiveConverter x:Key="NumberToIsPositive" />
 
     <!-- Allows a ListItem to be presented as a radio button -->
@@ -73,4 +73,6 @@
         </Style.Triggers>
     </Style>
 
+    
+    
 </ResourceDictionary>

@@ -26,6 +26,9 @@ namespace SoDotCash.ViewModels
     public class ViewModelLocator
     {
         private readonly IModernNavigationService _modernNavigationService;
+
+
+
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
@@ -38,6 +41,7 @@ namespace SoDotCash.ViewModels
             SimpleIoc.Default.Register<AddAccountViewModel>();
             SimpleIoc.Default.Register<WelcomeViewModel>();
             SimpleIoc.Default.Register<SettingsViewModel>();
+            SimpleIoc.Default.Register<InitViewModel>();
 
             var navigationService = new NavigationService();
             navigationService.Configure(nameof(Main), new Uri("/Views/MainWindow.xaml", UriKind.RelativeOrAbsolute));
@@ -45,6 +49,7 @@ namespace SoDotCash.ViewModels
             navigationService.Configure(nameof(AddAccount), new Uri("/Views/AddAccountView.xaml", UriKind.RelativeOrAbsolute));
             navigationService.Configure(nameof(Welcome), new Uri("/Views/WelcomeView.xaml", UriKind.RelativeOrAbsolute));
             navigationService.Configure(nameof(Settings), new Uri("/Views/SettingsView.xaml", UriKind.RelativeOrAbsolute));
+            navigationService.Configure(nameof(Init), new Uri("/Views/Initializing.xaml", UriKind.RelativeOrAbsolute));
 
             try
             {
@@ -52,7 +57,7 @@ namespace SoDotCash.ViewModels
             }
             catch
             {
-                
+                //a navigation server alreayd exists so no need to register
             }
         }
 
@@ -76,7 +81,15 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public WelcomeViewModel Welcome => ServiceLocator.Current.GetInstance<WelcomeViewModel>();
 
+        /// <summary>
+        /// the settings view model
+        /// </summary>
         public SettingsViewModel Settings => ServiceLocator.Current.GetInstance<SettingsViewModel>();
+
+        /// <summary>
+        /// the initialization view model for the application
+        /// </summary>
+        public InitViewModel Init => ServiceLocator.Current.GetInstance<InitViewModel>();
 
         public static void Cleanup()
         {

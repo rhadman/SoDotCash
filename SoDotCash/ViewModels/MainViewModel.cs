@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -62,20 +63,10 @@ namespace SoDotCash.ViewModels
 
         private void Loaded()
         {
-            // Initialize the databas
-            DataService.InitDb();
+            NavigationCommands.GoToPage.Execute("/Views/Initializing.xaml",
+                NavigationService.GetDescendantFromName(Application.Current.MainWindow));
 
-            // Determing initial view
-            //var locator = new ViewModelLocator();
 
-            // If there are accounts, start in the accounts view
-            if (DataService.AnyExistAccounts())
-                _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
-            //ActiveViewModel = locator.Accounts;
-            else
-                // No existing accounts, show welcome screen
-                _modernNavigationService.NavigateTo(nameof(ViewModelLocator.AddAccount));
-            //ActiveViewModel = locator.Welcome;
         }
 
 

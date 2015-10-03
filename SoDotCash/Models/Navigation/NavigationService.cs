@@ -45,7 +45,7 @@ namespace SoDotCash.Models
                 if(!_pagesByKey.ContainsKey(pageKey))
                     throw new ArgumentException($"No such page: {pageKey}. Did you forget to call NavigationService.Configure?", nameof(pageKey));
 
-                var frame = GetDescendantFromName(Application.Current.MainWindow, "ContentFrame") as ModernFrame;
+                var frame = GetDescendantFromName(Application.Current.MainWindow) as ModernFrame;
 
                 if (frame != null)
                     frame.Source = _pagesByKey[pageKey];
@@ -59,11 +59,16 @@ namespace SoDotCash.Models
         public string CurrentPageKey { get; private set; }
         public object Parameter { get; private set; }
 
+        public void ClearNavigationHistory()
+        {
+            _historic.Clear();
+        }
+
         #endregion
 
         #region [ Helpers ]
 
-        private static FrameworkElement GetDescendantFromName(DependencyObject parent, string name)
+        public static FrameworkElement GetDescendantFromName(DependencyObject parent, string name = "ContentFrame")
         {
             var count = VisualTreeHelper.GetChildrenCount(parent);
 
