@@ -42,9 +42,9 @@
 
     
     
-    <!--<StackPanel Orientation="Vertical" Style="{StaticResource ContentRoot}">
+    <StackPanel Orientation="Vertical">
         <xctk:BusyIndicator IsBusy="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=ActionsPending}" BusyContent="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=CurrentActionDescription}">
             <ContentControl Content="{Binding ActiveViewModel}"/>
         </xctk:BusyIndicator>
-    </StackPanel>-->
+    </StackPanel>
 </mui:ModernWindow>
