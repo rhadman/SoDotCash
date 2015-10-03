@@ -375,8 +375,11 @@ namespace SoDotCash.ViewModels
                 Currency = "USD"
             };
 
-            // Add to database
-            DataService.AddAccount(newAccount);
+            using (var dataService = new DataService())
+            {
+                // Add to database
+                dataService.AddAccount(newAccount);
+            }
 
             return newAccount;
         }
@@ -394,16 +397,20 @@ namespace SoDotCash.ViewModels
             // Attach account name to account
             SelectedAccount.AccountName = AccountName;
 
-            // Add to database
-            var newAccount = DataService.AddAccount(SelectedAccount, SelectedFinancialInstitution,
-                new FinancialInstitutionUser
-                {
-                    UserId = FinancialInstitutionUsername,
-                    Password = password
-                }
-                );
+            Account newAccount;
+            using (var dataService = new DataService())
+            {
+                // Add to database
+                newAccount = dataService.AddAccount(SelectedAccount, SelectedFinancialInstitution,
+                    new FinancialInstitutionUser
+                    {
+                        UserId = FinancialInstitutionUsername,
+                        Password = password
+                    }
+                    );
+            }
 
-            // Start an automatic retrieval of transactions
+            // Start an automatic background retrieval of transactions for this account
             UpdateService.DownloadOfxTransactionsForAccount(newAccount);
 
             return newAccount;

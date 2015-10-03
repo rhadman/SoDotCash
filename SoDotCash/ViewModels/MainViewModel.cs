@@ -58,7 +58,7 @@ namespace SoDotCash.ViewModels
 
             ViewLoaded = new RelayCommand(Loaded);
 
-            
+
         }
 
         private void Loaded()

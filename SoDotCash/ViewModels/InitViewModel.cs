@@ -38,13 +38,17 @@ namespace SoDotCash.ViewModels
         private async void AsyncInit()
         {
             // Initialize database
-            await Task.Run(() => DataService.InitDb());
+            await Task.Run(() => DataService.Initialize());
 
-            // Transition to Welcome screen if no accounts, otherwise account list
-            if (DataService.AnyExistAccounts())
-                _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
-            else
-                _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Welcome));
+            // If there are accounts, start in the accounts view
+            using (var dataService = new DataService())
+            {
+                if (dataService.AnyExistAccounts())
+                    _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
+                else
+                    // No existing accounts, show welcome screen
+                    _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Welcome));
+            }
 
             //prevent the user from navigating to this point or further back
             _modernNavigationService.ClearNavigationHistory();

@@ -117,11 +117,14 @@ namespace SoDotCash.ViewModels
             }
             set
             {
-                // Update in account object
-                SelectedAccount.AccountName = value;
+                using (var dataService = new DataService())
+                {
+                    // Update in account object
+                    SelectedAccount.AccountName = value;
 
-                // Save to database
-                DataService.UpdateAccount(SelectedAccount);
+                    // Save to database
+                    dataService.UpdateAccount(SelectedAccount);
+                }
 
                 RaisePropertyChanged(() => SelectedAccount.AccountName);
 
@@ -544,8 +547,11 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public void DeleteTransaction()
         {
-            // Delete the transaction
-            DataService.DeleteTransaction(SelectedTransaction);
+            using (var dataService = new DataService())
+            {
+                // Delete the transaction
+                dataService.DeleteTransaction(SelectedTransaction);
+            }
 
             // Need to re-sort the data and recalculate balances
             RaisePropertyChanged(() => Transactions);
@@ -634,9 +640,12 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public void DeleteSelectedAccount()
         {
-            // Delete the account
-            DataService.DeleteAccount(SelectedAccount);
-            
+            using (var dataService = new DataService())
+            {
+                // Delete the account
+                dataService.DeleteAccount(SelectedAccount);
+            }
+
             // Set to no account
             SelectedAccount = null;
 
@@ -661,8 +670,11 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public void UnlinkSelectedAccount()
         {
-            // Unlink from fiUser
-            DataService.UnlinkAccount(SelectedAccount);
+            using (var dataService = new DataService())
+            {
+                // Unlink from fiUser
+                dataService.UnlinkAccount(SelectedAccount);
+            }
 
             // Manual and automatic account properties changed 
             RaisePropertyChanged(() => IsAutomaticAccount);
@@ -738,8 +750,11 @@ namespace SoDotCash.ViewModels
             updateAccount.FinancialInstitutionUser.UserId = credentials.UserId;
             updateAccount.FinancialInstitutionUser.Password = credentials.Password;
 
-            // Save to DB
-            DataService.UpdateFiUser(updateAccount.FinancialInstitutionUser);
+            using (var dataService = new DataService())
+            {
+                // Save to DB
+                dataService.UpdateFiUser(updateAccount.FinancialInstitutionUser);
+            }
 
             // Saved
             CredentialsVerified = true;
