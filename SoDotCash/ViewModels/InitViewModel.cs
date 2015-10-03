@@ -13,22 +13,34 @@ namespace SoDotCash.ViewModels
     {
         private readonly IModernNavigationService _modernNavigationService;
 
+        /// <summary>
+        /// Mapped OnLoaded event trigger - Allows actions when the view is loaded
+        /// </summary>
         public ICommand ViewLoaded => new RelayCommand(Loaded);
-
-        private BackgroundWorker initBackgroundWorker;
 
         public InitViewModel(IModernNavigationService navService)
         {
             _modernNavigationService = navService;
-
-            initBackgroundWorker = new BackgroundWorker();
-            initBackgroundWorker.DoWork += InitBackgroundWorker_DoWork;
-            initBackgroundWorker.RunWorkerCompleted += InitBackgroundWorkerOnRunWorkerCompleted;
         }
 
-        private void InitBackgroundWorkerOnRunWorkerCompleted(object sender,
-            RunWorkerCompletedEventArgs runWorkerCompletedEventArgs)
+        /// <summary>
+        /// Called when the view associated with this viewmodel loads
+        /// </summary>
+        private void Loaded()
         {
+            // Perform the rest of the init asyncronously
+            AsyncInit();
+        }
+
+        /// <summary>
+        /// Async wrapper for database init followed by proper page transition
+        /// </summary>
+        private async void AsyncInit()
+        {
+            // Initialize database
+            await Task.Run(() => DataService.InitDb());
+
+            // Transition to Welcome screen if no accounts, otherwise account list
             if (DataService.AnyExistAccounts())
                 _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
             else
@@ -38,17 +50,5 @@ namespace SoDotCash.ViewModels
             _modernNavigationService.ClearNavigationHistory();
         }
 
-        private void InitBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            DataService.InitDb();
-        }
-
-        private void Loaded()
-        {
-            using (BackgroundTaskTracker.BeginTask("InitDB"))
-            {
-                initBackgroundWorker.RunWorkerAsync();
-            }
-        }
     }
 }
