@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Windows.Input;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
 using OFX.Types;
 using SoDotCash.Services;
 using SoDotCash.Models;
@@ -18,10 +20,13 @@ namespace SoDotCash.ViewModels
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : ModernViewModelBase
     {
+        private readonly IModernNavigationService _modernNavigationService;
 
         #region [ Public Bound Properties ]
+
+        public ICommand ViewLoaded { get; }
 
         /// <summary>
         /// The ViewModel tied to the currently active view in the GUI
@@ -45,22 +50,34 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel()
+        public MainViewModel(IModernNavigationService navService)
+        {
+            //assign the navigation service
+            _modernNavigationService = navService;
+
+            ViewLoaded = new RelayCommand(Loaded);
+
+            
+        }
+
+        private void Loaded()
         {
             // Initialize the databas
             DataService.InitDb();
 
             // Determing initial view
-            var locator = new ViewModelLocator();
+            //var locator = new ViewModelLocator();
 
             // If there are accounts, start in the accounts view
             if (DataService.AnyExistAccounts())
-                ActiveViewModel = locator.Accounts;
+                _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
+            //ActiveViewModel = locator.Accounts;
             else
                 // No existing accounts, show welcome screen
-                ActiveViewModel = locator.Welcome;
-
+                _modernNavigationService.NavigateTo(nameof(ViewModelLocator.AddAccount));
+            //ActiveViewModel = locator.Welcome;
         }
+
 
         #endregion
     }

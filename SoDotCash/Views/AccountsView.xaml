@@ -7,28 +7,36 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:models="clr-namespace:SoDotCash.Models"
-             xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid" x:Class="SoDotCash.Views.AccountsView"
+             xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid" 
+             x:Class="SoDotCash.Views.AccountsView"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
              >
     <Grid>
 
-        <Grid Grid.Column="0" Margin="10,5,752,10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Grid Grid.Column="0" Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Label Content="Accounts" HorizontalAlignment="Center" Margin="10,0,120,0" />
-            <Button Grid.Row="0" x:Name="AddAccount" Content="Add Account" HorizontalAlignment="Left" Margin="103,3,0,0" VerticalAlignment="Top" Width="75" Command="{Binding AddAccountCommand}"/>
-
+            <Label Content="Accounts" HorizontalAlignment="Left" Margin="0,5,0,0" />
+            <Button Grid.Row="0" x:Name="AddAccount" Content="Add Account" HorizontalAlignment="Right"  VerticalAlignment="Top"  Command="{Binding AddAccountCommand}"/>
+            
+            
             <TreeView Grid.Row="1" Margin="10,0,10,10" ItemsSource="{Binding AccountsView}">
-                <i:Interaction.Behaviors>
+                <!--<i:Interaction.Behaviors>
                     <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
-                </i:Interaction.Behaviors>
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
+                </i:Interaction.Behaviors>-->
+                <!--<TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="">
                         <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                         <Style.Triggers>
                             <Trigger Property="IsSelected" Value="True">
@@ -39,7 +47,7 @@
                             </Trigger>
                         </Style.Triggers>
                     </Style>
-                </TreeView.ItemContainerStyle>
+                </TreeView.ItemContainerStyle>-->
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Value}">
                         <TextBlock Text="{Binding Key}" />
@@ -53,82 +61,19 @@
             </TreeView>
 
         </Grid>
-        <TabControl x:Name="TabControl" HorizontalAlignment="Left" Margin="206,5,10,21" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndexAsInt}">
-            <TabItem Header="Overview">
-                <Grid  Width="730" Height="300">
-                    <StackPanel Orientation="Vertical">
-                        <StackPanel Orientation="Horizontal">
-                            <Grid Margin="0,20,0,0">
-                                <charting:Chart x:Name="Chart" Width="550" Height="250">
-                                    <charting:Chart.Axes>
-                                        <charting:DateTimeAxis x:Name="XAxis" ShowGridLines="True" Orientation="X" />
-                                        <charting:LinearAxis Orientation="Y" ShowGridLines="True"/>
-                                    </charting:Chart.Axes>
-                                    <charting:LineSeries ItemsSource="{Binding Transactions}"
-										DependentValueBinding="{Binding LocalizedBalance}"
-										IndependentValuePath="Date"
-										Title="Historical Balance" IsSelectionEnabled="True" />
-                                </charting:Chart>
-                            </Grid>
-                        </StackPanel>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Ledger">
-                <Grid  Width="730" Height="300">
-                    <Grid.Resources>
-                        <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
-                    </Grid.Resources>
-
-                    <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
-
-                    <DataGrid x:Name="DatagridTransactions" ItemsSource="{Binding Transactions}" CanUserAddRows="{Binding IsManualAccount}" SelectionUnit="FullRow" SelectionMode="Single"
-						CanUserDeleteRows="{Binding IsManualAccount}" AutoGenerateColumns="False" SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}"
-						AlternatingRowBackground="Beige">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:d\}, UpdateSourceTrigger=PropertyChanged}" Width="70"
-								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
-                            <DataGridTextColumn Header="Description" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Width="200"
-								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
-                            <DataGridTextColumn Header="Transaction ID" Binding="{Binding FiTransactionId, UpdateSourceTrigger=PropertyChanged}" Width="200" 
-								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
-                            <DataGridTextColumn Header="CategoryName" Binding="{Binding CategoryName, UpdateSourceTrigger=PropertyChanged}" Width="80" />
-                            <DataGridTextColumn Header="Amount" Binding="{Binding LocalizedAmount, StringFormat=\{0:C2\}, UpdateSourceTrigger=PropertyChanged}" Width="70" 
-								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}" CellStyle="{StaticResource Balanace}" />
-                            <DataGridTextColumn Header="Balance" Binding="{Binding LocalizedBalance, StringFormat=\{0:C2\}}" Width="80" IsReadOnly="True"  />
-                        </DataGrid.Columns>
-                        <DataGrid.InputBindings>
-                            <KeyBinding Key="Delete" Command="{Binding DeleteTransactionCommand}" />
-                        </DataGrid.InputBindings>
-
-
-                        <!--<DataGrid.RowStyle>
-                            <Style TargetType="DataGridRow">
-                                <Style.Triggers>
-                                    <Trigger Property="AlternationIndex" Value="0">
-                                        <Setter Property="Background" Value="White" />
-                                    </Trigger>
-                                    <Trigger Property="AlternationIndex" Value="1">
-                                        <Setter Property="Background" Value="WhiteSmoke"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.RowStyle>-->
-
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Import">
-                <Grid  Width="730" Height="300">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="This section allows you to import transactions from an OFX/QFX file. If this account is linked with a supported online financial institution, you may also download transactions." TextWrapping="Wrap"/>
-                        <StackPanel Orientation="Horizontal">
-                            <Button x:Name="ButtonImportTransactions" Content="Import Transactions" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding ImportTransactionsCommand}" />
-                            <Button x:Name="ButtonDownloadTransactions" Content="Download Transactions" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DownloadTransactionsCommand}" Margin="20,0,0,0"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
+        
+        <mui:ModernTab Grid.Column="1">
+            <mui:ModernTab.Links>
+                <mui:Link DisplayName="Graph" Source="/Views/AccountsViewTabs/AccountGraph.xaml" />
+                <mui:Link DisplayName="Ledger" Source="/Views/AccountsViewTabs/AccountLedger.xaml" />
+                <mui:Link DisplayName="Import" Source="/Views/AccountsViewTabs/AccountImport.xaml" />
+            </mui:ModernTab.Links>
+        </mui:ModernTab>
+        
+        <!--<TabControl Grid.Column="1" x:Name="TabControl" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndexAsInt}">
+            
+            
+            
             <TabItem Header="Configuration">
                 <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
@@ -137,6 +82,6 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-        </TabControl>
+        </TabControl>-->
     </Grid>
 </UserControl>

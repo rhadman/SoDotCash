@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="SoDotCash.Views.AccountsViewTabs.AccountGraph"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SoDotCash.Views.AccountsViewTabs"
+             xmlns:chartingToolkit="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+             mc:Ignorable="d" 
+             DataContext="{Binding Source={StaticResource Locator}, Path=Accounts}"
+             >
+    <Grid>
+        
+            <StackPanel Orientation="Horizontal">
+                <Grid >
+                    <chartingToolkit:Chart x:Name="Chart" Width="700" Height="350">
+                        <chartingToolkit:Chart.Axes>
+                            <chartingToolkit:DateTimeAxis x:Name="XAxis" ShowGridLines="True" Orientation="X" />
+                            <chartingToolkit:LinearAxis Orientation="Y" ShowGridLines="True"/>
+                        </chartingToolkit:Chart.Axes>
+                        <chartingToolkit:LineSeries ItemsSource="{Binding Transactions}"
+										DependentValueBinding="{Binding LocalizedBalance}"
+										IndependentValuePath="Date"
+										Title="Historical Balance" IsSelectionEnabled="True" />
+                    </chartingToolkit:Chart>
+                </Grid>
+            </StackPanel>
+        
+    </Grid>
+
+</UserControl>

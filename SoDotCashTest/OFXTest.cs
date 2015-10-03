@@ -27,7 +27,7 @@ namespace SoDotCashTest
         {
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
         }
-        private TestContext testContextInstance;
+        //private TestContext testContextInstance;
 
 
 

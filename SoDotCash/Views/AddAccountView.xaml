@@ -46,7 +46,7 @@
         </StackPanel>
         <DockPanel Dock="Bottom" VerticalAlignment="Bottom">
             <Button x:Name="ButtonCancel" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="208" Height="50" Command="{Binding CancelCommand}"/>
-            <Button x:Name="ButtonCreate" Content="Create" HorizontalAlignment="Right" VerticalAlignment="Top" Width="208" Height="50" Command="{Binding CreateAccountCommand}"/>
+            <Button x:Name="ButtonCreate" Content="Create" HorizontalAlignment="Right" VerticalAlignment="Top" Width="208" Height="50" Command="{Binding CreateAccountCommand}" CommandParameter="/Views/AccountsView.xaml" IsEnabled="{Binding CanCreateAccount}" />
         </DockPanel>
     </DockPanel>
 </UserControl>

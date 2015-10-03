@@ -13,6 +13,8 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles.xaml"/>
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.xaml" />
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Dark.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <vm:ViewModelLocator xmlns:vm="clr-namespace:SoDotCash.ViewModels" x:Key="Locator" d:IsDataSource="True" />
             <conv:BoolToInverseBoolConverter x:Key="BoolToInverseBoolConverter"/>

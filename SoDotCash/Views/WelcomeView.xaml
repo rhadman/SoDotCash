@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SoDotCash.Views"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding Welcome, Source={StaticResource Locator}}">
@@ -16,7 +17,8 @@
             
             </StackPanel>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
-                <Button x:Name="button_getStarted" Height="45" Content="Let's get started!" FontSize="30" Command="{Binding GetStartedCommand}"/>
+                <!--<Button Height="50" Content="Let's get started!" FontSize="30" Command="{Binding GetStartedCommand}"/>-->
+                <Button Height="50" Content="Let's get started!" FontSize="30" Command="mui:LinkCommands.NavigateLink" CommandParameter="/Views/AddAccountView.xaml"/>
             </StackPanel>
         </DockPanel>
 

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
+using FirstFloor.ModernUI.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using SoDotCash.Models;
 using SoDotCash.Services;
+using SoDotCash.Views;
 
 namespace SoDotCash.ViewModels
 {
@@ -24,8 +27,14 @@ namespace SoDotCash.ViewModels
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class AddAccountViewModel : ViewModelBase
+    public class AddAccountViewModel : ModernViewModelBase
     {
+        private readonly IModernNavigationService _modernNavigationService;
+
+        public AddAccountViewModel(IModernNavigationService navService)
+        {
+            _modernNavigationService = navService;
+        }
 
         #region [ Always Visible Fields ]
 
@@ -174,12 +183,9 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Binding for the Create Account button
         /// </summary>
-        private RelayCommand _createAccountCommand;
-        public ICommand CreateAccountCommand
-        {
-            get { return _createAccountCommand ?? (_createAccountCommand = new RelayCommand(CreateAccount, CanCreateAccount)); }
-        }
-
+        //private RelayCommand<string> _createAccountCommand;
+        public RelayCommand CreateAccountCommand => new RelayCommand(CreateAccount, CanCreateAccount);
+        
         /// <summary>
         /// Determine whether enough information has been provided to create a manual-entry account
         /// </summary>
@@ -237,13 +243,14 @@ namespace SoDotCash.ViewModels
             // A financial institution account must be selected
             if (SelectedAccount == null)
                 return false;
-
+            
             // We can create an automatic entry account!
             return true;
 
+            
+
         }
-
-
+        
         /// <summary>
         /// Called to determine whether there's enough information selected to create an account
         /// </summary>
@@ -365,8 +372,11 @@ namespace SoDotCash.ViewModels
 
             // Transition back to accounts view
             var locator = new ViewModelLocator();
-            locator.Main.ActiveViewModel = locator.Accounts;
+            //locator.Main.ActiveViewModel = locator.Accounts;
             locator.Accounts.SelectedAccount = newAccount;
+
+            _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
+
         }
 
 

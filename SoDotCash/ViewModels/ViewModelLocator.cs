@@ -12,8 +12,10 @@
   See http://www.galasoft.ch/mvvm
 */
 
+using System;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
+using SoDotCash.Models;
 
 namespace SoDotCash.ViewModels
 {
@@ -23,6 +25,7 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class ViewModelLocator
     {
+        private readonly IModernNavigationService _modernNavigationService;
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
@@ -34,6 +37,16 @@ namespace SoDotCash.ViewModels
             SimpleIoc.Default.Register<AccountsViewModel>();
             SimpleIoc.Default.Register<AddAccountViewModel>();
             SimpleIoc.Default.Register<WelcomeViewModel>();
+            SimpleIoc.Default.Register<SettingsViewModel>();
+
+            var navigationService = new NavigationService();
+            navigationService.Configure(nameof(Main), new Uri("/Views/MainWindow.xaml", UriKind.RelativeOrAbsolute));
+            navigationService.Configure(nameof(Accounts), new Uri("/Views/AccountsView.xaml", UriKind.RelativeOrAbsolute));
+            navigationService.Configure(nameof(AddAccount), new Uri("/Views/AddAccountView.xaml", UriKind.RelativeOrAbsolute));
+            navigationService.Configure(nameof(Welcome), new Uri("/Views/WelcomeView.xaml", UriKind.RelativeOrAbsolute));
+            navigationService.Configure(nameof(Settings), new Uri("/Views/SettingsView.xaml", UriKind.RelativeOrAbsolute));
+
+            SimpleIoc.Default.Register<IModernNavigationService>(() => navigationService);
         }
 
         /// <summary>
@@ -55,6 +68,8 @@ namespace SoDotCash.ViewModels
         /// The single welcome view model - backing the single WelcomeView
         /// </summary>
         public WelcomeViewModel Welcome => ServiceLocator.Current.GetInstance<WelcomeViewModel>();
+
+        public SettingsViewModel Settings => ServiceLocator.Current.GetInstance<SettingsViewModel>();
 
         public static void Cleanup()
         {
