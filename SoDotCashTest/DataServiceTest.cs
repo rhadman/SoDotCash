@@ -220,5 +220,40 @@ namespace SoDotCashTest
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
         }
 
+        /// <summary>
+        /// Test updating a transaction
+        /// </summary>
+        [TestMethod]
+        public void TestUpdateTransaction()
+        {
+            // Transaction used for test
+            var transaction = new Transaction
+            {
+                Amount = 100,
+                CategoryName = "TestCat",
+                Description = "TestDesc",
+                FiTransactionId = "TRN1"
+            };
+
+            // Mock for Entity() call on context
+            var mockEntityEntry = new Mock<DbEntityEntry<Transaction>>();
+            mockEntityEntry.SetupAllProperties();
+
+            // Mock setup for DataService
+            var mockTransactionSet = new Mock<DbSet<Transaction>>();
+            var mockContext = new Mock<SoCashDbContext>();
+            mockContext.Setup(m => m.Set<Transaction>()).Returns(mockTransactionSet.Object);
+
+
+            // Delete the transaction
+            using (var service = new DataService(mockContext.Object))
+                service.UpdateTransaction(transaction);
+
+            // Verify that the service joined the transaction to the session in a modified state
+            mockContext.Verify(m => m.SetModified(It.IsAny<Transaction>()), Times.Once());
+
+            // Verify that the transaction ended properly
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
     }
 }
