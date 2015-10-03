@@ -271,5 +271,26 @@ namespace SoDotCash.Services
             // Retrieve transactions ordered by date
             return from t in dbAccount.Transactions orderby t.Date select t;
         }
+
+
+        /// <summary>
+        /// Retrieve an account from the database by account id
+        /// </summary>
+        /// <param name="accountId">Numeric Id of the account to retrieve</param>
+        /// <returns>Account matching the Id, or null if there are no matching accounts</returns>
+        public Account GetAccountById(int accountId)
+        {
+            return DbContext.Accounts.First(dbAccount => dbAccount.AccountId == accountId);
+        }
+
+        /// <summary>
+        /// Retrieve accounts from the database by the FI-assigned account Id
+        /// </summary>
+        /// <param name="fiAccountId">Account id to retrieve</param>
+        /// <returns>Collection of account matching the Id</returns>
+        public IEnumerable<Account> GetAccountByFinancialId(string fiAccountId)
+        {
+            return DbContext.Accounts.Where(a => a.FiAccountId == fiAccountId);
+        }
     }
 }

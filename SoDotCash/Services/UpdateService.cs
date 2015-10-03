@@ -24,10 +24,10 @@ namespace SoDotCash.Services
         {
             using (BackgroundTaskTracker.BeginTask("Processing Transactions"))
             {
-                using (var db = new SoCashDbContext())
+                using (var dataService = new DataService())
                 {
                     // Retrieve matching account from DB - we need to get an entity in the current db session
-                    var updateAccount = db.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
+                    var updateAccount = dataService.GetAccountById(account.AccountId);
 
                     // If the account has no account ID set, set it from the imported statement
                     if (updateAccount.FiAccountId == null)
@@ -116,9 +116,6 @@ namespace SoDotCash.Services
                             updateAccount.Transactions.Add(fillerTransaction);
                         }
                     }
-
-
-                    db.SaveChanges();
                 }
             }
         }
@@ -178,10 +175,10 @@ namespace SoDotCash.Services
                 var endTime = DateTimeOffset.Now;
                 var startTime = new DateTimeOffset(new DateTime(1997, 1, 1));
 
-                using (var db = new SoCashDbContext())
+                using (var dataService = new DataService())
                 {
                     // Retrieve matching account from DB - we need to get an entity in the current db session
-                    var updateAccount = db.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
+                    var updateAccount = dataService.GetAccountById(account.AccountId);
 
                     // Form FI connection properties for transaction retrieval
                     var fi = new OFX.Types.FinancialInstitution(
@@ -270,12 +267,10 @@ namespace SoDotCash.Services
                 var accountList = new List<Account>();
                 var ofxAccountList = await ofxService.ListAccounts().ConfigureAwait(false);
 
-                // TODO: If ofxAccountList is null, raise an exception
+                // TODO: If ofxAccountList is null, raise a more detailed exception
 
-                using (var db = new SoCashDbContext())
+                using (var dataService = new DataService())
                 {
-
-
                     foreach (var ofxAccount in ofxAccountList)
                     {
                         // Convert from OFX account type to db account type and encode account id 
@@ -298,7 +293,7 @@ namespace SoDotCash.Services
                         }
 
                         // Look for a matching account in the database
-                        if (!db.Accounts.Any(a => a.FiAccountId == accountId))
+                        if (!dataService.GetAccountByFinancialId(accountId).Any())
                         {
                             // This account is not already in the DB, add to new account list
                             accountList.Add(new Account
