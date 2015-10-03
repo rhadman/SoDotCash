@@ -27,6 +27,22 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            <ControlTemplate x:Key="CommonLineSeriesDataPointTemplate" TargetType="charting:LineDataPoint">
+                <!--Comment out data points from the default template; just an empty template-->
+                <Grid x:Name="Root" Opacity="1"/>
+            </ControlTemplate>
+            <Style x:Key="CommonLineSeriesDataPoint" TargetType="charting:LineDataPoint">
+                <Setter Property="IndependentValueStringFormat" Value="{}{0:yyyy}" />
+                <Setter Property="DependentValueStringFormat" Value="{}{0:c0}" />
+                <Setter Property="Background" Value="#FF0077CC" />
+                <Setter Property="BorderBrush" Value="White" />
+                <Setter Property="BorderThickness" Value="2" />
+                <Setter Property="IsTabStop" Value="False" />
+                <Setter Property="Template" Value="{StaticResource CommonLineSeriesDataPointTemplate}" />
+            </Style>
+            <Style TargetType="charting:LineSeries">
+                <Setter Property="DataPointStyle" Value="{StaticResource CommonLineSeriesDataPoint}" />
+            </Style>
         </Grid.Resources>
 
         <Grid Grid.Column="0" Margin="10,5,752,10">
@@ -78,15 +94,23 @@
                                     <StackPanel Orientation="Vertical">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <TextBlock Text="High Balance:"/>
-                                            <TextBlock Text="$0"/>
+                                            <TextBlock Text="{Binding AccountHighBalance.Balance, StringFormat=\{0:C2\}}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <TextBlock Text="on"/>
+                                            <TextBlock Text="{Binding AccountHighBalance.Date, StringFormat=\{0:d\}}" Margin="5,0,0,0"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <TextBlock Text="Low Balance:"/>
-                                            <TextBlock Text="$0"/>
+                                            <TextBlock Text="{Binding AccountLowBalance.Balance, StringFormat=\{0:C2\}}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <TextBlock Text="on"/>
+                                            <TextBlock Text="{Binding AccountLowBalance.Date, StringFormat=\{0:d\}}"  Margin="5,0,0,0"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <TextBlock Text="Average Balance:"/>
-                                            <TextBlock Text="$0"/>
+                                            <TextBlock Text="{Binding AccountAvgBalance, StringFormat=\{0:C2\}}"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </Grid>
@@ -96,8 +120,8 @@
                                             <Setter Property="Width" Value="0" />
                                         </Style>
                                     </charting:Chart.LegendStyle>
-                                    <charting:LineSeries ItemsSource="{Binding SummaryTransactions}"
-									    DependentValueBinding="{Binding LocalizedBalance}"
+                                    <charting:LineSeries ItemsSource="{Binding SelectedAccountDailyBalances}"
+                                        DependentValuePath="Balance"
 									    IndependentValuePath="Date"
 									    Title="Historical Balance"
                                         IsSelectionEnabled="True">

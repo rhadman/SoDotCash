@@ -79,7 +79,11 @@ namespace SoDotCash.ViewModels
 
                 // Transactions will be updated since this is a different account
                 RaisePropertyChanged(() => Transactions);
-                RaisePropertyChanged(() => SummaryTransactions);
+                RaisePropertyChanged(() => SelectedAccountDailyBalances);
+                RaisePropertyChanged(() => AccountHighBalance);
+                RaisePropertyChanged(() => AccountLowBalance);
+                RaisePropertyChanged(() => AccountAvgBalance);
+
 
                 // Selected account name is changed
                 RaisePropertyChanged(() => SelectedAccountName);
@@ -206,9 +210,68 @@ namespace SoDotCash.ViewModels
         }
 
         /// <summary>
-        /// Bound abbridged transactions for charting
+        /// Encapsulating class for a balance associated with a day
         /// </summary>
-        public ObservableCollection<Transaction> SummaryTransactions
+        public class DailyBalance
+        {
+            public DateTime Date { get; set; }
+            public decimal Balance { get; set; }
+        }
+
+        /// <summary>
+        /// Helper function which calculates daily balances from a date-ordered enumeration of transactions
+        /// </summary>
+        /// <param name="transactions">Enumeration of transactions ordered by date</param>
+        /// <returns>Ordered collection of daily balances - in the same order as the transactions provided</returns>
+        private static IEnumerable<DailyBalance> GetDailyBalances(IEnumerable<Transaction> transactions)
+        {
+            ObservableCollection<DailyBalance> dailyBalances = new ObservableCollection<DailyBalance>();
+
+            // Sorted list of transaction dates so we can find the earliest
+            var sortedTransactionDates = from transaction in transactions
+                orderby transaction.Date
+                select transaction.Date;
+
+            // If no transactions, nothing to do
+            if (!sortedTransactionDates.Any())
+                return dailyBalances;
+
+            // Start with earliest date in transactions - begining of day
+            var startDate = sortedTransactionDates.First();
+            startDate = new DateTime(startDate.Year, startDate.Month, startDate.Day);
+            var oneDay = new TimeSpan(1,0,0,0);
+
+            // End at the start of tomorrow
+            var endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day) + oneDay;
+            decimal balance = 0.0m;
+            while (startDate < DateTime.Now)
+            {
+                var nextDate = startDate + oneDay;
+
+                // Get transactions for day
+                var dailyTransactions = from transaction in transactions
+                    where transaction.Date >= startDate && transaction.Date < nextDate
+                    orderby transaction.Date descending
+                    select transaction;
+
+                // Get ending balance for the day
+                if (dailyTransactions.Any())
+                    balance = dailyTransactions.First().LocalizedBalance;
+
+                // Add to set
+                dailyBalances.Add(new DailyBalance {Date=startDate, Balance = balance});
+
+                // Next day
+                startDate = nextDate;
+            }
+
+            return dailyBalances;
+        }
+
+        /// <summary>
+        /// Bound daily balances for the selected account
+        /// </summary>
+        public IEnumerable<DailyBalance> SelectedAccountDailyBalances
         {
             get
             {
@@ -217,23 +280,10 @@ namespace SoDotCash.ViewModels
                 if (transactions == null)
                     return null;
 
-                // Include values every 3 days
-                ObservableCollection<Transaction> summary = new ObservableCollection<Transaction>();
-                DateTime lastDate = DateTime.MinValue;
-                var maxTimeSpan = new TimeSpan(3,0,0,0); // 3 days
-                foreach (var transaction in transactions.Reverse())
-                {
-                    // If this transaction isn't longer than the minimum number of days since the last included, skip
-                    if ((transaction.Date - lastDate) < maxTimeSpan)
-                        continue;
+                var startDate = DateTime.Now - new TimeSpan(SummaryDays, 0, 0, 0);
 
-                    // Include transaction
-                    summary.Add(transaction);
-
-                    // Update the last date used for inclusion testing
-                    lastDate = transaction.Date;
-                }
-                return summary;
+                var result = (from balance in GetDailyBalances(transactions) where balance.Date >= startDate orderby balance.Date select balance );
+                return result;
             }
             
         }
@@ -268,6 +318,51 @@ namespace SoDotCash.ViewModels
 
                 // If the account is associated with a financial institution user, it is an auto-update account
                 return (SelectedAccount.IsAssociatedWithFinancialInstitution);
+            }
+        }
+
+        #endregion
+
+        #region [Account Summary Bindings]
+
+        /// <summary>
+        /// Number of days included in summary
+        /// </summary>
+        private readonly int SummaryDays = 365;
+
+        /// <summary>
+        /// High daily balance over the configured summary days
+        /// </summary>
+        public DailyBalance AccountHighBalance
+        {
+            get
+            {
+                var balances = SelectedAccountDailyBalances;
+                return balances == null || !balances.Any() ? null : (from balance in balances orderby balance.Balance descending select balance).First();
+            }
+        }
+
+        /// <summary>
+        /// Low daily balance over the configured summary days
+        /// </summary>
+        public DailyBalance AccountLowBalance
+        {
+            get
+            {
+                var balances = SelectedAccountDailyBalances;
+                return balances == null || !balances.Any() ? null : (from balance in balances orderby balance.Balance select balance).First();
+            }
+        }
+
+        /// <summary>
+        /// Average daily balance over the configured summary days - just the balance
+        /// </summary>
+        public decimal AccountAvgBalance
+        {
+            get
+            {
+                var balances = SelectedAccountDailyBalances;
+                return balances == null || !balances.Any() ? 0.0m : (from balance in balances select balance.Balance).Average();
             }
         }
 
@@ -410,7 +505,7 @@ namespace SoDotCash.ViewModels
         {
             // Need to re-sort the data and recalculate balances
             RaisePropertyChanged(() => Transactions);
-            RaisePropertyChanged(() => SummaryTransactions);
+            RaisePropertyChanged(() => SelectedAccountDailyBalances);
         }
 
         /// <summary>
@@ -451,7 +546,7 @@ namespace SoDotCash.ViewModels
 
             // Need to re-sort the data and recalculate balances
             RaisePropertyChanged(() => Transactions);
-            RaisePropertyChanged(() => SummaryTransactions);
+            RaisePropertyChanged(() => SelectedAccountDailyBalances);
         }
 
         /// <summary>
@@ -484,7 +579,7 @@ namespace SoDotCash.ViewModels
 
             // Update transactions
             RaisePropertyChanged(() => Transactions);
-            RaisePropertyChanged(() => SummaryTransactions);
+            RaisePropertyChanged(() => SelectedAccountDailyBalances);
 
             // Move to transactions tab
             ActiveTabIndex = TabIndex.Ledger;
@@ -510,7 +605,7 @@ namespace SoDotCash.ViewModels
 
             // Update transactions
             RaisePropertyChanged(() => Transactions);
-            RaisePropertyChanged(() => SummaryTransactions);
+            RaisePropertyChanged(() => SelectedAccountDailyBalances);
 
             // Move to transactions tab
             ActiveTabIndex = TabIndex.Ledger;
