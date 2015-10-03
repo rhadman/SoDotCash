@@ -248,6 +248,9 @@
     <Compile Include="Views\AccountsViewTabs\AccountImport.xaml.cs">
       <DependentUpon>AccountImport.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\AccountsViewTabs\AccountConfiguration.xaml.cs">
+      <DependentUpon>AccountConfiguration.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\AccountsViewTabs\AccountLedger.xaml.cs">
       <DependentUpon>AccountLedger.xaml</DependentUpon>
     </Compile>
@@ -272,6 +275,10 @@
     <Page Include="Views\AccountsViewTabs\AccountImport.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AccountsViewTabs\AccountConfiguration.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\AccountsViewTabs\AccountLedger.xaml">
       <SubType>Designer</SubType>

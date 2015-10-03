@@ -36,19 +36,6 @@
                 <i:Interaction.Behaviors>
                     <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
                 </i:Interaction.Behaviors>
-                <!--<TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="">
-                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-                        <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="FontWeight" Value="Bold"/>
-                            </Trigger>
-                            <Trigger Property="HasItems" Value="True">
-                                <Setter Property="Focusable" Value="False" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TreeView.ItemContainerStyle>-->
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Value}">
                         <TextBlock Text="{Binding Key}" />
@@ -68,21 +55,8 @@
                 <mui:Link DisplayName="Graph" Source="/Views/AccountsViewTabs/AccountGraph.xaml" />
                 <mui:Link DisplayName="Ledger" Source="/Views/AccountsViewTabs/AccountLedger.xaml" />
                 <mui:Link DisplayName="Import" Source="/Views/AccountsViewTabs/AccountImport.xaml" />
+                <mui:Link DisplayName="Config" Source="/Views/AccountsViewTabs/AccountConfiguration.xaml" />
             </mui:ModernTab.Links>
         </mui:ModernTab>
-
-        <!--<TabControl Grid.Column="1" x:Name="TabControl" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndexAsInt}">
-
-
-
-            <TabItem Header="Configuration">
-                <Grid  Width="730" Height="300">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="TODO: Fill this in (Configuration)"  TextWrapping="Wrap"/>
-                        <Button x:Name="ButtonDeleteAccount" Content="Delete Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DeleteAccountCommand}" />
-                    </StackPanel>
-                </Grid>
-            </TabItem>
-        </TabControl>-->
     </Grid>
 </UserControl>

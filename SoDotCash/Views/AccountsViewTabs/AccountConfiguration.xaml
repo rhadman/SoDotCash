@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="SoDotCash.Views.AccountsViewTabs.AccountConfiguration"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SoDotCash.Views.AccountsViewTabs"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             mc:Ignorable="d" 
+             DataContext="{Binding Accounts, Source={StaticResource Locator}}"
+             >
+
+
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <GroupBox Header="Overview" Margin="0,10,0,0">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Account Name:"  TextWrapping="Wrap"/>
+                        <TextBox Text="{Binding SelectedAccountName}" Margin="10,0,0,0" Width="300"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Account Type:"  TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding SelectedAccount.AccountType}" Margin="10,0,0,0"  TextWrapping="Wrap"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Update Mechanism" Margin="0,10,0,0">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Account Update Mechanism:" TextWrapping="Wrap"/>
+                        <TextBlock FontWeight="Bold" Text="Automatic" Margin="10,0,0,0" TextWrapping="Wrap" Visibility="{Binding IsAutomaticAccount, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <TextBlock FontWeight="Bold" Text="Manual" Margin="10,0,0,0" TextWrapping="Wrap" Visibility="{Binding IsManualAccount, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsAutomaticAccount, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Label Content="Financial Institution Login:"/>
+                        <TextBox Text="{Binding FiUserName}" Margin="10,0,0,0" Width="100" Height="20"/>
+                        <Label Content="Password:"/>
+                        <PasswordBox x:Name="PasswordEntry" Margin="10,0,0,0" Width="100" Height="20"/>
+                        <Button Content="Verify and Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Margin="10,3,0,0" Command="{Binding VerifyAndSaveCredentialsCommand}" CommandParameter="{Binding ElementName=PasswordEntry}" />
+                        <TextBlock FontWeight="Bold" Foreground="RED" Text="FAILED" Margin="10,5,0,0" TextWrapping="Wrap" Visibility="{Binding CredentialsFailed, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <TextBlock FontWeight="Bold" Foreground="GREEN" Text="SAVED" Margin="10,5,0,0" TextWrapping="Wrap" Visibility="{Binding CredentialsVerified, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsAutomaticAccount, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Button Content="Unlink Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding UnlinkAccountCommand}" />
+                        <TextBlock Text="This will change the account into a manual update account." Margin="10,0,0,0"  TextWrapping="Wrap"/>
+                        <TextBlock FontWeight="Bold" Text="This cannot be undone!" Margin="10,0,0,0"  TextWrapping="Wrap"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <StackPanel Orientation="Horizontal"/>
+            <GroupBox Header="Account Deletion" Margin="0,10,0,0">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="If you no longer wish to track finances in this account, you may use the button below to permanently remove it from So.Cash."  TextWrapping="Wrap"/>
+                    <Button x:Name="ButtonDeleteAccount" Content="Delete Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DeleteAccountCommand}" />
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </Grid>
+
+
+</UserControl>
