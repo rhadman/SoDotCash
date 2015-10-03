@@ -32,7 +32,7 @@
             <Label Content="Accounts" HorizontalAlignment="Left" Margin="0,5,0,0" />
             <Button Grid.Row="0" x:Name="AddAccount" Content="Add Account" HorizontalAlignment="Right"  VerticalAlignment="Top"  Command="{Binding AddAccountCommand}"/>
 
-            <TreeView Grid.Row="1" Margin="10,0,10,10" ItemsSource="{Binding AccountsView}">
+            <TreeView x:Name="AccountsList"  Grid.Row="1" Margin="10,0,10,10" ItemsSource="{Binding AccountsView}">
                 <i:Interaction.Behaviors>
                     <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
                 </i:Interaction.Behaviors>
@@ -61,7 +61,7 @@
 
         </Grid>
 
-        <mui:ModernTab Grid.Column="1" x:Name="TabControl">
+        <mui:ModernTab Grid.Column="1" x:Name="TabControl" IsEnabled="{Binding ElementName=AccountsList, Mode=OneWay, Path=SelectedValue, Converter={StaticResource SelectedValueToIsEnabled}}" >
             <mui:ModernTab.Links>
                 <mui:Link DisplayName="Graph" Source="/Views/AccountsViewTabs/AccountGraph.xaml" />
                 <mui:Link DisplayName="Ledger" Source="/Views/AccountsViewTabs/AccountLedger.xaml" />

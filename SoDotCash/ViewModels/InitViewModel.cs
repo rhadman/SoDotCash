@@ -33,6 +33,9 @@ namespace SoDotCash.ViewModels
                 _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
             else
                 _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Welcome));
+
+            //prevent the user from navigating to this point or further back
+            _modernNavigationService.ClearNavigationHistory();
         }
 
         private void InitBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)

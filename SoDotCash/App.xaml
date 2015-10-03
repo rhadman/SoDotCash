@@ -13,13 +13,17 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles.xaml"/>
+                <!--Modern UI Style-->
                 <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.xaml" />
                 <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Dark.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
             <vm:ViewModelLocator xmlns:vm="clr-namespace:SoDotCash.ViewModels" x:Key="Locator" d:IsDataSource="True" />
+            <!--Converters-->
             <conv:BoolToInverseBoolConverter x:Key="BoolToInverseBoolConverter"/>
             <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <utility:InverterConverter x:Key="InverterConverter"/>
+            <conv:SelectedValueToIsEnabled x:Key="SelectedValueToIsEnabled" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
