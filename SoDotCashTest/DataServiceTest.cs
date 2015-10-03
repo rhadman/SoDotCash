@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -134,6 +132,56 @@ namespace SoDotCashTest
             mockContext.Verify(m => m.SaveChanges(), Times.Exactly(2));
         }
 
+        /// <summary>
+        /// Test adding a transaction
+        /// </summary>
+        [TestMethod]
+        public void TestAddTransaction()
+        {
+            // Mock setup for DataService
+            var mockAccountSet = new Mock<DbSet<Account>>();
+            var mockTransactionSet = new Mock<ICollection<Transaction>>();
+            var mockContext = new Mock<SoCashDbContext>();
+
+
+            // Account containing mock transaction set
+            var account = new Account {Transactions = mockTransactionSet.Object};
+
+
+            // Place mock account into mock account list
+            var data = new List<Account>
+            {
+                account
+            };
+            mockAccountSet.As<IQueryable<Account>>().Setup(m => m.Provider).Returns(data.AsQueryable().Provider);
+            mockAccountSet.As<IQueryable<Account>>().Setup(m => m.Expression).Returns(data.AsQueryable().Expression);
+            mockAccountSet.As<IQueryable<Account>>().Setup(m => m.ElementType).Returns(data.AsQueryable().ElementType);
+            mockAccountSet.As<IQueryable<Account>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
+            mockContext.Setup(m => m.Accounts).Returns(mockAccountSet.Object);
+
+
+            // Transaction to add
+            var newTransaction = new Transaction
+            {
+                Amount = 100,
+                CategoryName = "TestCat",
+                Description = "TestDesc",
+                FiTransactionId = "TRN1"
+            };
+
+            // Add the transaction
+            using (var service = new DataService(mockContext.Object))
+            {
+
+                service.AddTransaction(account, newTransaction);
+            }
+
+            // Verify that the service added the transaction on the mock db exactly once
+            mockTransactionSet.Verify(m => m.Add(It.IsAny<Transaction>()), Times.Once());
+
+            // Verify that the transaction ended properly
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
 
 
     }
