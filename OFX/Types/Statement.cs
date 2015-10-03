@@ -79,8 +79,10 @@ namespace OFX.Types
         /// </summary>
         /// <param name="ofxResponse">OFX object populated with one or more statement responses</param>
         /// <returns></returns>
-        public static List<Statement> CreateFromOFXResponse(Protocol.OFX ofxResponse)
+        public static IEnumerable<Statement> CreateFromOFXResponse(Protocol.OFX ofxResponse, out string errorMessage)
         {
+            errorMessage = "";
+
             List<Statement> statementList = new List<Statement>();
 
             // Handle Credit Card responses
@@ -111,7 +113,12 @@ namespace OFX.Types
                             item => item.GetType() == typeof(StatementTransactionResponse))
                             .Select(item => (StatementTransactionResponse)item))
                 {
-                    statementList.Add(new Statement(transactionResponse.STMTRS));
+                    if(transactionResponse.STMTRS != null)
+                        statementList.Add(new Statement(transactionResponse.STMTRS));
+                    else
+                    {
+                        errorMessage = transactionResponse.STATUS.MESSAGE;
+                    }
                 }
             }
 

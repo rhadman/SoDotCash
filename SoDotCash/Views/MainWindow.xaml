@@ -13,7 +13,7 @@
         mc:Ignorable="d"
         Title="So.Cash" SizeToContent="WidthAndHeight" 
         Icon="../cash-flow.ico"
-        ContentSource="/Views/WelcomeView.xaml"
+        IsTitleVisible="True"
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
         >
     <i:Interaction.Triggers>

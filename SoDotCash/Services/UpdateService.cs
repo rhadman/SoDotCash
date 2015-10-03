@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using OFX;
 using SoDotCash.Models;
 
@@ -132,8 +133,19 @@ namespace SoDotCash.Services
         {
             // Deserialize the OFX file data to an object form
             var converter = new OFX1ToOFX2Converter(ofxFileStream);
-            foreach (var statement in OFX.Types.Statement.CreateFromOFXResponse(converter.ConvertToOFX()))
-                MergeStatementTransactionsIntoAccount(account, statement);
+            string errorMessage;
+
+            var statements = OFX.Types.Statement.CreateFromOFXResponse(converter.ConvertToOFX(), out errorMessage);
+
+            if (!String.IsNullOrEmpty(errorMessage) || !String.IsNullOrWhiteSpace(errorMessage))
+            {
+                MessageBox.Show(errorMessage, "Error");
+            }
+
+            else
+                foreach (var statement in statements)
+                    MergeStatementTransactionsIntoAccount(account, statement);
+
         }
 
         /// <summary>
@@ -229,7 +241,13 @@ namespace SoDotCash.Services
 
                 // Retrieve statement(s) (should only be one per protocol, but we can handle any number)
                 var ofxStatments = await ofxService.GetStatement(ofxAccount, startTime, endTime).ConfigureAwait(false);
-                foreach (var ofxStatement in ofxStatments)
+
+                if (!String.IsNullOrEmpty(ofxStatments.Item2) || !String.IsNullOrWhiteSpace(ofxStatments.Item2))
+                {
+                    MessageBox.Show(ofxStatments.Item2, "Error");
+                }
+
+                foreach (var ofxStatement in ofxStatments.Item1)
                     MergeStatementTransactionsIntoAccount(account, ofxStatement);
             }
 

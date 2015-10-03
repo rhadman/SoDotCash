@@ -56,7 +56,7 @@ namespace OFX
         /// <param name="startDate">Start of date range for transactions</param>
         /// <param name="endDate">End of date range for transactions</param>
         /// <returns>List of statements containing the requested data.</returns>
-        public async Task<IEnumerable<Statement>> GetStatement(Account account, DateTimeOffset startDate,
+        public async Task<Tuple<IEnumerable<Statement>,string>> GetStatement(Account account, DateTimeOffset startDate,
             DateTimeOffset endDate)
         {
             if (account is Types.BankAccount)
@@ -72,7 +72,7 @@ namespace OFX
         /// <param name="startDate">Start of date range for transactions</param>
         /// <param name="endDate">End of date range for transactions</param>
         /// <returns>List of statements containing the requested data.</returns>
-        public async Task<IEnumerable<Statement>> GetStatement(Types.BankAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<Tuple<IEnumerable<Statement>,string>> GetStatement(Types.BankAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             // Ensure service catalog is populated
             await PopulateServiceProfiles();
@@ -119,9 +119,9 @@ namespace OFX
             Protocol.OFX response = await new Transport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
-
+            string errorMessage;
             // Extract statement data and return
-            return Statement.CreateFromOFXResponse(response);
+            return Tuple.Create(Statement.CreateFromOFXResponse(response, out errorMessage), errorMessage);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace OFX
         /// <param name="startDate">Start of date range for transactions</param>
         /// <param name="endDate">End of date range for transactions</param>
         /// <returns>List of statements containing the requested data.</returns>
-        public async Task<IEnumerable<Statement>> GetStatement(Types.CreditCardAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<Tuple<IEnumerable<Statement>,string>>  GetStatement(Types.CreditCardAccount account, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             // Ensure service catalog is populated
             await PopulateServiceProfiles();
@@ -178,9 +178,10 @@ namespace OFX
             Protocol.OFX response = await new Transport(requestProfile.ServiceEndpoint).sendRequestAsync(requestMessageSets.ToArray());
 
             // TODO: Check response for errors
+            string errorMessage;
 
             // Extract statement data and return
-            return Statement.CreateFromOFXResponse(response);
+            return Tuple.Create(Statement.CreateFromOFXResponse(response, out errorMessage), errorMessage);
         }
 
         /// <summary>
