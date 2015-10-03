@@ -5,6 +5,8 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using GalaSoft.MvvmLight;
@@ -46,37 +48,17 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Provides the collection of accounts mapped by the account type of each
         /// </summary>
+        private Dictionary<string, ObservableCollection<Account>> _accountsView;
         public Dictionary<string, ObservableCollection<Account>> AccountsView
         {
             get
             {
-                var accountsByType = new Dictionary<string, ObservableCollection<Account>>();
-
-                // Retrieve the accounts from the database
-                using (var db = new SoCashDbContext())
-                {
-                    // Map all accounts by type
-                    foreach (var account in db.Accounts)
-                    {
-                        // Add category if needed
-                        ObservableCollection<Account> accountList;
-                        if (!accountsByType.ContainsKey(account.AccountType))
-                        {
-                            accountList = new ObservableCollection<Account>();
-                            accountsByType.Add(account.AccountType, accountList);
-                        }
-                        else
-                        {
-                            accountList = accountsByType[account.AccountType];
-                        }
-
-                        // Add to the list under this type
-                        accountList.Add(account);
-                    }
-                }
-                return accountsByType;
+                // If there are no accounts, fill in collection on first attempt to retrieve
+                if (_accountsView == null)
+                    UpdateAccounts();
+                return _accountsView;
             }
-        }
+        } 
 
         /// <summary>
         /// Bound current account
@@ -92,10 +74,54 @@ namespace SoDotCash.ViewModels
 
                 // Update indicator of whether this account allows the user to add transactions manually
                 RaisePropertyChanged(() => IsManualAccount);
+                RaisePropertyChanged(() => IsAutomaticAccount);
+
+                // Update indicator of whether any account is selected
+                RaisePropertyChanged(() => HasSelectedAccount);
 
                 // Transactions will be updated since this is a different account
                 RaisePropertyChanged(() => Transactions);
+                RaisePropertyChanged(() => SummaryTransactions);
+
+                // Selected account name is changed
+                RaisePropertyChanged(() => SelectedAccountName);
+
+                // Name of account is changed
+                RaisePropertyChanged(() => FiUserName);
+
+                RaisePropertyChanged();
             }
+        }
+
+        /// <summary>
+        /// Bindable indicator of whether any account is selected
+        /// </summary>
+        public bool HasSelectedAccount => SelectedAccount != null;
+
+        /// <summary>
+        /// Bound to selected account name. Used for configuration tab.
+        /// </summary>
+        public string SelectedAccountName
+        {
+            get
+            {
+                if (SelectedAccount == null)
+                    return "";
+                return SelectedAccount.AccountName;
+            }
+            set
+            {
+                // Update in account object
+                SelectedAccount.AccountName = value;
+
+                // Save to database
+                DataService.UpdateAccount(SelectedAccount);
+
+                RaisePropertyChanged(() => SelectedAccount.AccountName);
+
+                RaisePropertyChanged();
+            }
+            
         }
 
         /// <summary>
@@ -182,6 +208,39 @@ namespace SoDotCash.ViewModels
         }
 
         /// <summary>
+        /// Bound abbridged transactions for charting
+        /// </summary>
+        public ObservableCollection<Transaction> SummaryTransactions
+        {
+            get
+            {
+                // Retrieve transactions
+                var transactions = _transactions ?? Transactions;
+                if (transactions == null)
+                    return null;
+
+                // Include values every 3 days
+                ObservableCollection<Transaction> summary = new ObservableCollection<Transaction>();
+                DateTime lastDate = DateTime.MinValue;
+                var maxTimeSpan = new TimeSpan(3,0,0,0); // 3 days
+                foreach (var transaction in transactions.Reverse())
+                {
+                    // If this transaction isn't longer than the minimum number of days since the last included, skip
+                    if ((transaction.Date - lastDate) < maxTimeSpan)
+                        continue;
+
+                    // Include transaction
+                    summary.Add(transaction);
+
+                    // Update the last date used for inclusion testing
+                    lastDate = transaction.Date;
+                }
+                return summary;
+            }
+            
+        }
+
+        /// <summary>
         /// Determination of whether the user should be able to add transactions to the ledger
         /// </summary>
         public bool IsManualAccount
@@ -191,14 +250,119 @@ namespace SoDotCash.ViewModels
                 // If there is no selected account, transactions cannot be added
                 if (SelectedAccount == null)
                     return false;
+
                 // If the account is associated with a financial institution user, it is an auto-update account
                 //  and users may not add transactions manually
-                return (!SelectedAccount.IsAssociatedWithFinancialInstitution);
+                return (!IsAutomaticAccount);
+            }
+        }
+
+        /// <summary>
+        /// Determination of whether this is an automatic account - used for configuration field visibility check
+        /// </summary>
+        public bool IsAutomaticAccount
+        {
+            get
+            {
+                // If there is no selected account, the account is not automatic
+                if (SelectedAccount == null)
+                    return false;
+
+                // If the account is associated with a financial institution user, it is an auto-update account
+                return (SelectedAccount.IsAssociatedWithFinancialInstitution);
             }
         }
 
         #endregion
 
+        #region [Account Configuration Bindings]
+
+        /// <summary>
+        /// Bound userid for FI account
+        /// </summary>
+        public string FiUserName
+        {
+            get
+            {
+                return SelectedAccount?.FinancialInstitutionUser?.UserId;
+            }
+            set
+            {
+                SelectedAccount.FinancialInstitutionUser.UserId = value;
+
+                // Clear credentials verification status
+                CredentialsFailed = false;
+                CredentialsVerified = false;
+
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Bound indicator of whether the current credentials have been validated 
+        /// </summary>
+        private bool _credentialsVerified;
+        public bool CredentialsVerified
+        {
+            get { return _credentialsVerified;  }
+            set
+            {
+                _credentialsVerified = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Bound indicator of whether the current credentials failed validation 
+        /// </summary>
+        private bool _credentialsFailed;
+        public bool CredentialsFailed
+        {
+            get { return _credentialsFailed; }
+            set
+            {
+                _credentialsFailed = value;
+                RaisePropertyChanged();
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Called to refresh the list of accounts from the database
+        /// </summary>
+        public void UpdateAccounts()
+        {
+            var accountsByType = new Dictionary<string, ObservableCollection<Account>>();
+
+            // Retrieve the accounts from the database
+            using (var db = new SoCashDbContext())
+            {
+                // Map all accounts by type
+                foreach (var account in db.Accounts.Include("FinancialInstitutionUser").Include("FinancialInstitutionUser.FinancialInstitution"))
+                {
+                    // Add category if needed
+                    ObservableCollection<Account> accountList;
+                    if (!accountsByType.ContainsKey(account.AccountType))
+                    {
+                        accountList = new ObservableCollection<Account>();
+                        accountsByType.Add(account.AccountType, accountList);
+                    }
+                    else
+                    {
+                        accountList = accountsByType[account.AccountType];
+                    }
+
+                    // Add to the list under this type
+                    accountList.Add(account);
+                }
+            }
+
+            // Store in cached view
+            _accountsView = accountsByType;
+
+            // Notify of property update
+            RaisePropertyChanged(() => AccountsView);
+        }
 
         /// <summary>
         /// Handle modification events from the DataGrid containing transactions
@@ -248,6 +412,7 @@ namespace SoDotCash.ViewModels
         {
             // Need to re-sort the data and recalculate balances
             RaisePropertyChanged(() => Transactions);
+            RaisePropertyChanged(() => SummaryTransactions);
         }
 
         /// <summary>
@@ -287,6 +452,7 @@ namespace SoDotCash.ViewModels
 
             // Need to re-sort the data and recalculate balances
             RaisePropertyChanged(() => Transactions);
+            RaisePropertyChanged(() => SummaryTransactions);
         }
 
         /// <summary>
@@ -319,6 +485,7 @@ namespace SoDotCash.ViewModels
 
             // Update transactions
             RaisePropertyChanged(() => Transactions);
+            RaisePropertyChanged(() => SummaryTransactions);
 
             // Move to transactions tab
             ActiveTabIndex = TabIndex.Ledger;
@@ -344,6 +511,7 @@ namespace SoDotCash.ViewModels
 
             // Update transactions
             RaisePropertyChanged(() => Transactions);
+            RaisePropertyChanged(() => SummaryTransactions);
 
             // Move to transactions tab
             ActiveTabIndex = TabIndex.Ledger;
@@ -364,7 +532,7 @@ namespace SoDotCash.ViewModels
         public void DeleteSelectedAccount()
         {
             // Delete the account
-            UpdateService.DeleteAccount(SelectedAccount);
+            DataService.DeleteAccount(SelectedAccount);
             
             // Set to no account
             SelectedAccount = null;
@@ -372,8 +540,107 @@ namespace SoDotCash.ViewModels
             // Return to Overview tab
             ActiveTabIndex = 0;
 
-            // Notify that the list of accounts has changed
-            RaisePropertyChanged(() => AccountsView);
+            // Update the list of accounts
+            UpdateAccounts();
         }
+
+        /// <summary>
+        /// Binding for the Unlink Account button
+        /// </summary>
+        private ICommand _unlinkAccountCommand;
+        public ICommand UnlinkAccountCommand
+        {
+            get { return _unlinkAccountCommand ?? (_unlinkAccountCommand = new RelayCommand(UnlinkSelectedAccount, () => IsAutomaticAccount)); }
+        }
+
+        /// <summary>
+        /// Unlink the selected automatic update account, turning it into a manual update account
+        /// </summary>
+        public void UnlinkSelectedAccount()
+        {
+            // Unlink from fiUser
+            DataService.UnlinkAccount(SelectedAccount);
+
+            // Manual and automatic account properties changed 
+            RaisePropertyChanged(() => IsAutomaticAccount);
+            RaisePropertyChanged(() => IsManualAccount);
+        }
+
+        /// <summary>
+        /// Binding for the Unlink Account button
+        /// </summary>
+        private ICommand _verifyAndSaveCredentialsCommand;
+        public ICommand VerifyAndSaveCredentialsCommand
+        {
+            get { return _verifyAndSaveCredentialsCommand ?? (_verifyAndSaveCredentialsCommand = new RelayCommand<object>(async p => await VerifyAndSaveCredentials(p), CanVerifyCredentials)); }
+        }
+
+        /// <summary>
+        /// Logic for determining whether the Verify and Save action should be available
+        /// </summary>
+        /// <param name="passwordEntry">Password entry box</param>
+        /// <returns>True - Can verify  False - Not enough information to verify</returns>
+        private bool CanVerifyCredentials(object passwordEntry)
+        {
+            // Can only verify for automatic update accounts
+            if (!IsAutomaticAccount)
+                return false;
+
+            // Cannot have a null or empty user name
+            if (string.IsNullOrEmpty(FiUserName))
+                return false;
+
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            return !string.IsNullOrEmpty(passwordBox?.Password);
+        }
+
+
+        /// <summary>
+        /// Verify the user provided credentials against the configured FI. If they verify
+        /// </summary>
+        public async Task VerifyAndSaveCredentials(object passwordEntry)
+        {
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
+
+            // Store the account we're updating in case it changes while we're validating
+            var updateAccount = SelectedAccount;
+
+            // Form credentials into proper type for verification
+            var credentials = new OFX.Types.Credentials(FiUserName, password);
+
+            // Verify credentials and update if verification fails
+            try
+            {
+                
+                await
+                    UpdateService.VerifyAccountCredentials(
+                        SelectedAccount.FinancialInstitutionUser.FinancialInstitution,
+                        credentials).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // Verify failed
+                CredentialsFailed = true;
+                CredentialsVerified = false;
+                return;
+            }
+
+            // Verification OK
+            CredentialsFailed = false;
+
+            // Update FI user
+            updateAccount.FinancialInstitutionUser.UserId = credentials.UserId;
+            updateAccount.FinancialInstitutionUser.Password = credentials.Password;
+
+            // Save to DB
+            DataService.UpdateFiUser(updateAccount.FinancialInstitutionUser);
+
+            // Saved
+            CredentialsVerified = true;
+        }
+
     }
 }

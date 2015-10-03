@@ -5,11 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:utility="clr-namespace:SoDotCash.Utility"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:models="clr-namespace:SoDotCash.Models"
              xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid" 
              x:Class="SoDotCash.Views.AccountsView"
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:primitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
@@ -29,8 +31,7 @@
 
             <Label Content="Accounts" HorizontalAlignment="Left" Margin="0,5,0,0" />
             <Button Grid.Row="0" x:Name="AddAccount" Content="Add Account" HorizontalAlignment="Right"  VerticalAlignment="Top"  Command="{Binding AddAccountCommand}"/>
-            
-            
+
             <TreeView Grid.Row="1" Margin="10,0,10,10" ItemsSource="{Binding AccountsView}">
                 <i:Interaction.Behaviors>
                     <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
@@ -61,7 +62,7 @@
             </TreeView>
 
         </Grid>
-        
+
         <mui:ModernTab Grid.Column="1">
             <mui:ModernTab.Links>
                 <mui:Link DisplayName="Graph" Source="/Views/AccountsViewTabs/AccountGraph.xaml" />
@@ -69,11 +70,11 @@
                 <mui:Link DisplayName="Import" Source="/Views/AccountsViewTabs/AccountImport.xaml" />
             </mui:ModernTab.Links>
         </mui:ModernTab>
-        
+
         <!--<TabControl Grid.Column="1" x:Name="TabControl" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndexAsInt}">
-            
-            
-            
+
+
+
             <TabItem Header="Configuration">
                 <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">

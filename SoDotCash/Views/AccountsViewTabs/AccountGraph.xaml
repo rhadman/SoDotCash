@@ -12,7 +12,20 @@
         
             <StackPanel Orientation="Horizontal">
                 <Grid >
-                    <chartingToolkit:Chart x:Name="Chart" Width="700" Height="350">
+                <Grid.Resources>
+                    <Style x:Key="DateTimeAxisLabelStyle" TargetType="{x:Type chartingToolkit:DateTimeAxisLabel}">
+                        <Setter Property="IsTabStop" Value="False" />
+                        <Setter Property="StringFormat" Value="{}{0:MMM d}" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type chartingToolkit:DateTimeAxisLabel}">
+                                    <TextBlock Text="{TemplateBinding FormattedContent}" FontSize="10"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Grid.Resources>
+                <chartingToolkit:Chart x:Name="Chart" Width="700" Height="350">
                         <chartingToolkit:Chart.Axes>
                             <chartingToolkit:DateTimeAxis x:Name="XAxis" ShowGridLines="True" Orientation="X" />
                             <chartingToolkit:LinearAxis Orientation="Y" ShowGridLines="True"/>

@@ -301,34 +301,29 @@ namespace SoDotCash.Services
             }
         }
 
-
         /// <summary>
-        /// Delete the specified account from the database.
-        /// Deletes all transactions and removes the FIUser if there are no other accounts attached.
+        /// Verify the provided account credentials. Raises an exception if validation fails
         /// </summary>
-        /// <param name="account">Account to delete</param>
-        public static void DeleteAccount(Account account)
+        /// <param name="financialInstitution">Financial institution to query</param>
+        /// <param name="fiCredentials">Credentials for financial institution account</param>
+        /// <returns>List of accounts</returns>
+        public static async Task VerifyAccountCredentials(FinancialInstitution financialInstitution,
+            OFX.Types.Credentials fiCredentials)
         {
-            using (var db = new SoCashDbContext())
+            using (BackgroundTaskTracker.BeginTask("Verifying Credentials"))
             {
-                // Retrieve matching account from DB - we need to get an entity in the current db session
-                var deleteAccount = db.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
 
-                // Delete fiUser if this is the only account referencing it
-                if (deleteAccount.FinancialInstitutionUser != null &&
-                    deleteAccount.FinancialInstitutionUser.Accounts.Count == 1)
-                    db.FinancialInstitutionUsers.Remove(deleteAccount.FinancialInstitutionUser);
+                // Convert from data model FI into OFX FI
+                var ofxFinancialInstitition = new OFX.Types.FinancialInstitution(financialInstitution.Name,
+                    new Uri(financialInstitution.OfxUpdateUrl), financialInstitution.OfxOrganizationId,
+                    financialInstitution.OfxFinancialUnitId);
 
-                // Remove the account
-                db.Accounts.Remove(deleteAccount);
+                var ofxService = new OFX2Service(ofxFinancialInstitition, fiCredentials);
 
-                // Commit to db
-                db.SaveChanges();
+                // Call list accounts to validate credentials
+                await ofxService.ListAccounts().ConfigureAwait(false);
             }
         }
-
-
-
     } // class
 
 } // namespace

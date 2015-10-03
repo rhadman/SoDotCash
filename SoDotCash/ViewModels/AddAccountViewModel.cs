@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using FirstFloor.ModernUI.Windows.Controls;
 using GalaSoft.MvvmLight;
@@ -48,6 +49,7 @@ namespace SoDotCash.ViewModels
         /// Bound selected account source
         /// </summary>
         private EAccountSource _accountSource;
+
         public EAccountSource AccountSource
         {
             get { return _accountSource; }
@@ -92,27 +94,45 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Retrieve all financial institutions supported by OFX - ordered by name
         /// </summary>
-        public IEnumerable<OFX.Types.FinancialInstitution> AllFinancialInstitutions => OFX.OFX2Service.ListFinancialInstitutions().OrderBy(fi => fi.Name);
+        public IEnumerable<OFX.Types.FinancialInstitution> AllFinancialInstitutions
+            => OFX.OFX2Service.ListFinancialInstitutions().OrderBy(fi => fi.Name);
 
         /// <summary>
         /// Bound to the user selection of financial institution
         /// </summary>
-        public OFX.Types.FinancialInstitution SelectedFinancialInstitution { get; set; }
+        private OFX.Types.FinancialInstitution _selectedFinancialInstitution;
+
+        public OFX.Types.FinancialInstitution SelectedFinancialInstitution
+        {
+            get { return _selectedFinancialInstitution; }
+            set
+            {
+                _selectedFinancialInstitution = value;
+                RaisePropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Username used to authenticate with the financial institution
         /// </summary>
-        public string FinancialInstitutionUsername { get; set; }
+        private string _financialInstitutionUsername;
 
-        /// <summary>
-        /// Password used to authenticate with the financial institution
-        /// </summary>
-        public string FinancialInstitutionPassword { get; set; }
+        public string FinancialInstitutionUsername
+        {
+            get { return _financialInstitutionUsername; }
+            set
+            {
+                _financialInstitutionUsername = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
         /// <summary>
         /// List of accounts available from financial institution using the provided credentials
         /// </summary>
         private IEnumerable<Account> _availableAccounts;
+
         public IEnumerable<Account> AvailableAccounts
         {
             get { return _availableAccounts; }
@@ -132,30 +152,105 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound to autoamtic entry grid to control visibility
         /// </summary>
-        public bool HasAvailableAccounts => AvailableAccounts!=null && AvailableAccounts.Any();
+        public bool HasAvailableAccounts => AvailableAccounts != null && AvailableAccounts.Any();
+
+        /// <summary>
+        /// Bound indicator of whether account retrieval failed (invalid credentials)
+        /// </summary>
+        private bool _accountRetrievalFailed;
+
+        public bool AccountRetrievalFailed
+        {
+            get { return _accountRetrievalFailed; }
+            set
+            {
+                _accountRetrievalFailed = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Bound indicator of whether the account retrieval succeded but no new accounts were retrieved
+        /// </summary>
+        private bool _noAccountsRetrieved;
+
+        public bool NoAccountsRetrieved
+        {
+            get { return _noAccountsRetrieved; }
+            set
+            {
+                _noAccountsRetrieved = value;
+                RaisePropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Binding for the Retrieve Accounts button
         /// </summary>
         private ICommand _retrieveAccountsCommand;
+
         public ICommand RetrieveAccountsCommand
+            =>
+                _retrieveAccountsCommand ??
+                (_retrieveAccountsCommand = new RelayCommand<object>(PopulateAccounts, CanPopulateAccounts));
+
+        /// <summary>
+        /// Called to determine whether the user has provided enough information to populate FI account list
+        /// </summary>
+        /// <param name="passwordEntry">Reference to password entry box</param>
+        /// <returns>True - enough information is present.  False - Insufficient information entered</returns>
+        private bool CanPopulateAccounts(object passwordEntry)
         {
-            get { return _retrieveAccountsCommand ?? (_retrieveAccountsCommand = new RelayCommand(PopulateAccounts, () => FinancialInstitutionUsername!=null && SelectedFinancialInstitution!=null && FinancialInstitutionPassword!=null)); }
+            // Must have a username
+            if (string.IsNullOrEmpty(FinancialInstitutionUsername))
+                return false;
+
+            // Must have a selected FI
+            if (SelectedFinancialInstitution == null)
+                return false;
+
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
+
+            // Must have a password entered
+            return !string.IsNullOrEmpty(password);
         }
 
         /// <summary>
         /// Cancels action. Returns to previous view.
         /// </summary>
-        public async void PopulateAccounts()
+        public async void PopulateAccounts(object passwordEntry)
         {
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
+
+            // Reset account retrieval failed indicator
+            AccountRetrievalFailed = false;
+
             // Clear current list of accounts
             AvailableAccounts = null;
 
             // Form Credentials
-            var fiCredentials = new OFX.Types.Credentials(FinancialInstitutionUsername, FinancialInstitutionPassword);
+            var fiCredentials = new OFX.Types.Credentials(FinancialInstitutionUsername, password);
 
-            // Retrieve accounts from fI
-            AvailableAccounts = await UpdateService.EnumerateNewAccounts(SelectedFinancialInstitution, fiCredentials).ConfigureAwait(false);
+            try
+            {
+                // Retrieve accounts from fI
+                AvailableAccounts =
+                    await
+                        UpdateService.EnumerateNewAccounts(SelectedFinancialInstitution, fiCredentials)
+                            .ConfigureAwait(false);
+
+                // If no accounts were retrieved, notify user
+                NoAccountsRetrieved = !AvailableAccounts.Any();
+            }
+            catch (Exception)
+            {
+                // Error retrieving accounts
+                AccountRetrievalFailed = true;
+            }
         }
 
         #endregion
@@ -165,6 +260,7 @@ namespace SoDotCash.ViewModels
         /// Binding for the Cancel button
         /// </summary>
         private ICommand _cancelCommand;
+
         public ICommand CancelCommand
         {
             get { return _cancelCommand ?? (_cancelCommand = new RelayCommand(Cancel, () => true)); }
@@ -184,8 +280,8 @@ namespace SoDotCash.ViewModels
         /// Binding for the Create Account button
         /// </summary>
         //private RelayCommand<string> _createAccountCommand;
-        public RelayCommand CreateAccountCommand => new RelayCommand(CreateAccount, CanCreateAccount);
-        
+        public RelayCommand<object> CreateAccountCommand => new RelayCommand<object>(CreateAccount, CanCreateAccount);
+
         /// <summary>
         /// Determine whether enough information has been provided to create a manual-entry account
         /// </summary>
@@ -218,7 +314,7 @@ namespace SoDotCash.ViewModels
         /// True - An automatic-update account can be created
         /// False - An automatic-update account cannot be created
         /// </returns>
-        private bool CanCreateAutomaticAccount()
+        private bool CanCreateAutomaticAccount(object passwordEntry)
         {
             // Automatic entry must be selected
             if (!IsAutomaticEntry)
@@ -236,21 +332,23 @@ namespace SoDotCash.ViewModels
             if (string.IsNullOrEmpty(FinancialInstitutionUsername))
                 return false;
 
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
+
             // A password must be entered
-            if (string.IsNullOrEmpty(FinancialInstitutionPassword))
+            if (string.IsNullOrEmpty(password))
                 return false;
 
             // A financial institution account must be selected
             if (SelectedAccount == null)
                 return false;
-            
+
             // We can create an automatic entry account!
             return true;
 
-            
-
         }
-        
+
         /// <summary>
         /// Called to determine whether there's enough information selected to create an account
         /// </summary>
@@ -258,9 +356,9 @@ namespace SoDotCash.ViewModels
         /// True - An account can be created
         /// False - An account cannot be created
         /// </returns>
-        public bool CanCreateAccount()
+        public bool CanCreateAccount(object passwordEntry)
         {
-            return CanCreateManualAccount() || CanCreateAutomaticAccount();
+            return CanCreateManualAccount() || CanCreateAutomaticAccount(passwordEntry);
         }
 
         /// <summary>
@@ -269,111 +367,75 @@ namespace SoDotCash.ViewModels
         /// <returns>Created account</returns>
         protected Account CreateManualAccount()
         {
-            // Add the new account
-            using (var db = new SoCashDbContext())
+            // Fill in account data
+            var newAccount = new Account
             {
-                // Fill in account data
-                var newAccount = new Account
-                {
-                    AccountName = AccountName,
-                    AccountType = SelectedAccountType,
-                    Currency = "USD"
-                };
+                AccountName = AccountName,
+                AccountType = SelectedAccountType,
+                Currency = "USD"
+            };
 
-                // Add to database
-                db.Accounts.Add(newAccount);
+            // Add to database
+            DataService.AddAccount(newAccount);
 
-                // Commit changes
-                db.SaveChanges();
-
-                return newAccount;
-            }
+            return newAccount;
         }
 
         /// <summary>
         /// Create an automatic-update account from the provided information
         /// </summary>
         /// <returns>Created account</returns>
-        protected Account CreateAutomaticAccount()
+        protected Account CreateAutomaticAccount(object passwordEntry)
         {
-            // Add the new account, financial institution and user
-            using (var db = new SoCashDbContext())
-            {
-                // TODO: See if there's an existing FI or user with this info already
-                // Look for existing FI entry with the same name
-                FinancialInstitution fi;
-                try
-                {
-                    fi = db.FinancialInstitutions.First(i => i.Name == SelectedFinancialInstitution.Name);
-                }
-                catch (InvalidOperationException)
-                {
-                    // FI Doesn't exist, add a new one
-                    fi = new FinancialInstitution
-                    {
-                        Name = SelectedFinancialInstitution.Name,
-                        OfxFinancialUnitId = SelectedFinancialInstitution.FinancialId,
-                        OfxOrganizationId = SelectedFinancialInstitution.OrganizationId,
-                        OfxUpdateUrl = SelectedFinancialInstitution.ServiceEndpoint.ToString()
-                    };
-                    db.FinancialInstitutions.Add(fi);
-                }
+            // Retrieve password from entry
+            var passwordBox = passwordEntry as PasswordBox;
+            var password = passwordBox?.Password;
 
-                // Look for existing user under this FI with same userId
-                FinancialInstitutionUser fiUser;
-                try
+            // Attach account name to account
+            SelectedAccount.AccountName = AccountName;
+
+            // Add to database
+            var newAccount = DataService.AddAccount(SelectedAccount, SelectedFinancialInstitution,
+                new FinancialInstitutionUser
                 {
-                    fiUser = fi.Users.First(u => u.UserId == FinancialInstitutionUsername && u.Password == FinancialInstitutionPassword);
+                    UserId = FinancialInstitutionUsername,
+                    Password = password
                 }
-                catch (Exception)
-                {
-                    // User doesn't exist, add a new one
-                    fiUser = new FinancialInstitutionUser
-                    {
-                        UserId = FinancialInstitutionUsername,
-                        Password = FinancialInstitutionPassword
-                    };
-                    fi.Users.Add(fiUser);
-                    db.FinancialInstitutionUsers.Add(fiUser);
-                }
+                );
 
-                // Create Account
-                var newAccount = new Account(SelectedAccount);
-                // Replace name with the user's chosen name
-                newAccount.AccountName = AccountName;
-                fiUser.Accounts.Add(newAccount);
-                db.Accounts.Add(newAccount);
+            // Start an automatic retrieval of transactions
+            UpdateService.DownloadOfxTransactionsForAccount(newAccount);
 
-                db.SaveChanges();
-
-                return newAccount;
-            }
+            return newAccount;
         }
 
         /// <summary>
         /// Creates the new account from the information in the form.
         /// </summary>
-        public void CreateAccount()
+        public void CreateAccount(object passwordEntry)
         {
             // Create the account of the appropriate manual/automatic type
             Account newAccount;
             if (CanCreateManualAccount())
                 newAccount = CreateManualAccount();
-            else if (CanCreateAutomaticAccount())
-            {
+            else if (CanCreateAutomaticAccount(passwordEntry))
                 // Create the automatic account
-                newAccount = CreateAutomaticAccount();
-
-                // Start an automatic retrieval of transactions
-                UpdateService.DownloadOfxTransactionsForAccount(newAccount);
-            }
+                newAccount = CreateAutomaticAccount(passwordEntry);
             else
-                return; // TODO: Should be unreachable
+                return; // Unreachable
+
+            var locator = new ViewModelLocator();
+
+            // Update accounts on accounts view
+            locator.Accounts.UpdateAccounts();
+
+            // Set selected
+            locator.Accounts.SelectedAccount = newAccount;
 
             // Transition back to accounts view
-            var locator = new ViewModelLocator();
+            
             //locator.Main.ActiveViewModel = locator.Accounts;
-            locator.Accounts.SelectedAccount = newAccount;
+            
 
             _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
 
