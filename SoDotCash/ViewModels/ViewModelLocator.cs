@@ -46,7 +46,14 @@ namespace SoDotCash.ViewModels
             navigationService.Configure(nameof(Welcome), new Uri("/Views/WelcomeView.xaml", UriKind.RelativeOrAbsolute));
             navigationService.Configure(nameof(Settings), new Uri("/Views/SettingsView.xaml", UriKind.RelativeOrAbsolute));
 
-            SimpleIoc.Default.Register<IModernNavigationService>(() => navigationService);
+            try
+            {
+                SimpleIoc.Default.Register<IModernNavigationService>(() => navigationService);
+            }
+            catch
+            {
+                
+            }
         }
 
         /// <summary>

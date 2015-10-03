@@ -425,7 +425,7 @@ namespace SoDotCash.ViewModels
                 return; // Unreachable
 
             var locator = new ViewModelLocator();
-
+            
             // Update accounts on accounts view
             locator.Accounts.UpdateAccounts();
 
