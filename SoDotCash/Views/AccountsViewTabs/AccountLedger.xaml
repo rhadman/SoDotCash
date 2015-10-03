@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="SoDotCash.Views.AccountsViewTabs.AccountLedger"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SoDotCash.Views.AccountsViewTabs"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             mc:Ignorable="d" 
+             DataContext="{Binding Accounts, Source={StaticResource Locator}}"
+             >
+
+
+    <Grid  Width="730" Height="300">
+        <Grid.Resources>
+            <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
+        </Grid.Resources>
+
+        <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
+
+        <DataGrid x:Name="DatagridTransactions" ItemsSource="{Binding Transactions}" CanUserAddRows="{Binding IsManualAccount}" SelectionUnit="FullRow" SelectionMode="Single"
+						CanUserDeleteRows="{Binding IsManualAccount}" AutoGenerateColumns="False" SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}"
+						>
+            <DataGrid.Columns>
+                <mui:DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:d\}, UpdateSourceTrigger=PropertyChanged}" Width="70"
+								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
+                <mui:DataGridTextColumn Header="Description" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Width="200"
+								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
+                <mui:DataGridTextColumn Header="Transaction ID" Binding="{Binding FiTransactionId, UpdateSourceTrigger=PropertyChanged}" Width="200" 
+								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
+                <mui:DataGridTextColumn Header="CategoryName" Binding="{Binding CategoryName, UpdateSourceTrigger=PropertyChanged}" Width="80" />
+                <mui:DataGridTextColumn Header="Amount" Binding="{Binding LocalizedAmount, StringFormat=\{0:C2\}, UpdateSourceTrigger=PropertyChanged}" Width="70" 
+								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}" CellStyle="{StaticResource Balanace}" />
+                <mui:DataGridTextColumn Header="Balance" Binding="{Binding LocalizedBalance, StringFormat=\{0:C2\}}" Width="80" IsReadOnly="True"  />
+            </DataGrid.Columns>
+            <DataGrid.InputBindings>
+                <KeyBinding Key="Delete" Command="{Binding DeleteTransactionCommand}" />
+            </DataGrid.InputBindings>
+
+
+            <!--<DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <Trigger Property="AlternationIndex" Value="0">
+                                        <Setter Property="Background" Value="White" />
+                                    </Trigger>
+                                    <Trigger Property="AlternationIndex" Value="1">
+                                        <Setter Property="Background" Value="WhiteSmoke"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>-->
+
+        </DataGrid>
+    </Grid>
+
+</UserControl>

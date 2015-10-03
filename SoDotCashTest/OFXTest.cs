@@ -27,7 +27,7 @@ namespace SoDotCashTest
         {
             Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
         }
-        private TestContext testContextInstance;
+        //private TestContext testContextInstance;
 
 
 
@@ -94,7 +94,9 @@ namespace SoDotCashTest
                 // Expect: Response message set 1 is CreditcardResponse
                 //Assert.IsInstanceOfType(obj.Items[1], typeof(OFX.CreditcardResponseMessageSetV1));
 
-                DumpStatement(OFX.Types.Statement.CreateFromOFXResponse(obj));
+                string errorMessage;
+
+                DumpStatement(OFX.Types.Statement.CreateFromOFXResponse(obj,out errorMessage));
 
             }
         }
@@ -131,7 +133,10 @@ namespace SoDotCashTest
                 var startTime = DateTimeOffset.Now.Subtract(new TimeSpan(30, 0, 0, 0));
                 var statements =
                     await ChaseBankService.GetStatement((OFX.Types.CreditCardAccount)account, startTime, DateTimeOffset.Now);
-                DumpStatement(statements);
+
+                Assert.Equals(statements.Item2, string.Empty);
+
+                DumpStatement(statements.Item1);
             }
         }
 

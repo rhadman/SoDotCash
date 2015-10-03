@@ -1,11 +1,11 @@
 ﻿namespace SoDotCash.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for Settings.xaml
     /// </summary>
-    public partial class MainWindow
+    public partial class SettingsView
     {
-        public MainWindow()
+        public SettingsView()
         {
             InitializeComponent();
         }

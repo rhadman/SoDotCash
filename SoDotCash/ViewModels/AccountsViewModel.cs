@@ -20,11 +20,13 @@ namespace SoDotCash.ViewModels
     /// <summary>
     /// ViewModel handling data exposure and backing functionality for the AccountsView view element
     /// </summary>
-    public class AccountsViewModel : ViewModelBase
+    public class AccountsViewModel : ModernViewModelBase
     {
+        private readonly IModernNavigationService _modernNavigationService;
 
-        public AccountsViewModel()
+        public AccountsViewModel(IModernNavigationService navService)
         {
+            _modernNavigationService = navService;
             // Start on Overview tab
             ActiveTabIndex = TabIndex.Overview;
         }
@@ -523,8 +525,7 @@ namespace SoDotCash.ViewModels
         public void AddAccount()
         {
             // Transition view
-            var locator = new ViewModelLocator();
-            locator.Main.ActiveViewModel = locator.AddAccount;
+            _modernNavigationService.NavigateTo(nameof(ViewModelLocator.AddAccount));
         }
 
         /// <summary>

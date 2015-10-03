@@ -8,58 +8,36 @@
              xmlns:datavis="clr-namespace:System.Windows.Controls.DataVisualization;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:charting="clr-namespace:System.Windows.Controls.DataVisualization.Charting;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              xmlns:models="clr-namespace:SoDotCash.Models"
-             xmlns:primitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=System.Windows.Controls.DataVisualization.Toolkit"
+             xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid" 
              x:Class="SoDotCash.Views.AccountsView"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:primitives="clr-namespace:System.Windows.Controls.DataVisualization.Charting.Primitives;assembly=System.Windows.Controls.DataVisualization.Toolkit"
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
              >
     <Grid>
-        <Grid.Resources>
-            <Style x:Key="DateTimeAxisLabelStyle" TargetType="{x:Type charting:DateTimeAxisLabel}">
-                <Setter Property="IsTabStop" Value="False" />
-                <Setter Property="StringFormat" Value="{}{0:MMM d}" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type charting:DateTimeAxisLabel}">
-                            <TextBlock Text="{TemplateBinding FormattedContent}" FontSize="10"/>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <ControlTemplate x:Key="CommonLineSeriesDataPointTemplate" TargetType="charting:LineDataPoint">
-                <!--Comment out data points from the default template; just an empty template-->
-                <Grid x:Name="Root" Opacity="1"/>
-            </ControlTemplate>
-            <Style x:Key="CommonLineSeriesDataPoint" TargetType="charting:LineDataPoint">
-                <Setter Property="IndependentValueStringFormat" Value="{}{0:yyyy}" />
-                <Setter Property="DependentValueStringFormat" Value="{}{0:c0}" />
-                <Setter Property="Background" Value="#FF0077CC" />
-                <Setter Property="BorderBrush" Value="White" />
-                <Setter Property="BorderThickness" Value="2" />
-                <Setter Property="IsTabStop" Value="False" />
-                <Setter Property="Template" Value="{StaticResource CommonLineSeriesDataPointTemplate}" />
-            </Style>
-            <Style TargetType="charting:LineSeries">
-                <Setter Property="DataPointStyle" Value="{StaticResource CommonLineSeriesDataPoint}" />
-            </Style>
-        </Grid.Resources>
 
-        <Grid Grid.Column="0" Margin="10,5,752,10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Grid Grid.Column="0" Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Label Content="Accounts" HorizontalAlignment="Center" Margin="10,0,120,0" />
-            <Button Grid.Row="0" x:Name="AddAccount" Content="Add Account" HorizontalAlignment="Left" Margin="103,3,0,0" VerticalAlignment="Top" Width="75" Command="{Binding AddAccountCommand}"/>
+            <Label Content="Accounts" HorizontalAlignment="Left" Margin="0,5,0,0" />
+            <Button Grid.Row="0" x:Name="AddAccount" Content="Add Account" HorizontalAlignment="Right"  VerticalAlignment="Top"  Command="{Binding AddAccountCommand}"/>
 
             <TreeView Grid.Row="1" Margin="10,0,10,10" ItemsSource="{Binding AccountsView}">
                 <i:Interaction.Behaviors>
                     <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
                 </i:Interaction.Behaviors>
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
+                <!--<TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="">
                         <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                         <Style.Triggers>
                             <Trigger Property="IsSelected" Value="True">
@@ -70,7 +48,7 @@
                             </Trigger>
                         </Style.Triggers>
                     </Style>
-                </TreeView.ItemContainerStyle>
+                </TreeView.ItemContainerStyle>-->
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Value}">
                         <TextBlock Text="{Binding Key}" />
@@ -84,177 +62,27 @@
             </TreeView>
 
         </Grid>
-        <TabControl x:Name="TabControl" HorizontalAlignment="Left" Margin="206,5,10,21" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndexAsInt}">
-            <TabItem Header="Overview" IsEnabled="{Binding HasSelectedAccount}">
+
+        <mui:ModernTab Grid.Column="1">
+            <mui:ModernTab.Links>
+                <mui:Link DisplayName="Graph" Source="/Views/AccountsViewTabs/AccountGraph.xaml" />
+                <mui:Link DisplayName="Ledger" Source="/Views/AccountsViewTabs/AccountLedger.xaml" />
+                <mui:Link DisplayName="Import" Source="/Views/AccountsViewTabs/AccountImport.xaml" />
+            </mui:ModernTab.Links>
+        </mui:ModernTab>
+
+        <!--<TabControl Grid.Column="1" x:Name="TabControl" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" SelectedIndex="{Binding ActiveTabIndexAsInt}">
+
+
+
+            <TabItem Header="Configuration">
                 <Grid  Width="730" Height="300">
                     <StackPanel Orientation="Vertical">
-                        <GroupBox Header="{Binding SelectedAccount.AccountName}" Visibility="{Binding HasSelectedAccount, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <DockPanel>
-                                <Grid Width="160" DockPanel.Dock="Left" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Vertical">
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <TextBlock Text="High Balance:"/>
-                                            <TextBlock Text="{Binding AccountHighBalance.Balance, StringFormat=\{0:C2\}}"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <TextBlock Text="on"/>
-                                            <TextBlock Text="{Binding AccountHighBalance.Date, StringFormat=\{0:d\}}" Margin="5,0,0,0"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <TextBlock Text="Low Balance:"/>
-                                            <TextBlock Text="{Binding AccountLowBalance.Balance, StringFormat=\{0:C2\}}"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <TextBlock Text="on"/>
-                                            <TextBlock Text="{Binding AccountLowBalance.Date, StringFormat=\{0:d\}}"  Margin="5,0,0,0"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <TextBlock Text="Average Balance:"/>
-                                            <TextBlock Text="{Binding AccountAvgBalance, StringFormat=\{0:C2\}}"/>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Grid>
-                                <charting:Chart x:Name="Chart" Width="550" Height="130" DockPanel.Dock="Right">
-                                    <charting:Chart.LegendStyle>
-                                        <Style TargetType="datavis:Legend">
-                                            <Setter Property="Width" Value="0" />
-                                        </Style>
-                                    </charting:Chart.LegendStyle>
-                                    <charting:LineSeries ItemsSource="{Binding SelectedAccountDailyBalances}"
-                                        DependentValuePath="Balance"
-									    IndependentValuePath="Date"
-									    Title="Historical Balance"
-                                        IsSelectionEnabled="True">
-                                        <charting:LineSeries.IndependentAxis>
-                                            <charting:DateTimeAxis Orientation="X"
-                                                ShowGridLines="True"
-                                                AxisLabelStyle="{StaticResource DateTimeAxisLabelStyle}"/>
-                                        </charting:LineSeries.IndependentAxis>
-                                    </charting:LineSeries>
-                                    <charting:Chart.Template>
-                                        <ControlTemplate TargetType="charting:Chart">
-                                            <Border Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                Padding="{TemplateBinding Padding}">
-                                                <Grid>
-                                                    <primitives:EdgePanel x:Name="ChartArea" Style="{TemplateBinding ChartAreaStyle}">
-                                                        <Grid Canvas.ZIndex="-1" Style="{TemplateBinding PlotAreaStyle}" />
-                                                        <Border Canvas.ZIndex="10" BorderBrush="#FF919191" BorderThickness="1" />
-                                                    </primitives:EdgePanel>
-                                                </Grid>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </charting:Chart.Template>
-                                </charting:Chart>
-                            </DockPanel>
-                        </GroupBox>
+                        <TextBlock Text="TODO: Fill this in (Configuration)"  TextWrapping="Wrap"/>
+                        <Button x:Name="ButtonDeleteAccount" Content="Delete Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DeleteAccountCommand}" />
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Ledger" IsEnabled="{Binding HasSelectedAccount}">
-                <Grid  Width="730" Height="300">
-                    <Grid.Resources>
-                        <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
-                    </Grid.Resources>
-
-                    <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
-
-                    <DataGrid x:Name="DatagridTransactions" ItemsSource="{Binding Transactions}" CanUserAddRows="{Binding IsManualAccount}" SelectionUnit="FullRow" SelectionMode="Single"
-						CanUserDeleteRows="{Binding IsManualAccount}" AutoGenerateColumns="False" SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}"
-						AlternatingRowBackground="Beige">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:d\}, UpdateSourceTrigger=PropertyChanged}" Width="70"
-								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
-                            <DataGridTextColumn Header="Description" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Width="200"
-								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
-                            <DataGridTextColumn Header="Transaction ID" Binding="{Binding FiTransactionId, UpdateSourceTrigger=PropertyChanged}" Width="200" 
-								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
-                            <DataGridTextColumn Header="CategoryName" Binding="{Binding CategoryName, UpdateSourceTrigger=PropertyChanged}" Width="80" />
-                            <DataGridTextColumn Header="Amount" Binding="{Binding LocalizedAmount, StringFormat=\{0:C2\}, UpdateSourceTrigger=PropertyChanged}" Width="70" 
-								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}" CellStyle="{StaticResource Balanace}" />
-                            <DataGridTextColumn Header="Balance" Binding="{Binding LocalizedBalance, StringFormat=\{0:C2\}}" Width="80" IsReadOnly="True"  />
-                        </DataGrid.Columns>
-                        <DataGrid.InputBindings>
-                            <KeyBinding Key="Delete" Command="{Binding DeleteTransactionCommand}" />
-                        </DataGrid.InputBindings>
-
-
-                        <!--<DataGrid.RowStyle>
-                            <Style TargetType="DataGridRow">
-                                <Style.Triggers>
-                                    <Trigger Property="AlternationIndex" Value="0">
-                                        <Setter Property="Background" Value="White" />
-                                    </Trigger>
-                                    <Trigger Property="AlternationIndex" Value="1">
-                                        <Setter Property="Background" Value="WhiteSmoke"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.RowStyle>-->
-
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Import" IsEnabled="{Binding HasSelectedAccount}">
-                <Grid  Width="730" Height="300">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="This section allows you to import transactions from an OFX/QFX file. If this account is linked with a supported online financial institution, you may also download transactions." TextWrapping="Wrap"/>
-                        <StackPanel Orientation="Horizontal">
-                            <Button x:Name="ButtonImportTransactions" Content="Import Transactions" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding ImportTransactionsCommand}" />
-                            <Button x:Name="ButtonDownloadTransactions" Content="Download Transactions" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DownloadTransactionsCommand}" Margin="20,0,0,0"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Configuration" IsEnabled="{Binding HasSelectedAccount}">
-                <Grid  Width="730" Height="300">
-                    <StackPanel Orientation="Vertical">
-                        <GroupBox Header="Overview" Margin="0,10,0,0">
-                            <StackPanel Orientation="Vertical">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Account Name:"  TextWrapping="Wrap"/>
-                                    <TextBox Text="{Binding SelectedAccountName}" Margin="10,0,0,0" Width="300"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Account Type:"  TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding SelectedAccount.AccountType}" Margin="10,0,0,0"  TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox Header="Update Mechanism" Margin="0,10,0,0">
-                            <StackPanel Orientation="Vertical">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Account Update Mechanism:" TextWrapping="Wrap"/>
-                                    <TextBlock FontWeight="Bold" Text="Automatic" Margin="10,0,0,0" TextWrapping="Wrap" Visibility="{Binding IsAutomaticAccount, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                    <TextBlock FontWeight="Bold" Text="Manual" Margin="10,0,0,0" TextWrapping="Wrap" Visibility="{Binding IsManualAccount, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Visibility="{Binding IsAutomaticAccount, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <Label Content="Financial Institution Login:"/>
-                                    <TextBox Text="{Binding FiUserName}" Margin="10,0,0,0" Width="100" Height="20"/>
-                                    <Label Content="Password:"/>
-                                    <PasswordBox x:Name="PasswordEntry" Margin="10,0,0,0" Width="100" Height="20"/>
-                                    <Button Content="Verify and Update" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Margin="10,3,0,0" Command="{Binding VerifyAndSaveCredentialsCommand}" CommandParameter="{Binding ElementName=PasswordEntry}" />
-                                    <TextBlock FontWeight="Bold" Foreground="RED" Text="FAILED" Margin="10,5,0,0" TextWrapping="Wrap" Visibility="{Binding CredentialsFailed, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                    <TextBlock FontWeight="Bold" Foreground="GREEN" Text="SAVED" Margin="10,5,0,0" TextWrapping="Wrap" Visibility="{Binding CredentialsVerified, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Visibility="{Binding IsAutomaticAccount, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <Button Content="Unlink Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding UnlinkAccountCommand}" />
-                                    <TextBlock Text="This will change the account into a manual update account." Margin="10,0,0,0"  TextWrapping="Wrap"/>
-                                    <TextBlock FontWeight="Bold" Text="This cannot be undone!" Margin="10,0,0,0"  TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </GroupBox>
-                        <StackPanel Orientation="Horizontal"/>
-                        <GroupBox Header="Account Deletion" Margin="0,10,0,0">
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Text="If you no longer wish to track finances in this account, you may use the button below to permanently remove it from So.Cash."  TextWrapping="Wrap"/>
-                                <Button x:Name="ButtonDeleteAccount" Content="Delete Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Command="{Binding DeleteAccountCommand}" />
-                            </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
-        </TabControl>
+        </TabControl>-->
     </Grid>
 </UserControl>

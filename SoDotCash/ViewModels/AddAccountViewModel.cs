@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using FirstFloor.ModernUI.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using SoDotCash.Models;
 using SoDotCash.Services;
+using SoDotCash.Views;
 
 namespace SoDotCash.ViewModels
 {
@@ -19,8 +22,20 @@ namespace SoDotCash.ViewModels
         Manual
     };
 
-    public class AddAccountViewModel : ViewModelBase
+    /// <summary>
+    /// This class contains properties that a View can data bind to.
+    /// <para>
+    /// See http://www.galasoft.ch/mvvm
+    /// </para>
+    /// </summary>
+    public class AddAccountViewModel : ModernViewModelBase
     {
+        private readonly IModernNavigationService _modernNavigationService;
+
+        public AddAccountViewModel(IModernNavigationService navService)
+        {
+            _modernNavigationService = navService;
+        }
 
         #region [ Always Visible Fields ]
 
@@ -34,6 +49,7 @@ namespace SoDotCash.ViewModels
         /// Bound selected account source
         /// </summary>
         private EAccountSource _accountSource;
+
         public EAccountSource AccountSource
         {
             get { return _accountSource; }
@@ -78,12 +94,14 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Retrieve all financial institutions supported by OFX - ordered by name
         /// </summary>
-        public IEnumerable<OFX.Types.FinancialInstitution> AllFinancialInstitutions => OFX.OFX2Service.ListFinancialInstitutions().OrderBy(fi => fi.Name);
+        public IEnumerable<OFX.Types.FinancialInstitution> AllFinancialInstitutions
+            => OFX.OFX2Service.ListFinancialInstitutions().OrderBy(fi => fi.Name);
 
         /// <summary>
         /// Bound to the user selection of financial institution
         /// </summary>
         private OFX.Types.FinancialInstitution _selectedFinancialInstitution;
+
         public OFX.Types.FinancialInstitution SelectedFinancialInstitution
         {
             get { return _selectedFinancialInstitution; }
@@ -98,9 +116,10 @@ namespace SoDotCash.ViewModels
         /// Username used to authenticate with the financial institution
         /// </summary>
         private string _financialInstitutionUsername;
+
         public string FinancialInstitutionUsername
         {
-            get { return _financialInstitutionUsername;}
+            get { return _financialInstitutionUsername; }
             set
             {
                 _financialInstitutionUsername = value;
@@ -113,6 +132,7 @@ namespace SoDotCash.ViewModels
         /// List of accounts available from financial institution using the provided credentials
         /// </summary>
         private IEnumerable<Account> _availableAccounts;
+
         public IEnumerable<Account> AvailableAccounts
         {
             get { return _availableAccounts; }
@@ -132,12 +152,13 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound to autoamtic entry grid to control visibility
         /// </summary>
-        public bool HasAvailableAccounts => AvailableAccounts!=null && AvailableAccounts.Any();
+        public bool HasAvailableAccounts => AvailableAccounts != null && AvailableAccounts.Any();
 
         /// <summary>
         /// Bound indicator of whether account retrieval failed (invalid credentials)
         /// </summary>
         private bool _accountRetrievalFailed;
+
         public bool AccountRetrievalFailed
         {
             get { return _accountRetrievalFailed; }
@@ -152,6 +173,7 @@ namespace SoDotCash.ViewModels
         /// Bound indicator of whether the account retrieval succeded but no new accounts were retrieved
         /// </summary>
         private bool _noAccountsRetrieved;
+
         public bool NoAccountsRetrieved
         {
             get { return _noAccountsRetrieved; }
@@ -166,7 +188,11 @@ namespace SoDotCash.ViewModels
         /// Binding for the Retrieve Accounts button
         /// </summary>
         private ICommand _retrieveAccountsCommand;
-        public ICommand RetrieveAccountsCommand => _retrieveAccountsCommand ?? (_retrieveAccountsCommand = new RelayCommand<object>(PopulateAccounts, CanPopulateAccounts));
+
+        public ICommand RetrieveAccountsCommand
+            =>
+                _retrieveAccountsCommand ??
+                (_retrieveAccountsCommand = new RelayCommand<object>(PopulateAccounts, CanPopulateAccounts));
 
         /// <summary>
         /// Called to determine whether the user has provided enough information to populate FI account list
@@ -234,6 +260,7 @@ namespace SoDotCash.ViewModels
         /// Binding for the Cancel button
         /// </summary>
         private ICommand _cancelCommand;
+
         public ICommand CancelCommand
         {
             get { return _cancelCommand ?? (_cancelCommand = new RelayCommand(Cancel, () => true)); }
@@ -252,8 +279,8 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Binding for the Create Account button
         /// </summary>
-        private ICommand _createAccountCommand;
-        public ICommand CreateAccountCommand => _createAccountCommand ?? (_createAccountCommand = new RelayCommand<object>(CreateAccount, CanCreateAccount));
+        //private RelayCommand<string> _createAccountCommand;
+        public RelayCommand<object> CreateAccountCommand => new RelayCommand<object>(CreateAccount, CanCreateAccount);
 
         /// <summary>
         /// Determine whether enough information has been provided to create a manual-entry account
@@ -321,7 +348,6 @@ namespace SoDotCash.ViewModels
             return true;
 
         }
-
 
         /// <summary>
         /// Called to determine whether there's enough information selected to create an account
@@ -407,8 +433,12 @@ namespace SoDotCash.ViewModels
             locator.Accounts.SelectedAccount = newAccount;
 
             // Transition back to accounts view
-            locator.Main.ActiveViewModel = locator.Accounts;
             
+            //locator.Main.ActiveViewModel = locator.Accounts;
+            
+
+            _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
+
         }
 
 

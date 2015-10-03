@@ -1,4 +1,4 @@
-﻿<Window
+﻿<mui:ModernWindow
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,12 +8,25 @@
         xmlns:local="clr-namespace:SoDotCash.Views"
         xmlns:services="clr-namespace:SoDotCash.Services"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="So.Cash" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+        Title="So.Cash" SizeToContent="WidthAndHeight" 
         Icon="../cash-flow.ico"
+        IsTitleVisible="True"
         DataContext="{Binding Main, Source={StaticResource Locator}}" 
         >
-    <Window.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ViewLoaded}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <mui:ModernWindow.TitleLinks>
+        <mui:Link DisplayName="Settings" Source="/Views/SettingsView.xaml" />
+    </mui:ModernWindow.TitleLinks>
+    
+    <!--<Window.Resources>
         <DataTemplate DataType="{x:Type viewmodels:WelcomeViewModel}">
             <local:WelcomeView/>
         </DataTemplate>
@@ -23,10 +36,15 @@
         <DataTemplate DataType="{x:Type viewmodels:AddAccountViewModel}">
             <local:AddAccountView/>
         </DataTemplate>
-    </Window.Resources>
-    <StackPanel Orientation="Vertical">
+    </Window.Resources>-->
+    
+    
+
+    
+    
+    <!--<StackPanel Orientation="Vertical" Style="{StaticResource ContentRoot}">
         <xctk:BusyIndicator IsBusy="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=ActionsPending}" BusyContent="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=CurrentActionDescription}">
             <ContentControl Content="{Binding ActiveViewModel}"/>
         </xctk:BusyIndicator>
-    </StackPanel>
-</Window>
+    </StackPanel>-->
+</mui:ModernWindow>
