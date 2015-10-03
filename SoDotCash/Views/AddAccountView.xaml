@@ -11,8 +11,8 @@
 
         <GroupBox Header="Basic Information" Margin="0,10,0,0">
             <StackPanel Orientation="Horizontal">
-                <Label Content="I would like to name my account:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-                <TextBox HorizontalAlignment="Left" Height="22" Margin="0,3,0,0" TextWrapping="Wrap" Text="{Binding AccountName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="200"/>
+                <Label Content="I would like to name my account:" Margin="0,0,0,0" VerticalAlignment="Center"/>
+                <TextBox Height="22" Margin="10,0,3,0" TextWrapping="Wrap" Text="{Binding AccountName, UpdateSourceTrigger=PropertyChanged}" Width="200"/>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Please choose how you would like to add your account">
@@ -23,39 +23,39 @@
         </GroupBox>
         <GroupBox Header="Manual Configuration" Visibility="{Binding IsManualEntry, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Hidden}">
             <StackPanel Orientation="Horizontal">
-                <Label x:Name="LabelAccountType" Content="Account Type" HorizontalAlignment="Left" VerticalAlignment="Center" Width="134"/>
-                <ComboBox x:Name="ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" ItemsSource="{Binding AllAccountTypes}" SelectedItem="{Binding SelectedAccountType}"/>
+                <Label Content="Account Type"/>
+                <ComboBox ItemsSource="{Binding AllAccountTypes}" SelectedItem="{Binding SelectedAccountType}" Width="100" Margin="10,0,0,0"/>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Automatic Configuration" Visibility="{Binding IsAutomaticEntry, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Hidden}">
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="918">
+            <StackPanel>
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="Financial Institution" HorizontalAlignment="Left" VerticalAlignment="Center" Width="134"/>
-                        <ComboBox SelectedValue="{Binding SelectedFinancialInstitution}" ItemsSource="{Binding AllFinancialInstitutions}" DisplayMemberPath="Name" Width="200" Height="25"/>
+                        <Label Content="Financial Institution" />
+                        <ComboBox SelectedValue="{Binding SelectedFinancialInstitution}" ItemsSource="{Binding AllFinancialInstitutions}" DisplayMemberPath="Name" Width="200" Margin="10,0,0,0"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="Username" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        <TextBox HorizontalAlignment="Left" Text="{Binding FinancialInstitutionUsername}" VerticalAlignment="Center" Width="120"/>
-                        <Label Content="Password" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        <PasswordBox x:Name="PasswordEntry" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Label Content="Username"/>
+                        <TextBox Text="{Binding FinancialInstitutionUsername}" Width="120" Margin="10,0,0,0"/>
+                        <Label Content="Password"  Margin="10,0,0,0"/>
+                        <PasswordBox x:Name="PasswordEntry" Width="120" Margin="0,10,0,0"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Button Content="Retrieve Accounts" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Height="22" Command="{Binding RetrieveAccountsCommand}" CommandParameter="{Binding ElementName=PasswordEntry}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Content="Retrieve Accounts" Command="{Binding RetrieveAccountsCommand}" CommandParameter="{Binding ElementName=PasswordEntry}"/>
                         <TextBlock Foreground="Red" FontWeight="Bold" Text="Invalid Credentials" Margin="10,3,0,0" Visibility="{Binding AccountRetrievalFailed, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         <TextBlock Foreground="Green" FontWeight="SemiBold" Text="All accounts from this bank are already added!" Margin="10,3,0,0" Visibility="{Binding NoAccountsRetrieved, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding HasAvailableAccounts}">
-                        <Label Content="Attach To" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        <ComboBox SelectedValue="{Binding SelectedAccount}" ItemsSource="{Binding AvailableAccounts}" DisplayMemberPath="AccountName" Width="200" Height="22"/>
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding HasAvailableAccounts}" Margin="0,10,0,0">
+                        <Label Content="Attach To"/>
+                        <ComboBox SelectedValue="{Binding SelectedAccount}" ItemsSource="{Binding AvailableAccounts}" DisplayMemberPath="AccountName" Width="200" Margin="10,0,3,0"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
 
 
-        <StackPanel Orientation="Horizontal">
-            <Button x:Name="ButtonCreate" Content="Add Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Height="22" Command="{Binding CreateAccountCommand}"  CommandParameter="{Binding ElementName=PasswordEntry}"/>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <Button x:Name="ButtonCreate" Content="Add Account" Command="{Binding CreateAccountCommand}"  CommandParameter="{Binding ElementName=PasswordEntry}"/>
         </StackPanel>
     </StackPanel>
 </UserControl>
