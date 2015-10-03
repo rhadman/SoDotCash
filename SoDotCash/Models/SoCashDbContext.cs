@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 
 namespace SoDotCash.Models
 {
@@ -33,7 +34,32 @@ namespace SoDotCash.Models
         /// </summary>
         public virtual DbSet<Account> Accounts { get; set; }
 
+        /// <summary>
+        /// Mockable wrapper for attaching an entity to the context and setting state to modified
+        /// </summary>
+        /// <param name="entity">Entity to attach and set to modified</param>
+        public virtual void SetModified(object entity)
+        {
+            Entry(entity).State = EntityState.Modified;
+        }
 
+        /// <summary>
+        /// Mockable wrapper for attaching an entity to the context and setting state to unchanged
+        /// </summary>
+        /// <param name="entity">Entity to attach and set to unchanged</param>
+        public virtual void SetUnchanged(object entity)
+        {
+            Entry(entity).State = EntityState.Unchanged;
+        }
+
+        /// <summary>
+        /// Mockable wrapper for attaching an entity to the context and setting state to added
+        /// </summary>
+        /// <param name="entity">Entity to attach and set to added</param>
+        public virtual void SetAdded(object entity)
+        {
+            Entry(entity).State = EntityState.Added;
+        }
     }
 
 }

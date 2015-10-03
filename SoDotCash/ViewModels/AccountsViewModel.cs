@@ -495,11 +495,11 @@ namespace SoDotCash.ViewModels
             var transaction = (Transaction)sender;
 
             // Ensure the Account is attached to the same context as the transaction
-            transaction.EditContext.Entry(SelectedAccount).State = EntityState.Unchanged;
+            transaction.EditContext.SetUnchanged(SelectedAccount);
             transaction.Account = SelectedAccount;
 
             // This is a new transaction. Ensure it is being ADDED to the database
-            transaction.EditContext.Entry(transaction).State = EntityState.Added;
+            transaction.EditContext.SetAdded(transaction);
         }
 
         /// <summary>

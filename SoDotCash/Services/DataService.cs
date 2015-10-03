@@ -110,7 +110,7 @@ namespace SoDotCash.Services
         public void DeleteTransaction(Transaction transaction)
         {
             // Add the transaction to the context in unchanged state creating a current reference
-            DbContext.Entry(transaction).State = EntityState.Unchanged;
+            DbContext.SetUnchanged(transaction);
             // Delete from database
             DbContext.Set<Transaction>().Remove(transaction);
         }
@@ -123,7 +123,7 @@ namespace SoDotCash.Services
         public void UpdateTransaction(Transaction transaction)
         {
             // Attach to context and mark as modified
-            DbContext.Entry(transaction).State = EntityState.Modified;
+            DbContext.SetModified(transaction);
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace SoDotCash.Services
         public void UpdateAccount(Account account)
         {
             // Attach to context and mark as modified
-            DbContext.Entry(account).State = EntityState.Modified;
+            DbContext.SetModified(account);
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace SoDotCash.Services
         public void UnlinkAccount(Account account)
         {
             // Attach to context and mark as modified
-            DbContext.Entry(account).State = EntityState.Modified;
+            DbContext.SetModified(account);
 
             // Hold reference to associated FiUser
             var fiUser = account.FinancialInstitutionUser;
@@ -255,7 +255,7 @@ namespace SoDotCash.Services
         public void UpdateFiUser(FinancialInstitutionUser user)
         {
             // Attach to context and mark as modified
-            DbContext.Entry(user).State = EntityState.Modified;
+            DbContext.SetModified(user);
         }
 
         /// <summary>
