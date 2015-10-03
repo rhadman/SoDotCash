@@ -15,7 +15,7 @@
         Icon="../cash-flow.ico"
         IsTitleVisible="True"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
-        MinWidth="950"
+        MinWidth="1250"
         MinHeight="350"
         >
     <i:Interaction.Triggers>

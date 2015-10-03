@@ -10,7 +10,7 @@
              >
 
 
-    <Grid Width="750">
+    <Grid>
         <Grid.Resources>
             <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
         </Grid.Resources>
@@ -19,18 +19,18 @@
 
         <DataGrid x:Name="DatagridTransactions" ItemsSource="{Binding Transactions}" CanUserAddRows="{Binding IsManualAccount}" SelectionUnit="FullRow" SelectionMode="Single"
 						CanUserDeleteRows="{Binding IsManualAccount}" AutoGenerateColumns="False" SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}"
-						Width="750">
+						Width="925">
             <DataGrid.Columns>
-                <mui:DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:d\}, UpdateSourceTrigger=PropertyChanged}" Width="70"
+                <mui:DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:d\}, UpdateSourceTrigger=PropertyChanged}" Width="auto"
 								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
-                <mui:DataGridTextColumn Header="Description" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Width="200"
+                <mui:DataGridTextColumn Header="Description" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Width="auto"
 								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
-                <mui:DataGridTextColumn Header="Transaction ID" Binding="{Binding FiTransactionId, UpdateSourceTrigger=PropertyChanged}" Width="200" 
+                <mui:DataGridTextColumn Header="Transaction ID" Binding="{Binding FiTransactionId, UpdateSourceTrigger=PropertyChanged}" Width="auto" 
 								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}"/>
-                <mui:DataGridTextColumn Header="CategoryName" Binding="{Binding CategoryName, UpdateSourceTrigger=PropertyChanged}" Width="80" />
-                <mui:DataGridTextColumn Header="Amount" Binding="{Binding LocalizedAmount, StringFormat=\{0:C2\}, UpdateSourceTrigger=PropertyChanged}" Width="70" 
+                <mui:DataGridTextColumn Header="CategoryName" Binding="{Binding CategoryName, UpdateSourceTrigger=PropertyChanged}" Width="auto" />
+                <mui:DataGridTextColumn Header="Amount" Binding="{Binding LocalizedAmount, StringFormat=\{0:C2\}, UpdateSourceTrigger=PropertyChanged}" Width="auto" 
 								IsReadOnly="{Binding DataContext.IsManualAccount, Converter={StaticResource BoolToInverseBoolConverter}, Source={StaticResource ProxyElement}}" CellStyle="{StaticResource Balanace}" />
-                <mui:DataGridTextColumn Header="Balance" Binding="{Binding LocalizedBalance, StringFormat=\{0:C2\}}" Width="80" IsReadOnly="True"  />
+                <mui:DataGridTextColumn Header="Balance" Binding="{Binding LocalizedBalance, StringFormat=\{0:C2\}}" Width="auto" IsReadOnly="True"  />
             </DataGrid.Columns>
             <DataGrid.InputBindings>
                 <KeyBinding Key="Delete" Command="{Binding DeleteTransactionCommand}" />
