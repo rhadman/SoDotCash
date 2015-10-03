@@ -7,46 +7,60 @@
              mc:Ignorable="d"
              Height="350" Width="950"
              DataContext="{Binding AddAccount, Source={StaticResource Locator}}">
-    <DockPanel>
-        <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
+    <StackPanel Orientation="Vertical" Margin="10">
+            
+        <GroupBox Header="Basic Information" Margin="0,10,0,0">
             <StackPanel Orientation="Horizontal">
-                <Label x:Name="LabelAccountName" Content="I would like to name my account:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
-                <TextBox x:Name="TextBoxAccountName" HorizontalAlignment="Left" Height="23" Margin="0,3,0,0" TextWrapping="Wrap" Text="{Binding AccountName}" VerticalAlignment="Top" Width="200"/>
+                    <Label Content="I would like to name my account:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top"/>
+                    <TextBox HorizontalAlignment="Left" Height="22" Margin="0,3,0,0" TextWrapping="Wrap" Text="{Binding AccountName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="200"/>
             </StackPanel>
-            <Label x:Name="LabelHelpText" Content="Please choose how you would like to add account(s)." HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <GroupBox x:Name="GroupBoxAutoManualSelect" Header="" HorizontalAlignment="Left" VerticalAlignment="Top" BorderThickness="0">
-                <ListBox Style="{StaticResource HorizontalRadioButtonList}" SelectedValue="{Binding AccountSource}" SelectedValuePath="Tag">
+            </GroupBox>
+            <GroupBox Header="Please choose how you would like to add your account">
+                <ListBox Style="{StaticResource HorizontalRadioButtonList}" SelectedValue="{Binding AccountSource}" SelectedValuePath="Tag" Margin="0,10,0,0">
                     <ListBoxItem Tag="{x:Static vms:EAccountSource.Automatic}">Automatically import my accounts online</ListBoxItem>
                     <ListBoxItem Tag="{x:Static vms:EAccountSource.Manual}" Margin="40,0,0,0">Manually enter my account information</ListBoxItem>
                 </ListBox>
             </GroupBox>
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="918">
-                <Grid x:Name="GridManualEntry" Visibility="{Binding IsManualEntry, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Hidden}">
+            <GroupBox Header="Manual Configuration" Visibility="{Binding IsManualEntry, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Hidden}">
                     <StackPanel Orientation="Horizontal">
                         <Label x:Name="LabelAccountType" Content="Account Type" HorizontalAlignment="Left" VerticalAlignment="Center" Width="134"/>
                         <ComboBox x:Name="ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" ItemsSource="{Binding AllAccountTypes}" SelectedItem="{Binding SelectedAccountType}"/>
                     </StackPanel>
-                </Grid>
-                <StackPanel x:Name="GridAutomaticEntry" Visibility="{Binding IsAutomaticEntry, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Hidden}">
+            </GroupBox>
+            <GroupBox Header="Automatic Configuration" Visibility="{Binding IsAutomaticEntry, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Hidden}">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="918">
+                    <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label x:Name="LabelFinancialInstitution" Content="Financial Institution" HorizontalAlignment="Left" VerticalAlignment="Center" Width="134"/>
+                            <Label Content="Financial Institution" HorizontalAlignment="Left" VerticalAlignment="Center" Width="134"/>
                         <ComboBox SelectedValue="{Binding SelectedFinancialInstitution}" ItemsSource="{Binding AllFinancialInstitutions}" DisplayMemberPath="Name" Width="200" Height="25"/>
-                        <Label x:Name="LabelUsername" Content="Username" HorizontalAlignment="Left" VerticalAlignment="Center" Width="134"/>
-                        <TextBox x:Name="TextBoxUsername" HorizontalAlignment="Left" Text="{Binding FinancialInstitutionUsername}" VerticalAlignment="Center" Width="120"/>
-                        <Label x:Name="LabelPassword" Content="Password" HorizontalAlignment="Left" VerticalAlignment="Center" Width="134"/>
-                        <PasswordBox x:Name="TextBoxPassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" PasswordChanged="textBox_Password_PasswordChanged"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Username" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <TextBox HorizontalAlignment="Left" Text="{Binding FinancialInstitutionUsername}" VerticalAlignment="Center" Width="120"/>
+                            <Label Content="Password" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <PasswordBox x:Name="PasswordEntry" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Retrieve Accounts" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Height="22" Command="{Binding RetrieveAccountsCommand}" CommandParameter="{Binding ElementName=PasswordEntry}"/>
+                            <TextBlock Foreground="Red" FontWeight="Bold" Text="Invalid Credentials" Margin="10,3,0,0" Visibility="{Binding AccountRetrievalFailed, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <TextBlock Foreground="Green" FontWeight="SemiBold" Text="All accounts from this bank are already added!" Margin="10,3,0,0" Visibility="{Binding NoAccountsRetrieved, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" IsEnabled="{Binding HasAvailableAccounts}">
+                            <Label Content="Attach To" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <ComboBox SelectedValue="{Binding SelectedAccount}" ItemsSource="{Binding AvailableAccounts}" DisplayMemberPath="AccountName" Width="200" Height="22"/>
                     </StackPanel>
-                    <Button x:Name="ButtonRetrieveAccounts" Content="Retrieve Accounts" HorizontalAlignment="Left" VerticalAlignment="Top" Height="25" Command="{Binding RetrieveAccountsCommand}"/>
-                    <StackPanel Orientation="Horizontal" Visibility="{Binding HasAvailableAccounts, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Hidden}">
-                        <Label x:Name="LabelAccount" Content="Account to Add" HorizontalAlignment="Left" VerticalAlignment="Center" Width="134"/>
-                        <ComboBox SelectedValue="{Binding SelectedAccount}" ItemsSource="{Binding AvailableAccounts}" DisplayMemberPath="AccountName" Width="200" Height="25"/>
                     </StackPanel>
                 </StackPanel>
+            </GroupBox>
+
+
+        <!--<StackPanel Orientation="Horizontal">
+            <Button x:Name="ButtonCreate" Content="Add Account" HorizontalAlignment="Left" VerticalAlignment="Top" Width="149" Height="22" Command="{Binding CreateAccountCommand}"  CommandParameter="{Binding ElementName=PasswordEntry}"/>
             </StackPanel>
-        </StackPanel>
+        </StackPanel>-->
         <DockPanel Dock="Bottom" VerticalAlignment="Bottom">
             <Button x:Name="ButtonCancel" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="208" Height="50" Command="{Binding CancelCommand}"/>
             <Button x:Name="ButtonCreate" Content="Create" HorizontalAlignment="Right" VerticalAlignment="Top" Width="208" Height="50" Command="{Binding CreateAccountCommand}" CommandParameter="/Views/AccountsView.xaml" IsEnabled="{Binding CanCreateAccount}" />
         </DockPanel>
-    </DockPanel>
+    </StackPanel>
 </UserControl>

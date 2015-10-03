@@ -32,9 +32,9 @@
             
             
             <TreeView Grid.Row="1" Margin="10,0,10,10" ItemsSource="{Binding AccountsView}">
-                <!--<i:Interaction.Behaviors>
+                <i:Interaction.Behaviors>
                     <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
-                </i:Interaction.Behaviors>-->
+                </i:Interaction.Behaviors>
                 <!--<TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}" BasedOn="">
                         <Setter Property="IsSelected" Value="{Binding IsSelected}" />
