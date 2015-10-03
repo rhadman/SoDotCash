@@ -65,8 +65,6 @@ namespace SoDotCash.ViewModels
         {
             NavigationCommands.GoToPage.Execute("/Views/Initializing.xaml",
                 NavigationService.GetDescendantFromName(Application.Current.MainWindow));
-
-
         }
 
 

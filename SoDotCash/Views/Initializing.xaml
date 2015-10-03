@@ -18,8 +18,14 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
         
-        <ProgressBar IsIndeterminate="True" />
+        <Label Content="Loading, Please Wait" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        <ProgressBar Grid.Row="1" IsIndeterminate="True" />
         <!--<xctk:BusyIndicator IsBusy="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=ActionsPending}" BusyContent="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=CurrentActionDescription}"/>-->
         <!--<ContentControl Content="{Binding ActiveViewModel}"/>-->
     
