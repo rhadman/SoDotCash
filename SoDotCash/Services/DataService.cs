@@ -155,17 +155,23 @@ namespace SoDotCash.Services
             {
                 fi = DbContext.FinancialInstitutions.First(i => i.Name == financialInstitution.Name);
             }
-            catch (InvalidOperationException)
+            catch (Exception ex)
             {
-                // FI Doesn't exist, add a new one
-                fi = new FinancialInstitution
+                // Can result in InvalidOperationException or NullReferenceException depending on provider
+                if (ex is InvalidOperationException || ex is NullReferenceException)
                 {
-                    Name = financialInstitution.Name,
-                    OfxFinancialUnitId = financialInstitution.FinancialId,
-                    OfxOrganizationId = financialInstitution.OrganizationId,
-                    OfxUpdateUrl = financialInstitution.ServiceEndpoint.ToString()
-                };
-                DbContext.FinancialInstitutions.Add(fi);
+                    // FI Doesn't exist, add a new one
+                    fi = new FinancialInstitution
+                    {
+                        Name = financialInstitution.Name,
+                        OfxFinancialUnitId = financialInstitution.FinancialId,
+                        OfxOrganizationId = financialInstitution.OrganizationId,
+                        OfxUpdateUrl = financialInstitution.ServiceEndpoint.ToString()
+                    };
+                    DbContext.FinancialInstitutions.Add(fi);
+                }
+                else
+                    throw; // Unhandled
             }
 
             // Look for existing user under this FI with same userId
@@ -173,11 +179,17 @@ namespace SoDotCash.Services
             {
                 fiUser = fi.Users.First(u => u.UserId == fiUser.UserId && u.Password == fiUser.Password);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // User doesn't exist, add as new
-                fi.Users.Add(fiUser);
-                DbContext.FinancialInstitutionUsers.Add(fiUser);
+                // Can result in InvalidOperationException or NullReferenceException depending on provider
+                if (ex is InvalidOperationException || ex is NullReferenceException)
+                {
+                    // User doesn't exist, add as new
+                    fi.Users.Add(fiUser);
+                    DbContext.FinancialInstitutionUsers.Add(fiUser);
+                }
+                else
+                    throw; // Unhandled
             }
 
             fiUser.Accounts.Add(account);
