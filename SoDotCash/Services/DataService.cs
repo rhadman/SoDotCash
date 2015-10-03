@@ -206,16 +206,16 @@ namespace SoDotCash.Services
         /// <param name="account">Account to delete</param>
         public void DeleteAccount(Account account)
         {
-            // Retrieve matching account from DB - we need to get an entity in the current db session
-            var deleteAccount = DbContext.Accounts.First(dbAccount => dbAccount.AccountId == account.AccountId);
+            // Add the account to the context in unchanged state creating a current reference
+            DbContext.SetUnchanged(account);
 
             // Delete fiUser if this is the only account referencing it
-            if (deleteAccount.FinancialInstitutionUser != null &&
-                deleteAccount.FinancialInstitutionUser.Accounts.Count == 1)
-                DbContext.FinancialInstitutionUsers.Remove(deleteAccount.FinancialInstitutionUser);
+            if (account.FinancialInstitutionUser != null &&
+                account.FinancialInstitutionUser.Accounts.Count == 1)
+                DbContext.FinancialInstitutionUsers.Remove(account.FinancialInstitutionUser);
 
             // Remove the account
-            DbContext.Accounts.Remove(deleteAccount);
+            DbContext.Set<Account>().Remove(account);
         }
 
         /// <summary>
