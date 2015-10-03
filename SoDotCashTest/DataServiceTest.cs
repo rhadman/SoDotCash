@@ -12,7 +12,9 @@ using SoDotCash.Services;
 namespace SoDotCashTest
 {
     /// <summary>
-    /// Summary description for DataServiceTest
+    /// Test cases for the DataService.
+    /// The DataService provides a thin business logic layer on top of Database operations.
+    /// The tests here ensure that the business logic is properly implemented in terms of DB operations.
     /// </summary>
     [TestClass]
     public class DataServiceTest
