@@ -63,8 +63,6 @@
 
     <!-- DataGridCell Style used to set the text colors of balances -->
     <Style TargetType="DataGridCell" x:Key="Balanace">
-        <Setter Property="Foreground" Value="Black" />
-
         <Style.Triggers>
             <DataTrigger Binding="{Binding LocalizedAmount, Converter={StaticResource NumberToIsPositive}}" Value="False">
                 <Setter Property="Foreground" Value="Red" />
