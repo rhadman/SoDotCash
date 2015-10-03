@@ -15,7 +15,7 @@
                 <Button x:Name="ButtonImportTransactions" Content="Import Transactions" HorizontalAlignment="Left" VerticalAlignment="Top"  Command="{Binding ImportTransactionsCommand}" />
                 <Button x:Name="ButtonDownloadTransactions" Content="Download Transactions" HorizontalAlignment="Left" VerticalAlignment="Top"  Command="{Binding DownloadTransactionsCommand}" Margin="20,0,0,0"/>
             </StackPanel>
-            <
+            
         </StackPanel>
     </Grid>
 
