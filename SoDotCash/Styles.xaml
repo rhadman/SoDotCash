@@ -6,6 +6,26 @@
     
     <conv:NumberToIsPositiveConverter x:Key="NumberToIsPositive" />
 
+    <!-- Allows a ListItem to be presented as a radio button -->
+    <Style x:Key="RadioButtonListItem" TargetType="{x:Type ListBoxItem}" >
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <DockPanel LastChildFill="True" Background="{TemplateBinding Background}" HorizontalAlignment="Stretch" VerticalAlignment="Center" >
+                        <RadioButton IsChecked="{TemplateBinding IsSelected}" Focusable="False" IsHitTestVisible="False" VerticalAlignment="Center" Margin="0,0,4,0" />
+                        <ContentPresenter
+                            Content             = "{TemplateBinding ContentControl.Content}"
+                            ContentTemplate     = "{TemplateBinding ContentControl.ContentTemplate}"
+                            ContentStringFormat = "{TemplateBinding ContentControl.ContentStringFormat}"
+                            HorizontalAlignment = "{TemplateBinding Control.HorizontalContentAlignment}"
+                            VerticalAlignment   = "{TemplateBinding Control.VerticalContentAlignment}"
+                            SnapsToDevicePixels = "{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Allows a ListBox control to be styled as multiple radio buttons -->
     <Style x:Key="RadioButtonList" TargetType="ListBox">
         <Style.Resources>
