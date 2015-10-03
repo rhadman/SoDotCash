@@ -228,6 +228,7 @@
     <Compile Include="Models\SoCashDbContext.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Services\BackgroundTaskTracker.cs" />
+    <Compile Include="Services\BaseService.cs" />
     <Compile Include="Services\DataService.cs" />
     <Compile Include="Services\UpdateService.cs" />
     <Compile Include="SoCash.Designer.cs">
