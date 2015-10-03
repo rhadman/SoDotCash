@@ -99,7 +99,7 @@ namespace SoDotCashTest
             }
 
             // Verify that the service added the transaction on the mock db exactly once
-            mockTransactionSet.Verify(m => m.Add(It.IsAny<Transaction>()), Times.Once());
+            mockTransactionSet.Verify(m => m.Add(newTransaction), Times.Once());
 
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
@@ -135,7 +135,7 @@ namespace SoDotCashTest
                 service.DeleteTransaction(transaction);
 
             // Verify that the service removed the transaction on the mock db exactly once
-            mockTransactionSet.Verify(m => m.Remove(It.IsAny<Transaction>()), Times.Once());
+            mockTransactionSet.Verify(m => m.Remove(transaction), Times.Once());
 
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
@@ -167,7 +167,7 @@ namespace SoDotCashTest
                 service.UpdateTransaction(transaction);
 
             // Verify that the service joined the transaction to the session in a modified state
-            mockContext.Verify(m => m.SetModified(It.IsAny<Transaction>()), Times.Once());
+            mockContext.Verify(m => m.SetModified(transaction), Times.Once());
 
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
@@ -201,7 +201,7 @@ namespace SoDotCashTest
             }
 
             // Verify that the service added the account on the mock db exactly once
-            mockSet.Verify(m => m.Add(It.IsAny<Account>()), Times.Once());
+            mockSet.Verify(m => m.Add(newAccount), Times.Once());
 
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
@@ -246,9 +246,9 @@ namespace SoDotCashTest
             }
 
             // Verify that the service added 1 account, 1 fi and 1 fi user
-            mockAccountSet.Verify(m => m.Add(It.IsAny<Account>()), Times.Once());
+            mockAccountSet.Verify(m => m.Add(newAccount), Times.Once());
             mockFiSet.Verify(m => m.Add(It.IsAny<FinancialInstitution>()), Times.Once());
-            mockFiUserSet.Verify(m => m.Add(It.IsAny<FinancialInstitutionUser>()), Times.Once());
+            mockFiUserSet.Verify(m => m.Add(financialInstitutionUser), Times.Once());
 
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
@@ -278,7 +278,7 @@ namespace SoDotCashTest
                 service.DeleteAccount(account);
 
             // Verify that the service removed the account on the mock db exactly once
-            mockAccountSet.Verify(m => m.Remove(It.IsAny<Account>()), Times.Once());
+            mockAccountSet.Verify(m => m.Remove(account), Times.Once());
 
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
@@ -308,7 +308,7 @@ namespace SoDotCashTest
                 service.UpdateAccount(account);
 
             // Verify that the service attached the account on the mock db exactly once
-            mockContext.Verify(m => m.SetModified(It.IsAny<Account>()), Times.Once());
+            mockContext.Verify(m => m.SetModified(account), Times.Once());
 
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
@@ -353,6 +353,31 @@ namespace SoDotCashTest
 
             // Verify that the account has the FiUser removed
             dataMock.Verify(m => m.Remove(account), Times.Once());
+
+            // Verify that the transaction ended properly
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
+
+        /// <summary>
+        /// Test updating the information associated with a financialinstitutionuser
+        /// </summary>
+        [TestMethod]
+        public void TestUpdateFiUser()
+        {
+            // FiUser for test
+            var fiUser = new FinancialInstitutionUser {UserId = "OriginalId", Password = "OriginalPw"};
+
+            // Mock setup for DataService
+            var mockFiUserSet = new Mock<DbSet<FinancialInstitutionUser>>();
+            var mockContext = new Mock<SoCashDbContext>();
+            mockContext.Setup(m => m.Set<FinancialInstitutionUser>()).Returns(mockFiUserSet.Object);
+
+            // Update the user
+            using (var service = new DataService(mockContext.Object))
+                service.UpdateFiUser(fiUser);
+
+            // Verify that the service attached the user on the mock db exactly once
+            mockContext.Verify(m => m.SetModified(fiUser), Times.Once());
 
             // Verify that the transaction ended properly
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
