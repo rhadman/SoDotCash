@@ -161,7 +161,7 @@ namespace SoDotCashTest
             mockContext.Setup(m => m.Set<Transaction>()).Returns(mockTransactionSet.Object);
 
 
-            // Delete the transaction
+            // Update the transaction
             using (var service = new DataService(mockContext.Object))
                 service.UpdateTransaction(transaction);
 
@@ -283,5 +283,34 @@ namespace SoDotCashTest
             mockContext.Verify(m => m.SaveChanges(), Times.Once());
         }
 
+        /// <summary>
+        /// Test updating an account
+        /// </summary>
+        [TestMethod]
+        public void TestUpdateAccount()
+        {
+            // Account for test
+            var account = new Account
+            {
+                AccountName = "Test Account",
+                AccountType = AccountType.Checking.ToString(),
+                Currency = "USD"
+            };
+
+            // Mock setup for DataService
+            var mockAccountSet = new Mock<DbSet<Account>>();
+            var mockContext = new Mock<SoCashDbContext>();
+            mockContext.Setup(m => m.Set<Account>()).Returns(mockAccountSet.Object);
+
+            // Update the account
+            using (var service = new DataService(mockContext.Object))
+                service.UpdateAccount(account);
+
+            // Verify that the service attached the account on the mock db exactly once
+            mockContext.Verify(m => m.SetModified(It.IsAny<Account>()), Times.Once());
+
+            // Verify that the transaction ended properly
+            mockContext.Verify(m => m.SaveChanges(), Times.Once());
+        }
     }
 }
