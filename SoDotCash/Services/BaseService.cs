@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity.Infrastructure;
 using SoDotCash.Models;
 
 namespace SoDotCash.Services
@@ -40,6 +41,7 @@ namespace SoDotCash.Services
         public void Dispose()
         {
             DbContext.SaveChanges();
+            DbContext.Dispose();
         }
 
     }
