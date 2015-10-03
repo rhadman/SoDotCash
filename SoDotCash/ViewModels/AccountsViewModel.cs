@@ -184,11 +184,10 @@ namespace SoDotCash.ViewModels
             {
                 if (SelectedAccount == null)
                     return null;
-                using (var db = new SoCashDbContext())
+                using (var dataService = new DataService())
                 {
                     // Retrieve account - we need to get an entity in the current db session
-                    var dbAccount = db.Accounts.First(account => account.AccountId == SelectedAccount.AccountId);
-                    var transactions = from t in dbAccount.Transactions orderby t.Date select t;
+                    var transactions = dataService.GetTransactionsByDate(SelectedAccount);
 
                     // Calculate running balance and attach edit notifications
                     int balance = 0;
@@ -435,10 +434,10 @@ namespace SoDotCash.ViewModels
             var accountsByType = new Dictionary<string, ObservableCollection<Account>>();
 
             // Retrieve the accounts from the database
-            using (var db = new SoCashDbContext())
+            using (var dataService = new DataService())
             {
                 // Map all accounts by type
-                foreach (var account in db.Accounts.Include("FinancialInstitutionUser").Include("FinancialInstitutionUser.FinancialInstitution"))
+                foreach (var account in dataService.GetAccountsWithFi())
                 {
                     // Add category if needed
                     ObservableCollection<Account> accountList;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Deployment.Application;
 using System.IO;
@@ -245,5 +246,30 @@ namespace SoDotCash.Services
             DbContext.Entry(user).State = EntityState.Modified;
         }
 
+        /// <summary>
+        /// Retrieve all accounts from the database along with any associated Financial Institution records
+        /// </summary>
+        /// <returns>Collection of all accounts in database</returns>
+        public IEnumerable<Account> GetAccountsWithFi()
+        {
+            return
+                new List<Account>(
+                    DbContext.Accounts.Include("FinancialInstitutionUser")
+                        .Include("FinancialInstitutionUser.FinancialInstitution"));
+        }
+
+        /// <summary>
+        /// Retrieve all transactions for an account from the database ordered by date
+        /// </summary>
+        /// <param name="account">The account to retrieve transactions for</param>
+        /// <returns>Collection of all transactions associated with the provided account</returns>
+        public IEnumerable<Transaction> GetTransactionsByDate(Account account)
+        {
+            // Retrieve the current account record in this session - to ensure the transaction list is not stale
+            var dbAccount = DbContext.Accounts.First(a => a.AccountId == account.AccountId);
+
+            // Retrieve transactions ordered by date
+            return from t in dbAccount.Transactions orderby t.Date select t;
+        }
     }
 }
