@@ -202,6 +202,7 @@ namespace SoDotCashTest
         /// Test that accounts can be retrieved from the configured authenticated Financial Institution using OFX service
         /// </summary>
         [TestMethod]
+        [Ignore]
         public async Task TestListAccounts()
         {
             // Retrieve accounts using provided credentials
@@ -220,6 +221,7 @@ namespace SoDotCashTest
         /// Test that statements can be retrieved from all accounts returned from the authenticated FI
         /// </summary>
         [TestMethod]
+        [Ignore]
         public async Task TestGetStatement()
         {
             // Retrieve accounts using provided credentials
