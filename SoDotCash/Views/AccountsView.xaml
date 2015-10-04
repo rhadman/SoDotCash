@@ -16,14 +16,14 @@
              Height="350" Width="1250"
              DataContext="{Binding Accounts, Source={StaticResource Locator}}"
              >
-    <Grid>
+    <Grid Name="AccountsGrid1">
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
         
-        <Grid Grid.Column="0" Margin="10">
+        <Grid Grid.Column="0" Margin="10" Name="AccountsGrid2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
                 <RowDefinition />
@@ -71,4 +71,5 @@
             </mui:ModernTab.Links>
         </mui:ModernTab>
     </Grid>
+    
 </UserControl>
