@@ -7,6 +7,9 @@ using FirstFloor.ModernUI.Windows.Controls;
 
 namespace SoDotCash.ViewModels.Navigation
 {
+    /// <summary>
+    /// Basic NavigationService provided by ModernUI
+    /// </summary>
     public class NavigationService : IModernNavigationService
     {
         private readonly Dictionary<string, Uri> _pagesByKey;
