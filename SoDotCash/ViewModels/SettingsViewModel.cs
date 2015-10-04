@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Configuration;
+﻿using System.ComponentModel;
 using System.Linq;
 using System.Windows.Media;
 using FirstFloor.ModernUI.Presentation;
@@ -41,9 +39,9 @@ namespace SoDotCash.ViewModels
             SelectedAccentColor = AppearanceManager.Current.AccentColor;
 
             //write settings to the config file so that they will be loaded next time
-            UpdateConfig("Theme", SelectedTheme?.DisplayName);
-            UpdateConfig("Accent", SelectedAccentColor.ToString());
-
+            Properties.Settings.Default.Theme = SelectedTheme?.DisplayName;
+            Properties.Settings.Default.Accent = SelectedAccentColor.ToString();
+            Properties.Settings.Default.Save();
         }
 
         /// <summary>
@@ -161,40 +159,6 @@ namespace SoDotCash.ViewModels
                 Color.FromRgb(0x76, 0x60, 0x8a), // mauve
                 Color.FromRgb(0x87, 0x79, 0x4e) // taupe
             };
-
-        /// <summary>
-        /// Write application setting to the configuration file
-        /// </summary>
-        /// <param name="setting">Setting to write</param>
-        /// <param name="value">Value of setting</param>
-        private static void UpdateConfig(string setting, string value)
-        {
-            var assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
-            var assemblyName = "SoDotCash";
-
-            //need to modify the configuration file, launch the server with those settings.
-            var config =
-                ConfigurationManager.OpenExeConfiguration($"{assemblyPath}\\{"SoDotCash"}.exe");
-
-            //config.AppSettings.Settings["RunMaintenance"].Value = "false";
-            var getSection = config.GetSection("applicationSettings");
-            Console.WriteLine(getSection);
-
-            var settingsGroup = config.SectionGroups["userSettings"];
-            var settings =
-                settingsGroup?.Sections[$"{assemblyName}.Properties.Settings"] as ClientSettingsSection;
-            if (settings != null)
-            {
-                var settingsElement = settings.Settings.Get(setting);
-
-                settings.Settings.Remove(settingsElement);
-                settingsElement.Value.ValueXml.InnerText = value;
-                settings.Settings.Add(settingsElement);
-            }
-
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
-        }
 
     }
 }

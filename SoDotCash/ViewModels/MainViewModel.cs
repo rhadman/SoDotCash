@@ -76,9 +76,9 @@ namespace SoDotCash.ViewModels
                     AppearanceManager.Current.ThemeSource = AppearanceManager.LightThemeSource;
                     break;
             }
-
-            //try to convert the color in the config file to be a color
-            //if any of it fails then set it to the default color
+            
+            //Try to convert the color in the config file to be a color
+            //  if any of it fails then leave it to the default color
             try
             {
                 
@@ -87,7 +87,6 @@ namespace SoDotCash.ViewModels
 
                 AppearanceManager.Current.AccentColor = (Color)colorFromString;
             }
-
             catch (Exception)
             {
                 AppearanceManager.Current.AccentColor = (Color)ColorConverter.ConvertFromString("#FF1BA1E2");
