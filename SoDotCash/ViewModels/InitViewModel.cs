@@ -1,10 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.CommandWpf;
-using SoDotCash.Models;
 using SoDotCash.Services;
 using SoDotCash.ViewModels.Navigation;
 
@@ -20,7 +16,7 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Indicator of whether initialization has been called
         /// </summary>
-        private bool initialized;
+        private bool _initialized;
 
         /// <summary>
         /// Mapped OnLoaded event trigger - Allows actions when the view is loaded
@@ -38,9 +34,9 @@ namespace SoDotCash.ViewModels
         private void Loaded()
         {
             // Initialize only once
-            if (!initialized)
+            if (!_initialized)
             {
-                initialized = true;
+                _initialized = true;
                 // Perform the rest of the init asyncronously
                 AsyncInit();
             }
