@@ -77,23 +77,22 @@ namespace SoDotCash.ViewModels
                     break;
             }
 
-            //try to convert the color in the config file to be a color
-            //if any of it fails then set it to the default color
+            // Start with default color
+            var convertFromString = ColorConverter.ConvertFromString("#FF1BA1E2");
+            if (convertFromString != null)
+                AppearanceManager.Current.AccentColor = (Color)convertFromString;
+
+            //Try to convert the color in the config file to be a color
+            //  if any of it fails then leave it to the default color
             try
             {
-                var convertFromString = ColorConverter.ConvertFromString(Properties.Settings.Default.Accent);
-                if (convertFromString != null)
-                    AppearanceManager.Current.AccentColor = (Color)convertFromString;
-                convertFromString = ColorConverter.ConvertFromString("#FF1BA1E2");
+                convertFromString = ColorConverter.ConvertFromString(Properties.Settings.Default.Accent);
                 if (convertFromString != null)
                     AppearanceManager.Current.AccentColor = (Color)convertFromString;
             }
-
             catch (Exception)
             {
-                var convertFromString = ColorConverter.ConvertFromString("#FF1BA1E2");
-                if (convertFromString != null)
-                    AppearanceManager.Current.AccentColor = (Color)convertFromString;
+                // Ignore, leave as default
             }
         }
 
