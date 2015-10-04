@@ -1,20 +1,4 @@
-/*
-  In App.xaml:
-  <Application.Resources>
-      <vm:ViewModelLocator xmlns:vm="clr-namespace:SoDotCash"
-                           x:Key="Locator" />
-  </Application.Resources>
-  
-  In the View:
-  DataContext="{Binding Source={StaticResource Locator}, Path=ViewModelName}"
-
-  You can also use Blend to do all this with the tool's support.
-  See http://www.galasoft.ch/mvvm
-*/
-
 using System;
-using System.Windows.Media;
-using FirstFloor.ModernUI.Presentation;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 using SoDotCash.ViewModels.Navigation;
@@ -32,36 +16,6 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public ViewModelLocator()
         {
-            //load user visual preferences
-            switch (Properties.Settings.Default.Theme)
-            {
-                default:
-                case "dark":
-                    AppearanceManager.Current.ThemeSource = AppearanceManager.DarkThemeSource;
-                    break;
-                case "light":
-                    AppearanceManager.Current.ThemeSource = AppearanceManager.LightThemeSource;
-                    break;
-            }
-
-            //try to convert the color in the config file to be a color
-            //if any of it fails then set it to the default color
-            try
-            {
-                var convertFromString = ColorConverter.ConvertFromString(Properties.Settings.Default.Accent);
-                if (convertFromString != null)
-                    AppearanceManager.Current.AccentColor = (Color) convertFromString;
-                convertFromString = ColorConverter.ConvertFromString("#FF1BA1E2");
-                AppearanceManager.Current.AccentColor = (Color) convertFromString;
-            }
-            
-            catch (Exception)
-            {   
-                AppearanceManager.Current.AccentColor = (Color) ColorConverter.ConvertFromString("#FF1BA1E2");
-            }
-
-
-
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
             SimpleIoc.Default.Register<MainViewModel>();
