@@ -96,6 +96,11 @@ namespace SoDotCash.ViewModels
                 RaisePropertyChanged(() => FiUserName);
 
                 RaisePropertyChanged();
+
+                //Application.Current.Dispatcher.BeginInvoke((Action) (() =>
+                //    NavigationCommands.GoToPage.Execute("/Views/AccountsViewTabs/AccountGraph.xaml",
+                //        NavigationService.GetDescendantFromName(Application.Current.MainWindow, "TabFrame"))
+                //    ));
             }
         }
 
@@ -649,7 +654,11 @@ namespace SoDotCash.ViewModels
             SelectedAccount = null;
 
             // Return to Overview tab
-            ActiveTabIndex = 0;
+
+            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+               NavigationCommands.GoToPage.Execute("/Views/AccountsViewTabs/AccountGraph.xaml",
+                   NavigationService.GetDescendantFromName(Application.Current.MainWindow, "TabFrame"))
+                ));
 
             // Update the list of accounts
             UpdateAccounts();
