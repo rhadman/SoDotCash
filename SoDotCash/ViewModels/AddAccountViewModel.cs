@@ -443,6 +443,8 @@ namespace SoDotCash.ViewModels
             // Transition back to accounts view
             _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
 
+            // Do not allow navigation back to add account screen
+            _modernNavigationService.ClearNavigationHistory();
         }
 
 
