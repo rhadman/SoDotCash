@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using FirstFloor.ModernUI.Windows.Controls;
 
-namespace SoDotCash.Models
+namespace SoDotCash.ViewModels.Navigation
 {
     public class NavigationService : IModernNavigationService
     {
