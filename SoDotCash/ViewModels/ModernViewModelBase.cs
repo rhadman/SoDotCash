@@ -3,42 +3,45 @@ using GalaSoft.MvvmLight;
 
 namespace SoDotCash.ViewModels
 {
+    /// <summary>
+    /// Extends the basic ViewModel class with commands triggered by ModernUI
+    /// </summary>
     public abstract class ModernViewModelBase : ViewModelBase
     {
         /// <summary>
-        /// Gets or sets the navigating from command.
+        /// Called before navigating away from the view
         /// </summary>
-        /// <value>The navigating from command.</value>
+        /// <value>Command to execute when event is triggered.</value>
         public ICommand NavigatingFromCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the navigated from command.
+        /// Called after navigating away from the view
         /// </summary>
-        /// <value>The navigated from command.</value>
+        /// <value>Command to execute when event is triggered.</value>
         public ICommand NavigatedFromCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the navigated to command.
+        /// Called after navigating to from the view
         /// </summary>
-        /// <value>The navigated to command.</value>
+        /// <value>Command to execute when event is triggered.</value>
         public ICommand NavigatedToCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the fragment navigation command.
+        /// Called to navigate to a different page fragment
         /// </summary>
-        /// <value>The fragment navigation command.</value>
+        /// <value>Command to execute when event is triggered.</value>
         public ICommand FragmentNavigationCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the loaded command.
+        /// Called when the view is loaded
         /// </summary>
-        /// <value>The loaded command.</value>
+        /// <value>Command to execute when event is triggered.</value>
         public ICommand LoadedCommand { get; set; }
 
         /// <summary>
-        /// Gets or sets the is visible changed command.
+        /// Called when visibility is changed
         /// </summary>
-        /// <value>The is visible changed command.</value>
+        /// <value>Command to execute when event is triggered.</value>
         public ICommand IsVisibleChangedCommand { get; set; }
     }
 }

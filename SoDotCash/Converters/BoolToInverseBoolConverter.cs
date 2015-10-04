@@ -4,6 +4,10 @@ using System.Windows.Data;
 
 namespace SoDotCash.Converters
 {
+    /// <summary>
+    /// Converter which inverts the value of a boolean.
+    /// Used for XAML bindings to allow inverting operation without duplicating ModelView functionality
+    /// </summary>
     [ValueConversion(typeof(bool), typeof(bool))]
     public class BoolToInverseBoolConverter : IValueConverter
     {
@@ -14,7 +18,8 @@ namespace SoDotCash.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            // Reverse is the same as forward
+            return Convert(value, targetType, parameter, culture);
         }
     }
 }

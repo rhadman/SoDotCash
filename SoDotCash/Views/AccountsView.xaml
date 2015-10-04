@@ -22,7 +22,7 @@
             <ColumnDefinition />
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-
+        
         <Grid Grid.Column="0" Margin="10" Name="AccountsGrid2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
@@ -36,7 +36,7 @@
                 <i:Interaction.Behaviors>
                     <utility:BindableSelectedItemBehavior SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"/>
                 </i:Interaction.Behaviors>
-
+                
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Value}">
                         <TextBlock Text="{Binding Key}" />
@@ -61,8 +61,8 @@
 
         </Grid>
 
-        <Grid Grid.Column="1" Name="TabControl">
-        <mui:ModernTab IsEnabled="{Binding ElementName=AccountsList, Mode=OneWay, Path=SelectedValue, Converter={StaticResource SelectedValueToIsEnabled}}" >
+        <mui:ModernTab Grid.Column="1" x:Name="TabControl" IsEnabled="{Binding ElementName=AccountsList, Mode=OneWay, Path=SelectedValue, Converter={StaticResource SelectedValueToIsEnabled}}" 
+                       SelectedSource="{Binding SelectedTabSource, Mode=TwoWay}" >
             <mui:ModernTab.Links>
                 <mui:Link DisplayName="Graph" Source="/Views/AccountsViewTabs/AccountGraph.xaml" />
                 <mui:Link DisplayName="Ledger" Source="/Views/AccountsViewTabs/AccountLedger.xaml" />
@@ -70,6 +70,6 @@
                 <mui:Link DisplayName="Config" Source="/Views/AccountsViewTabs/AccountConfiguration.xaml" />
             </mui:ModernTab.Links>
         </mui:ModernTab>
-        </Grid>
+    </Grid>
     </Grid>
 </UserControl>
