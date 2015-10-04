@@ -222,9 +222,6 @@
     <Compile Include="Models\EditableEntity.cs" />
     <Compile Include="Models\FinancialInstitution.cs" />
     <Compile Include="Models\FinancialInstitutionUser.cs" />
-    <Compile Include="Models\ModernViewModelBase.cs" />
-    <Compile Include="Models\Navigation\IModernNavigationService.cs" />
-    <Compile Include="Models\Navigation\NavigationService.cs" />
     <Compile Include="Models\SoCashDbContext.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Services\BackgroundTaskTracker.cs" />
@@ -242,6 +239,9 @@
     <Compile Include="ViewModels\AddAccountViewModel.cs" />
     <Compile Include="ViewModels\InitViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\ModernViewModelBase.cs" />
+    <Compile Include="ViewModels\Navigation\IModernNavigationService.cs" />
+    <Compile Include="ViewModels\Navigation\NavigationService.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="ViewModels\WelcomeViewModel.cs" />

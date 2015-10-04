@@ -1,6 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Views;
 
-namespace SoDotCash.Models
+namespace SoDotCash.ViewModels.Navigation
 {
     public interface IModernNavigationService : INavigationService
     {

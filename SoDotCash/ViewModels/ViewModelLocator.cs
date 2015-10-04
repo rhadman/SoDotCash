@@ -16,6 +16,7 @@ using System;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 using SoDotCash.Models;
+using SoDotCash.ViewModels.Navigation;
 
 namespace SoDotCash.ViewModels
 {

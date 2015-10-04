@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
 using GalaSoft.MvvmLight;
 
-namespace SoDotCash.Models
+namespace SoDotCash.ViewModels
 {
     public abstract class ModernViewModelBase : ViewModelBase
     {

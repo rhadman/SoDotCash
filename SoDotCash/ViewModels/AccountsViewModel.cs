@@ -16,6 +16,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
 using SoDotCash.Models;
 using SoDotCash.Services;
+using SoDotCash.ViewModels.Navigation;
 
 namespace SoDotCash.ViewModels
 {

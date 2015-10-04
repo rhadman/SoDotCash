@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using OFX.Types;
 using SoDotCash.Services;
 using SoDotCash.Models;
+using SoDotCash.ViewModels.Navigation;
 
 namespace SoDotCash.ViewModels
 {
