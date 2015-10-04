@@ -128,8 +128,6 @@ namespace SoDotCash.ViewModels
                 RaisePropertyChanged(() => SelectedAccount.AccountName);
 
                 RaisePropertyChanged();
-
-                _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
             }
             
         }
