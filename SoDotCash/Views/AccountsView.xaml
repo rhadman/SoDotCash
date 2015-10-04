@@ -71,5 +71,5 @@
             </mui:ModernTab.Links>
         </mui:ModernTab>
     </Grid>
-    </Grid>
+    
 </UserControl>

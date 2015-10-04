@@ -172,8 +172,9 @@ namespace SoDotCashTest
                 // Expect: Response message set 0 is SignonResponse
                 Assert.IsInstanceOfType(obj.Items[0], typeof(SignonResponseMessageSetV1));
 
+                string errormessage;
                 // Parses the response to ensure it's valid, and records response data to trace log
-                DumpStatement(OFX.Types.Statement.CreateFromOFXResponse(obj));
+                DumpStatement(Statement.CreateFromOFXResponse(obj, out errormessage));
 
             }
         }
@@ -242,10 +243,10 @@ namespace SoDotCashTest
                     await AuthenticatedOfxService.GetStatement((OFX.Types.CreditCardAccount)account, startTime, DateTimeOffset.Now);
 
                 // Should only be one statement
-                Assert.Equals(statements.Count(), 1);
+                Assert.Equals(statements.Item1.Count(), 1);
 
                 // Iterates statements and transactions, records to debug file and raises exception if the data is invalid
-                DumpStatement(statements);
+                DumpStatement(statements.Item1);
             }
         }
 
