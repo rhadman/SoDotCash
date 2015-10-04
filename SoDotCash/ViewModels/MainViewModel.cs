@@ -70,6 +70,8 @@ namespace SoDotCash.ViewModels
             switch (Properties.Settings.Default.Theme)
             {
                 default:
+                // ReSharper disable once RedundantCaseLabel we may add more themes at a later date
+                case "dark":
                     AppearanceManager.Current.ThemeSource = AppearanceManager.DarkThemeSource;
                     break;
                 case "light":
@@ -80,8 +82,7 @@ namespace SoDotCash.ViewModels
             //Try to convert the color in the config file to be a color
             //  if any of it fails then leave it to the default color
             try
-            {
-                
+            {   
                 var colorFromString = ColorConverter.ConvertFromString(Properties.Settings.Default.Accent) ??
                                       ColorConverter.ConvertFromString("#FF1BA1E2");
 
