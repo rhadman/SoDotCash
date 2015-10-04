@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 using System.Windows.Media;
 using FirstFloor.ModernUI.Presentation;
@@ -34,9 +36,14 @@ namespace SoDotCash.ViewModels
         {
             // synchronizes the selected viewmodel theme with the actual theme used by the appearance manager.
             SelectedTheme = _themes.FirstOrDefault(l => l.Source.Equals(AppearanceManager.Current.ThemeSource));
-
+            
             // and make sure accent color is up-to-date
             SelectedAccentColor = AppearanceManager.Current.AccentColor;
+
+            //write settings to the config file so that they will be loaded next time
+            UpdateConfig("Theme", SelectedTheme?.DisplayName);
+            UpdateConfig("Accent", SelectedAccentColor.ToString());
+
         }
 
         /// <summary>
@@ -56,13 +63,15 @@ namespace SoDotCash.ViewModels
         /// Available font size
         /// </summary>
         private const string FontSmall = "small";
+
         private const string FontLarge = "large";
-        public string[] FontSizes => new[] { FontSmall, FontLarge };
+        public string[] FontSizes => new[] {FontSmall, FontLarge};
 
         /// <summary>
         /// The current UI accent color
         /// </summary>
         private Color _selectedAccentColor;
+
         public Color SelectedAccentColor
         {
             get { return _selectedAccentColor; }
@@ -82,12 +91,14 @@ namespace SoDotCash.ViewModels
         /// List of available color themes
         /// </summary>
         private readonly LinkCollection _themes = new LinkCollection();
+
         public LinkCollection Themes => _themes;
 
         /// <summary>
         /// The selected color theme for the application
         /// </summary>
         private Link _selectedTheme;
+
         public Link SelectedTheme
         {
             get { return _selectedTheme; }
@@ -108,6 +119,7 @@ namespace SoDotCash.ViewModels
         /// Selected font size for the application
         /// </summary>
         private string _selectedFontSize;
+
         public string SelectedFontSize
         {
             get { return _selectedFontSize; }
@@ -149,6 +161,32 @@ namespace SoDotCash.ViewModels
                 Color.FromRgb(0x76, 0x60, 0x8a), // mauve
                 Color.FromRgb(0x87, 0x79, 0x4e) // taupe
             };
+
+        private static void UpdateConfig(string setting, string value)
+        {
+            var assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
+            var assemblyName = "SoDotCash";
+
+            //need to modify the configuration file, launch the server with those settings.
+            var config =
+                ConfigurationManager.OpenExeConfiguration(string.Format("{0}\\{1}.exe", assemblyPath, "SoDotCash"));
+
+            //config.AppSettings.Settings["RunMaintenance"].Value = "false";
+            var getSection = config.GetSection("applicationSettings");
+            Console.WriteLine(getSection);
+
+            var settingsGroup = config.SectionGroups["userSettings"];
+            var settings =
+                settingsGroup.Sections[string.Format("{0}.Properties.Settings", assemblyName)] as ClientSettingsSection;
+            var settingsElement = settings.Settings.Get(setting);
+
+            settings.Settings.Remove(settingsElement);
+            settingsElement.Value.ValueXml.InnerText = value;
+            settings.Settings.Add(settingsElement);
+
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+        }
 
     }
 }

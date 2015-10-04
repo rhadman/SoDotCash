@@ -1,4 +1,7 @@
-﻿
+﻿using System.Windows.Media;
+using FirstFloor.ModernUI.Presentation;
+using SoDotCash.Properties;
+
 namespace SoDotCash
 {
     /// <summary>
@@ -6,5 +9,9 @@ namespace SoDotCash
     /// </summary>
     public partial class App
     {
+        public App()
+        {
+            
+        }
     }
 }

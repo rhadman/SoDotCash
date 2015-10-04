@@ -49,9 +49,18 @@
                             </HierarchicalDataTemplate.ItemTemplate>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
+                    <TreeView.Style>
+                        <Style BasedOn="{StaticResource {x:Type TreeView}}" TargetType="TreeView">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Background" Value="Red" />
+                                    
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TreeView.Style>
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                            <!--So.Cash Added properties-->
                             <Style.Triggers>
                                 <Trigger Property="HasItems" Value="True">
                                     <Setter Property="Focusable" Value="False" />
@@ -63,7 +72,7 @@
 
             </Grid>
 
-            <mui:ModernTab Grid.Column="1" x:Name="TabControl" IsEnabled="{Binding ElementName=AccountsList, Mode=OneWay, Path=SelectedValue, Converter={StaticResource SelectedValueToIsEnabled}}" 
+            <mui:ModernTab Grid.Column="1" Name="TabFrame" IsEnabled="{Binding ElementName=AccountsList, Mode=OneWay, Path=SelectedValue, Converter={StaticResource SelectedValueToIsEnabled}}" 
                        SelectedSource="{Binding SelectedTabSource, Mode=TwoWay}" >
                 <mui:ModernTab.Links>
                     <mui:Link DisplayName="Graph" Source="/Views/AccountsViewTabs/AccountGraph.xaml" />

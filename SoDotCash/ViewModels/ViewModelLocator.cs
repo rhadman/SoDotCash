@@ -13,6 +13,8 @@
 */
 
 using System;
+using System.Windows.Media;
+using FirstFloor.ModernUI.Presentation;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 using SoDotCash.ViewModels.Navigation;
@@ -30,6 +32,28 @@ namespace SoDotCash.ViewModels
         /// </summary>
         public ViewModelLocator()
         {
+            //load user visual preferences
+            switch (Properties.Settings.Default.Theme)
+            {
+                default:
+                case "dark":
+                    AppearanceManager.Current.ThemeSource = AppearanceManager.DarkThemeSource;
+                    break;
+                case "light":
+                    AppearanceManager.Current.ThemeSource = AppearanceManager.LightThemeSource;
+                    break;
+            }
+
+            var convertFromString = ColorConverter.ConvertFromString(Properties.Settings.Default.Accent);
+            if (convertFromString != null)
+                AppearanceManager.Current.AccentColor = (Color) convertFromString;
+            else
+            {
+                convertFromString = ColorConverter.ConvertFromString("#FF1BA1E2");
+                AppearanceManager.Current.AccentColor = (Color)convertFromString;
+            }
+
+
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
             SimpleIoc.Default.Register<MainViewModel>();

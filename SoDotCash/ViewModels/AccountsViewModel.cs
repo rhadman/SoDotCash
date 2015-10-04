@@ -578,10 +578,7 @@ namespace SoDotCash.ViewModels
             RaisePropertyChanged(() => SelectedAccountDailyBalances);
 
             // Move to transactions tab
-            Application.Current.Dispatcher.Invoke(() =>
-                NavigationCommands.GoToPage.Execute("/Views/AccountsViewTabs/AccountLedger.xaml",
-                    NavigationService.GetDescendantFromName(Application.Current.MainWindow, "TabFrame"))
-                );
+            SelectedTabSource = "/Views/AccountsViewTabs/AccountLedger.xaml";
         }
 
 
@@ -607,10 +604,7 @@ namespace SoDotCash.ViewModels
             RaisePropertyChanged(() => SelectedAccountDailyBalances);
             // Move to transactions tab
 
-            await Application.Current.Dispatcher.BeginInvoke((Action) (() =>
-                NavigationCommands.GoToPage.Execute("/Views/AccountsViewTabs/AccountLedger.xaml",
-                    NavigationService.GetDescendantFromName(Application.Current.MainWindow, "TabFrame"))
-                ));
+            SelectedTabSource = "/Views/AccountsViewTabs/AccountLedger.xaml";
         }
 
         /// <summary>
