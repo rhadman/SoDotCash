@@ -177,7 +177,7 @@ namespace SoDotCash.Services
             // Look for existing user under this FI with same userId
             try
             {
-                fiUser = fi.Users.First(u => u.UserId == fiUser.UserId && u.Password == fiUser.Password);
+                fiUser = fi.Users.First(u => u.UserId == fiUser.UserId);
             }
             catch (Exception ex)
             {

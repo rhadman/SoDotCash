@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
+using System.Text;
 
 
 namespace SoDotCash.Models
@@ -33,9 +36,54 @@ namespace SoDotCash.Models
         /// <summary>
         /// User provided password for the OFX online update service
         /// </summary>
-        [StringLength(50)]
-        public string Password { get; set; }
+        [StringLength(500)]
+        [Column("Password")]
+        private string _Password { get; set; }
 
+        /// <summary>
+        /// Wrapper that encrypts password stored in the database
+        /// </summary>
+        public string Password
+        {
+            get
+            {
+                // Convert from base64 to bytes
+                var combined = Convert.FromBase64String(_Password);
+
+                // Split into entropy and ciphertext
+                var entropy = new byte[20];
+                Array.Copy(combined, 0, entropy, 0, 20);
+                var ciphertext = new byte[combined.Length - 20];
+                Array.Copy(combined, 20, ciphertext, 0, ciphertext.Length);
+
+                // Decrypt with current user credentials
+                var plaintext = ProtectedData.Unprotect(ciphertext, entropy, DataProtectionScope.CurrentUser);
+
+                // Convert to a string and return
+                return Encoding.UTF8.GetString(plaintext);
+            }
+            set
+            {
+                // Data to protect. Convert a string to a byte[] using Encoding.UTF8.GetBytes().
+                var plaintext = Encoding.UTF8.GetBytes(value);
+
+                // Generate additional entropy (will be used as the Initialization vector)
+                var entropy = new byte[20];
+                using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
+                    rng.GetBytes(entropy);
+
+                // Encrypt with current user credentials
+                var ciphertext = ProtectedData.Protect(plaintext, entropy, DataProtectionScope.CurrentUser);
+
+                // Combine entropy and ciphertext
+                var combined = new byte[entropy.Length + ciphertext.Length];
+                Buffer.BlockCopy(entropy, 0, combined, 0, entropy.Length);
+                Buffer.BlockCopy(ciphertext, 0, combined, entropy.Length, ciphertext.Length);
+
+                // Convert to base64 for storage
+                _Password = Convert.ToBase64String(combined);
+            }
+        }
 
         /// <summary>
         /// Relationship link to the FI this user and credentials apply
