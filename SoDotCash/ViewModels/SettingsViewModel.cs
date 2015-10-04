@@ -2,34 +2,14 @@
 using System.Linq;
 using System.Windows.Media;
 using FirstFloor.ModernUI.Presentation;
-// ReSharper disable InvertIf
 
 namespace SoDotCash.ViewModels
 {
+    /// <summary>
+    /// View model for the settings selection
+    /// </summary>
     public class SettingsViewModel : NotifyPropertyChanged
     {
-        private const string FontSmall = "small";
-        private const string FontLarge = "large";
-
-        // 9 accent colors from metro design principles
-        /*private Color[] accentColors = new Color[]{
-            Color.FromRgb(0x33, 0x99, 0xff),   // blue
-            Color.FromRgb(0x00, 0xab, 0xa9),   // teal
-            Color.FromRgb(0x33, 0x99, 0x33),   // green
-            Color.FromRgb(0x8c, 0xbf, 0x26),   // lime
-            Color.FromRgb(0xf0, 0x96, 0x09),   // orange
-            Color.FromRgb(0xff, 0x45, 0x00),   // orange red
-            Color.FromRgb(0xe5, 0x14, 0x00),   // red
-            Color.FromRgb(0xff, 0x00, 0x97),   // magenta
-            Color.FromRgb(0xa2, 0x00, 0xff),   // purple            
-        };*/
-
-        // 20 accent colors from Windows Phone 8
-
-        private Color _selectedAccentColor;
-        private readonly LinkCollection _themes = new LinkCollection();
-        private Link _selectedTheme;
-        private string _selectedFontSize;
 
         public SettingsViewModel()
         {
@@ -37,12 +17,19 @@ namespace SoDotCash.ViewModels
             _themes.Add(new Link {DisplayName = "dark", Source = AppearanceManager.DarkThemeSource});
             _themes.Add(new Link {DisplayName = "light", Source = AppearanceManager.LightThemeSource});
 
+            // Ensure our font size value reflects the font size in use
             SelectedFontSize = AppearanceManager.Current.FontSize == FontSize.Large ? FontLarge : FontSmall;
+
+            // Synchronize view model variables with in-use variables
             SyncThemeAndColor();
 
+            // Recieve notification of appearance changes
             AppearanceManager.Current.PropertyChanged += OnAppearanceManagerPropertyChanged;
         }
 
+        /// <summary>
+        /// Update the viewmodel variables for theme and color to reflect those in use
+        /// </summary>
         private void SyncThemeAndColor()
         {
             // synchronizes the selected viewmodel theme with the actual theme used by the appearance manager.
@@ -52,6 +39,11 @@ namespace SoDotCash.ViewModels
             SelectedAccentColor = AppearanceManager.Current.AccentColor;
         }
 
+        /// <summary>
+        /// Handle change of appearance property by updating our state
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnAppearanceManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ThemeSource" || e.PropertyName == "AccentColor")
@@ -60,10 +52,80 @@ namespace SoDotCash.ViewModels
             }
         }
 
+        /// <summary>
+        /// Available font size
+        /// </summary>
+        private const string FontSmall = "small";
+        private const string FontLarge = "large";
+        public string[] FontSizes => new[] { FontSmall, FontLarge };
+
+        /// <summary>
+        /// The current UI accent color
+        /// </summary>
+        private Color _selectedAccentColor;
+        public Color SelectedAccentColor
+        {
+            get { return _selectedAccentColor; }
+            set
+            {
+                if (_selectedAccentColor != value)
+                {
+                    _selectedAccentColor = value;
+                    OnPropertyChanged("SelectedAccentColor");
+
+                    AppearanceManager.Current.AccentColor = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// List of available color themes
+        /// </summary>
+        private readonly LinkCollection _themes = new LinkCollection();
         public LinkCollection Themes => _themes;
 
-        public string[] FontSizes => new[] {FontSmall, FontLarge};
+        /// <summary>
+        /// The selected color theme for the application
+        /// </summary>
+        private Link _selectedTheme;
+        public Link SelectedTheme
+        {
+            get { return _selectedTheme; }
+            set
+            {
+                if (_selectedTheme != value)
+                {
+                    _selectedTheme = value;
+                    OnPropertyChanged("SelectedTheme");
 
+                    // and update the actual theme
+                    AppearanceManager.Current.ThemeSource = value.Source;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Selected font size for the application
+        /// </summary>
+        private string _selectedFontSize;
+        public string SelectedFontSize
+        {
+            get { return _selectedFontSize; }
+            set
+            {
+                if (_selectedFontSize != value)
+                {
+                    _selectedFontSize = value;
+                    OnPropertyChanged("SelectedFontSize");
+
+                    AppearanceManager.Current.FontSize = value == FontLarge ? FontSize.Large : FontSize.Small;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Available accent colors
+        /// </summary>
         public Color[] AccentColors { get; } =
             {
                 Color.FromRgb(0xa4, 0xc4, 0x00), // lime
@@ -88,50 +150,5 @@ namespace SoDotCash.ViewModels
                 Color.FromRgb(0x87, 0x79, 0x4e) // taupe
             };
 
-        public Link SelectedTheme
-        {
-            get { return _selectedTheme; }
-            set
-            {
-                if (_selectedTheme != value)
-                {
-                    _selectedTheme = value;
-                    OnPropertyChanged("SelectedTheme");
-
-                    // and update the actual theme
-                    AppearanceManager.Current.ThemeSource = value.Source;
-                }
-            }
-        }
-
-        public string SelectedFontSize
-        {
-            get { return _selectedFontSize; }
-            set
-            {
-                if (_selectedFontSize != value)
-                {
-                    _selectedFontSize = value;
-                    OnPropertyChanged("SelectedFontSize");
-
-                    AppearanceManager.Current.FontSize = value == FontLarge ? FontSize.Large : FontSize.Small;
-                }
-            }
-        }
-
-        public Color SelectedAccentColor
-        {
-            get { return _selectedAccentColor; }
-            set
-            {
-                if (_selectedAccentColor != value)
-                {
-                    _selectedAccentColor = value;
-                    OnPropertyChanged("SelectedAccentColor");
-
-                    AppearanceManager.Current.AccentColor = value;
-                }
-            }
-        }
     }
 }
