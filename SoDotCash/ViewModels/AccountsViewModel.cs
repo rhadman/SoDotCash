@@ -79,6 +79,7 @@ namespace SoDotCash.ViewModels
 
                 // Transactions will be updated since this is a different account
                 _transactions = null;
+                _cachedSelectedAccountDailyBalances = null;
                 RaisePropertyChanged(() => Transactions);
                 RaisePropertyChanged(() => SelectedAccountDailyBalances);
                 RaisePropertyChanged(() => AccountHighBalance);
@@ -163,6 +164,22 @@ namespace SoDotCash.ViewModels
         }
 
         /// <summary>
+        /// Set the balance on each entry in a date-ordered list of transactions
+        /// </summary>
+        /// <param name="transactions">Date ordered list of transactions</param>
+        private void CalculateTransactionBalances(IEnumerable<Transaction> transactions)
+        {
+            // Calculate running balance
+            int balance = 0;
+            foreach (var transaction in transactions)
+            {
+                // Calculate balance
+                balance += transaction.Amount;
+                transaction.Balance = balance;
+            }
+        }
+
+        /// <summary>
         /// Provides the collection of transactions for the currently selected account
         /// </summary>
         private ObservableCollection<Transaction>_transactions ; 
@@ -175,22 +192,18 @@ namespace SoDotCash.ViewModels
                 using (var dataService = new DataService())
                 {
                     // Retrieve account - we need to get an entity in the current db session
-                    var transactions = dataService.GetTransactionsByDate(SelectedAccount);
+                    var transactions = new List<Transaction>(dataService.GetTransactionsByDate(SelectedAccount));
 
-                    // Calculate running balance and attach edit notifications
-                    int balance = 0;
+                    // Calculate running balance
+                    CalculateTransactionBalances(transactions);
+
+                    // Attach notifications for edit events
                     foreach (var transaction in transactions)
-                    {
-                        // Calculate balance
-                        balance += transaction.Amount;
-                        transaction.Balance = balance;
-
-                        // Attach notifications for edit events
                         transaction.EditEnded += OnTransactionEditEnded;
-                    }
 
                     // Reverse transactions so newest are listed first
-                    _transactions = new ObservableCollection<Transaction>(transactions.Reverse());
+                    transactions.Reverse();
+                    _transactions = new ObservableCollection<Transaction>(transactions);
 
                     // Ensure the new item row is at the top of the view
                     ((IEditableCollectionView) CollectionViewSource.GetDefaultView(_transactions)).NewItemPlaceholderPosition = NewItemPlaceholderPosition.AtBeginning;
@@ -265,10 +278,15 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound daily balances for the selected account
         /// </summary>
+        private IEnumerable<DailyBalance> _cachedSelectedAccountDailyBalances;
         public IEnumerable<DailyBalance> SelectedAccountDailyBalances
         {
             get
             {
+                // Return cached value if set
+                if (_cachedSelectedAccountDailyBalances != null)
+                    return _cachedSelectedAccountDailyBalances;
+
                 // Retrieve transactions
                 var transactions = _transactions ?? Transactions;
                 if (transactions == null)
@@ -276,10 +294,69 @@ namespace SoDotCash.ViewModels
 
                 var startDate = DateTime.Now - new TimeSpan(SummaryDays, 0, 0, 0);
 
-                var result = (from balance in GetDailyBalances(transactions) where balance.Date >= startDate orderby balance.Date select balance );
-                return result;
+                _cachedSelectedAccountDailyBalances = (from balance in GetDailyBalances(transactions) where balance.Date >= startDate orderby balance.Date select balance);
+                return _cachedSelectedAccountDailyBalances;
             }
             
+        }
+
+        /// <summary>
+        /// Bound daily balances for the all accounts combined
+        /// </summary>
+        private IEnumerable<DailyBalance> _cachedSumDailyBalances;
+        public IEnumerable<DailyBalance> SumDailyBalances
+        {
+            get
+            {
+                // Return cached value if set
+                if (_cachedSumDailyBalances != null)
+                    return _cachedSumDailyBalances;
+
+                // Walk each account
+                var accounts = AccountsView;
+                if (accounts == null)
+                    return null;
+
+                // Sum balance for each day
+                var sumByDate = new Dictionary<DateTime, DailyBalance>();
+
+                using (var dataService = new DataService())
+                {
+                    foreach (var categoryAccounts in accounts.Values)
+                    {
+                        foreach (var account in categoryAccounts)
+                        {
+                            // Retrieve account - we need to get an entity in the current db session
+                            var transactions = new List<Transaction>(dataService.GetTransactionsByDate(account));
+
+                            // Calculate running balance
+                            CalculateTransactionBalances(transactions);
+
+                            var dailyBalances = GetDailyBalances(transactions);
+                            if (dailyBalances == null)
+                                continue;
+
+                            foreach (var balance in dailyBalances)
+                            {
+                                // If we already have an entry for this day, add to it, otherwise add new entry
+                                if (sumByDate.ContainsKey(balance.Date))
+                                    sumByDate[balance.Date].Balance += balance.Balance;
+                                else
+                                    sumByDate[balance.Date] = balance;
+                            }
+
+                        }
+                    }
+                }
+
+
+                // Select all sum balances for the summary days period ordered by date
+                var startDate = DateTime.Now - new TimeSpan(SummaryDays, 0, 0, 0);
+                _cachedSumDailyBalances = (from balance in sumByDate.Values where balance.Date >= startDate orderby balance.Date select balance);
+                return _cachedSumDailyBalances;
+
+            }
+
         }
 
         /// <summary>
@@ -356,6 +433,42 @@ namespace SoDotCash.ViewModels
             get
             {
                 var balances = SelectedAccountDailyBalances;
+                return balances == null || !balances.Any() ? 0.0m : (from balance in balances select balance.Balance).Average();
+            }
+        }
+
+        /// <summary>
+        /// High daily balance over the configured summary days (all accounts)
+        /// </summary>
+        public DailyBalance SumHighBalance
+        {
+            get
+            {
+                var balances = SumDailyBalances;
+                return balances == null || !balances.Any() ? null : (from balance in balances orderby balance.Balance descending select balance).First();
+            }
+        }
+
+        /// <summary>
+        /// Low daily balance over the configured summary days (all accounts)
+        /// </summary>
+        public DailyBalance SumLowBalance
+        {
+            get
+            {
+                var balances = SumDailyBalances;
+                return balances == null || !balances.Any() ? null : (from balance in balances orderby balance.Balance select balance).First();
+            }
+        }
+
+        /// <summary>
+        /// Average daily balance over the configured summary days - just the balance (all accounts)
+        /// </summary>
+        public decimal SumAvgBalance
+        {
+            get
+            {
+                var balances = SumDailyBalances;
                 return balances == null || !balances.Any() ? 0.0m : (from balance in balances select balance.Balance).Average();
             }
         }
@@ -471,6 +584,9 @@ namespace SoDotCash.ViewModels
                         break;
                     }
             }
+
+            // Refresh sum balances
+            _cachedSumDailyBalances = null;
         }
 
         /// <summary>
@@ -574,6 +690,8 @@ namespace SoDotCash.ViewModels
             }
 
             // Update transactions
+            _cachedSumDailyBalances = null;
+            _cachedSelectedAccountDailyBalances = null;
             RaisePropertyChanged(() => Transactions);
             RaisePropertyChanged(() => SelectedAccountDailyBalances);
 
@@ -600,6 +718,8 @@ namespace SoDotCash.ViewModels
             await UpdateService.DownloadOfxTransactionsForAccount(SelectedAccount).ConfigureAwait(false);
 
             // Update transactions
+            _cachedSumDailyBalances = null;
+            _cachedSelectedAccountDailyBalances = null;
             RaisePropertyChanged(() => Transactions);
             RaisePropertyChanged(() => SelectedAccountDailyBalances);
             // Move to transactions tab
