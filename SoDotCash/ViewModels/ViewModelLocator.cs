@@ -44,14 +44,22 @@ namespace SoDotCash.ViewModels
                     break;
             }
 
-            var convertFromString = ColorConverter.ConvertFromString(Properties.Settings.Default.Accent);
-            if (convertFromString != null)
-                AppearanceManager.Current.AccentColor = (Color) convertFromString;
-            else
+            //try to convert the color in the config file to be a color
+            //if any of it fails then set it to the default color
+            try
             {
+                var convertFromString = ColorConverter.ConvertFromString(Properties.Settings.Default.Accent);
+                if (convertFromString != null)
+                    AppearanceManager.Current.AccentColor = (Color) convertFromString;
                 convertFromString = ColorConverter.ConvertFromString("#FF1BA1E2");
-                AppearanceManager.Current.AccentColor = (Color)convertFromString;
+                AppearanceManager.Current.AccentColor = (Color) convertFromString;
             }
+            
+            catch (Exception)
+            {   
+                AppearanceManager.Current.AccentColor = (Color) ColorConverter.ConvertFromString("#FF1BA1E2");
+            }
+
 
 
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
