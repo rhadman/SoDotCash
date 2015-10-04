@@ -78,6 +78,7 @@ namespace SoDotCash.ViewModels
                 RaisePropertyChanged(() => HasSelectedAccount);
 
                 // Transactions will be updated since this is a different account
+                _transactions = null;
                 RaisePropertyChanged(() => Transactions);
                 RaisePropertyChanged(() => SelectedAccountDailyBalances);
                 RaisePropertyChanged(() => AccountHighBalance);
