@@ -1,7 +1,5 @@
 ﻿using System.Windows.Input;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using SoDotCash.Models;
 using SoDotCash.ViewModels.Navigation;
 
 namespace SoDotCash.ViewModels

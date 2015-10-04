@@ -15,7 +15,6 @@
 using System;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
-using SoDotCash.Models;
 using SoDotCash.ViewModels.Navigation;
 
 namespace SoDotCash.ViewModels
@@ -26,10 +25,6 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class ViewModelLocator
     {
-        private readonly IModernNavigationService _modernNavigationService;
-
-
-
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
@@ -94,7 +89,6 @@ namespace SoDotCash.ViewModels
 
         public static void Cleanup()
         {
-            // TODO Clear the ViewModels
         }
     }
 }
