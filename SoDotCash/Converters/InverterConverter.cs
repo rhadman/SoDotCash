@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace SoDotCash.Utility
+namespace SoDotCash.Converters
 {
 
     /// <summary>

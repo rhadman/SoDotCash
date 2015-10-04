@@ -22,7 +22,7 @@
             <!--Converters-->
             <conv:BoolToInverseBoolConverter x:Key="BoolToInverseBoolConverter"/>
             <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-            <utility:InverterConverter x:Key="InverterConverter"/>
+            <conv:InverterConverter x:Key="InverterConverter"/>
             <conv:IsNotNullConverter x:Key="SelectedValueToIsEnabled" />
         </ResourceDictionary>
     </Application.Resources>

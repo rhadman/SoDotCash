@@ -215,6 +215,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\BoolToInverseBoolConverter.cs" />
+    <Compile Include="Converters\InverterConverter.cs" />
     <Compile Include="Converters\NumberToIsPositiveConverter.cs" />
     <Compile Include="Converters\IsNotNullConverter.cs" />
     <Compile Include="Models\Account.cs" />
@@ -234,7 +235,6 @@
       <DependentUpon>SoCash.xsd</DependentUpon>
     </Compile>
     <Compile Include="Utility\BindableSelectedItemBehavior.cs" />
-    <Compile Include="Utility\InverterConverter.cs" />
     <Compile Include="ViewModels\AccountsViewModel.cs" />
     <Compile Include="ViewModels\AddAccountViewModel.cs" />
     <Compile Include="ViewModels\InitViewModel.cs" />
