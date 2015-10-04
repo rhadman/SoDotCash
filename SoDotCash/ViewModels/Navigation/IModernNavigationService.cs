@@ -8,7 +8,8 @@ namespace SoDotCash.ViewModels.Navigation
     public interface IModernNavigationService : INavigationService
     {
         object Parameter { get; }
-
+        
         void ClearNavigationHistory();
+
     }
 }

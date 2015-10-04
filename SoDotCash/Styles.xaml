@@ -4,6 +4,9 @@
                     xmlns:conv="clr-namespace:SoDotCash.Converters"
                     >
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ModernWindow.xaml" />
+    </ResourceDictionary.MergedDictionaries>
     <conv:NumberToIsPositiveConverter x:Key="NumberToIsPositive" />
 
     <!-- Allows a ListItem to be presented as a radio button -->

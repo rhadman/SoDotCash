@@ -17,6 +17,7 @@
         DataContext="{Binding Main, Source={StaticResource Locator}}"
         MinWidth="1250"
         MinHeight="350"
+        Style="{StaticResource MyModernWindow}"
         >
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">

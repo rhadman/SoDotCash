@@ -4,12 +4,23 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SoDotCash.Views"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:modernUi="clr-namespace:FirstFloor.ModernUI;assembly=FirstFloor.ModernUI"
              mc:Ignorable="d" 
              DataContext="{Binding Source={StaticResource Locator}, Path=Settings}"
              >
     <Grid>
+        <mui:ModernButton Margin="0,-50,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+            EllipseDiameter="24" IconWidth="12" IconHeight="12" 
+            IconData="F1 M 33,22L 33,26L 19.75,26L 27,33L 20.5,33L 11,24L 20.5,15L 27,15L 19.75,22L 33,22 Z"
+            Command="NavigationCommands.BrowseBack"
+            Content="Back"
+            CommandTarget="{Binding ElementName=ContentFrame}" 
+            ToolTip="{x:Static modernUi:Resources.Back}"
+            WindowChrome.IsHitTestVisibleInChrome="True" />
         <ScrollViewer>
             <StackPanel x:Name="Panel" MinWidth="150">
+                
                 <TextBlock Text="Accent Color" Style="{StaticResource Heading2}" Margin="0,0,0,8" />
 
                 <ListBox ItemsSource="{Binding AccentColors}"

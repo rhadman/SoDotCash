@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using FirstFloor.ModernUI.Windows.Controls;
+using SoDotCash.Models;
 
 namespace SoDotCash.ViewModels.Navigation
 {
@@ -33,7 +36,7 @@ namespace SoDotCash.ViewModels.Navigation
         #endregion
 
         #region [ IModernNavigationService Implementation ]
-
+        
         /// <summary>
         /// Return to the previous page in the navigation stack
         /// </summary>
