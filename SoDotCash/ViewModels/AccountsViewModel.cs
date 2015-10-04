@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -563,6 +562,9 @@ namespace SoDotCash.ViewModels
             // Store in cached view
             _accountsView = accountsByType;
 
+            // Clear cache of summary data
+            ClearSummaryCache();
+
             // Notify of property update
             RaisePropertyChanged(() => AccountsView);
         }
@@ -589,7 +591,7 @@ namespace SoDotCash.ViewModels
             }
 
             // Refresh sum balances
-            _cachedSumDailyBalances = null;
+            ClearSummaryCache();
         }
 
         /// <summary>
@@ -698,8 +700,7 @@ namespace SoDotCash.ViewModels
             }).ConfigureAwait(false);
 
             // Update transactions
-            _cachedSumDailyBalances = null;
-            _cachedSelectedAccountDailyBalances = null;
+            ClearSummaryCache();
             RaisePropertyChanged(() => Transactions);
             RaisePropertyChanged(() => SelectedAccountDailyBalances);
 
@@ -726,8 +727,7 @@ namespace SoDotCash.ViewModels
             await UpdateService.DownloadOfxTransactionsForAccount(SelectedAccount).ConfigureAwait(false);
 
             // Update transactions
-            _cachedSumDailyBalances = null;
-            _cachedSelectedAccountDailyBalances = null;
+            ClearSummaryCache();
             RaisePropertyChanged(() => Transactions);
             RaisePropertyChanged(() => SelectedAccountDailyBalances);
             // Move to transactions tab
@@ -758,12 +758,8 @@ namespace SoDotCash.ViewModels
             // Set to no account
             SelectedAccount = null;
 
-            // Return to Overview tab
-
-            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
-               NavigationCommands.GoToPage.Execute("/Views/AccountsViewTabs/AccountGraph.xaml",
-                   NavigationService.GetDescendantFromName(Application.Current.MainWindow, "TabFrame"))
-                ));
+            // Return to no tab selected
+            SelectedTabSource = null;
 
             // Update the list of accounts
             UpdateAccounts();
@@ -871,6 +867,18 @@ namespace SoDotCash.ViewModels
 
             // Saved
             CredentialsVerified = true;
+        }
+
+        /// <summary>
+        /// Helper method to clear the summary data cache and notify of changes
+        /// </summary>
+        private void ClearSummaryCache()
+        {
+            _cachedSumDailyBalances = null;
+            RaisePropertyChanged(() => SumDailyBalances);
+            RaisePropertyChanged(() => SumAvgBalance);
+            RaisePropertyChanged(() => SumHighBalance);
+            RaisePropertyChanged(() => SumLowBalance);
         }
 
     }
