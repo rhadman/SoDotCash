@@ -16,7 +16,7 @@
         IsTitleVisible="True"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
         MinWidth="1250"
-        MinHeight="350"
+        MinHeight="400"
         >
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">

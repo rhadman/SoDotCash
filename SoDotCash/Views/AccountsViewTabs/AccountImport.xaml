@@ -10,7 +10,7 @@
              DataContext="{Binding Source={StaticResource Locator}, Path=Accounts}"
              >
 
-    <Grid Width="730" Height="300">
+    <Grid Width="730" Height="350">
         <StackPanel Orientation="Vertical">
             <TextBlock Margin="10" Text="This section allows you to import transactions from an OFX/QFX file. If this account is linked with a supported online financial institution, you may also download transactions." TextWrapping="Wrap"/>
             <StackPanel Orientation="Horizontal" Margin="10">

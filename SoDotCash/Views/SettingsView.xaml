@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:SoDotCash.Views"
              mc:Ignorable="d" 
              DataContext="{Binding Source={StaticResource Locator}, Path=Settings}"
+             Width="1250"
+             Height="400"
              >
     <Grid>
         <ScrollViewer>

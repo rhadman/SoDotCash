@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:SoDotCash.Views"
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              mc:Ignorable="d"
-             Height="350" Width="950"
+             Height="400" Width="1250"
              DataContext="{Binding Welcome, Source={StaticResource Locator}}">
     <Grid>
         <DockPanel>
