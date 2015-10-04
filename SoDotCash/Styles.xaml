@@ -7,7 +7,7 @@
     <conv:NumberToIsPositiveConverter x:Key="NumberToIsPositive" />
 
     <!-- Allows a ListItem to be presented as a radio button -->
-    <Style x:Key="RadioButtonListItem" TargetType="{x:Type ListBoxItem}" >
+    <Style x:Key="RadioButtonListItem" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}" >
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
@@ -27,7 +27,7 @@
     </Style>
 
     <!-- Allows a ListBox control to be styled as multiple radio buttons -->
-    <Style x:Key="RadioButtonList" TargetType="ListBox">
+    <Style x:Key="RadioButtonList" TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
         <Style.Resources>
             <Style TargetType="Label">
                 <Setter Property="Padding" Value="0" />
@@ -35,7 +35,8 @@
         </Style.Resources>
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Background"      Value="Transparent" />
-        <Setter Property="TextBlock.Foreground"      Value="WhiteSmoke" />
+        <!--<Setter Property="TextBlock.Foreground"      Value="WhiteSmoke" />-->
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource ItemText}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource RadioButtonListItem}" />
         <Setter Property="Control.Template">
             <Setter.Value>
