@@ -38,17 +38,18 @@ namespace SoDotCash.Models
         /// </summary>
         [StringLength(500)]
         [Column("Password")]
-        private string _Password { get; set; }
+        public string EncryptedPassword { get; set; }
 
         /// <summary>
         /// Wrapper that encrypts password stored in the database
         /// </summary>
+        [NotMapped]
         public string Password
         {
             get
             {
                 // Convert from base64 to bytes
-                var combined = Convert.FromBase64String(_Password);
+                var combined = Convert.FromBase64String(EncryptedPassword);
 
                 // Split into entropy and ciphertext
                 var entropy = new byte[20];
@@ -81,7 +82,7 @@ namespace SoDotCash.Models
                 Buffer.BlockCopy(ciphertext, 0, combined, entropy.Length, ciphertext.Length);
 
                 // Convert to base64 for storage
-                _Password = Convert.ToBase64String(combined);
+                EncryptedPassword = Convert.ToBase64String(combined);
             }
         }
 
