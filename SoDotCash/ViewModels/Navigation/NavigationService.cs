@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using FirstFloor.ModernUI.Windows.Controls;
-using SoDotCash.Models;
 
 namespace SoDotCash.ViewModels.Navigation
 {

@@ -22,6 +22,9 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class AccountsViewModel : ModernViewModelBase
     {
+        /// <summary>
+        /// Accessor to navigation helper
+        /// </summary>
         private readonly IModernNavigationService _modernNavigationService;
 
         public AccountsViewModel(IModernNavigationService navService)
@@ -230,14 +233,12 @@ namespace SoDotCash.ViewModels
         /// </summary>
         /// <param name="transactions">Enumeration of transactions ordered by date</param>
         /// <returns>Ordered collection of daily balances - in the same order as the transactions provided</returns>
-        private static IEnumerable<DailyBalance> GetDailyBalances(IEnumerable<Transaction> transactions)
+        private static ObservableCollection<DailyBalance> GetDailyBalances(ObservableCollection<Transaction> transactions)
         {
             ObservableCollection<DailyBalance> dailyBalances = new ObservableCollection<DailyBalance>();
 
             // Sorted list of transaction dates so we can find the earliest
-            var sortedTransactionDates = from transaction in transactions
-                orderby transaction.Date
-                select transaction.Date;
+            var sortedTransactionDates = new ObservableCollection<DateTime>(from transaction in transactions orderby transaction.Date select transaction.Date);
 
             // If no transactions, nothing to do
             if (!sortedTransactionDates.Any())
@@ -251,15 +252,17 @@ namespace SoDotCash.ViewModels
             // End at the start of tomorrow
             var endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day) + oneDay;
             decimal balance = 0.0m;
-            while (startDate < DateTime.Now)
+            while (startDate < endDate)
             {
+                // Set range for transaction query
+                var currentDate = startDate;
                 var nextDate = startDate + oneDay;
 
                 // Get transactions for day
-                var dailyTransactions = from transaction in transactions
-                    where transaction.Date >= startDate && transaction.Date < nextDate
+                var dailyTransactions = new ObservableCollection <Transaction>(from transaction in transactions
+                    where transaction.Date >= currentDate && transaction.Date < nextDate
                     orderby transaction.Date descending
-                    select transaction;
+                    select transaction);
 
                 // Get ending balance for the day
                 if (dailyTransactions.Any())
@@ -278,8 +281,8 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound daily balances for the selected account
         /// </summary>
-        private IEnumerable<DailyBalance> _cachedSelectedAccountDailyBalances;
-        public IEnumerable<DailyBalance> SelectedAccountDailyBalances
+        private ObservableCollection<DailyBalance> _cachedSelectedAccountDailyBalances;
+        public ObservableCollection<DailyBalance> SelectedAccountDailyBalances
         {
             get
             {
@@ -294,7 +297,7 @@ namespace SoDotCash.ViewModels
 
                 var startDate = DateTime.Now - new TimeSpan(SummaryDays, 0, 0, 0);
 
-                _cachedSelectedAccountDailyBalances = (from balance in GetDailyBalances(transactions) where balance.Date >= startDate orderby balance.Date select balance);
+                _cachedSelectedAccountDailyBalances = new ObservableCollection<DailyBalance>(from balance in GetDailyBalances(transactions) where balance.Date >= startDate orderby balance.Date select balance);
                 return _cachedSelectedAccountDailyBalances;
             }
             
@@ -303,8 +306,8 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Bound daily balances for the all accounts combined
         /// </summary>
-        private IEnumerable<DailyBalance> _cachedSumDailyBalances;
-        public IEnumerable<DailyBalance> SumDailyBalances
+        private ObservableCollection<DailyBalance> _cachedSumDailyBalances;
+        public ObservableCollection<DailyBalance> SumDailyBalances
         {
             get
             {
@@ -327,7 +330,7 @@ namespace SoDotCash.ViewModels
                         foreach (var account in categoryAccounts)
                         {
                             // Retrieve account - we need to get an entity in the current db session
-                            var transactions = new List<Transaction>(dataService.GetTransactionsByDate(account));
+                            var transactions = new ObservableCollection<Transaction>(dataService.GetTransactionsByDate(account));
 
                             // Calculate running balance
                             CalculateTransactionBalances(transactions);
@@ -352,7 +355,7 @@ namespace SoDotCash.ViewModels
 
                 // Select all sum balances for the summary days period ordered by date
                 var startDate = DateTime.Now - new TimeSpan(SummaryDays, 0, 0, 0);
-                _cachedSumDailyBalances = (from balance in sumByDate.Values where balance.Date >= startDate orderby balance.Date select balance);
+                _cachedSumDailyBalances = new ObservableCollection<DailyBalance>(from balance in sumByDate.Values where balance.Date >= startDate orderby balance.Date select balance);
                 return _cachedSumDailyBalances;
 
             }
@@ -682,12 +685,17 @@ namespace SoDotCash.ViewModels
                 return;
             }
 
-            // Open the file the user selected for read
-            using (var ofxFileStream = fileDialog.OpenFile())
+            // Run the merge in the background asychronously
+            await Task.Run(() =>
             {
-                // Parse the file and merge transactions into the current account
-                await Task.Run(() => UpdateService.MergeOfxFileIntoAccount(SelectedAccount, ofxFileStream)).ConfigureAwait(false);
-            }
+                // Open the file the user selected for read
+                using (var ofxFileStream = fileDialog.OpenFile())
+                {
+                    // Parse the file and merge transactions into the current account
+                    UpdateService.MergeOfxFileIntoAccount(SelectedAccount, ofxFileStream);
+                }
+
+            }).ConfigureAwait(false);
 
             // Update transactions
             _cachedSumDailyBalances = null;

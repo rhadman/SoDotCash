@@ -162,6 +162,11 @@ namespace SoDotCash.ViewModels
                 Color.FromRgb(0x87, 0x79, 0x4e) // taupe
             };
 
+        /// <summary>
+        /// Write application setting to the configuration file
+        /// </summary>
+        /// <param name="setting">Setting to write</param>
+        /// <param name="value">Value of setting</param>
         private static void UpdateConfig(string setting, string value)
         {
             var assemblyPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -169,7 +174,7 @@ namespace SoDotCash.ViewModels
 
             //need to modify the configuration file, launch the server with those settings.
             var config =
-                ConfigurationManager.OpenExeConfiguration(string.Format("{0}\\{1}.exe", assemblyPath, "SoDotCash"));
+                ConfigurationManager.OpenExeConfiguration($"{assemblyPath}\\{"SoDotCash"}.exe");
 
             //config.AppSettings.Settings["RunMaintenance"].Value = "false";
             var getSection = config.GetSection("applicationSettings");
@@ -177,12 +182,15 @@ namespace SoDotCash.ViewModels
 
             var settingsGroup = config.SectionGroups["userSettings"];
             var settings =
-                settingsGroup.Sections[string.Format("{0}.Properties.Settings", assemblyName)] as ClientSettingsSection;
-            var settingsElement = settings.Settings.Get(setting);
+                settingsGroup?.Sections[$"{assemblyName}.Properties.Settings"] as ClientSettingsSection;
+            if (settings != null)
+            {
+                var settingsElement = settings.Settings.Get(setting);
 
-            settings.Settings.Remove(settingsElement);
-            settingsElement.Value.ValueXml.InnerText = value;
-            settings.Settings.Add(settingsElement);
+                settings.Settings.Remove(settingsElement);
+                settingsElement.Value.ValueXml.InnerText = value;
+                settings.Settings.Add(settingsElement);
+            }
 
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");

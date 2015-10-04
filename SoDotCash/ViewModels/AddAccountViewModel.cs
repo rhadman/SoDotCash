@@ -441,7 +441,8 @@ namespace SoDotCash.ViewModels
             }
 
             // Start an automatic background retrieval of transactions for this account
-            UpdateService.DownloadOfxTransactionsForAccount(newAccount);
+            var unwaitedTask = UpdateService.DownloadOfxTransactionsForAccount(newAccount);
+            unwaitedTask.ConfigureAwait(false);
 
             return newAccount;
         }

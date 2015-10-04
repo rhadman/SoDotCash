@@ -70,7 +70,6 @@ namespace SoDotCash.ViewModels
             switch (Properties.Settings.Default.Theme)
             {
                 default:
-                case "dark":
                     AppearanceManager.Current.ThemeSource = AppearanceManager.DarkThemeSource;
                     break;
                 case "light":
@@ -86,12 +85,15 @@ namespace SoDotCash.ViewModels
                 if (convertFromString != null)
                     AppearanceManager.Current.AccentColor = (Color)convertFromString;
                 convertFromString = ColorConverter.ConvertFromString("#FF1BA1E2");
-                AppearanceManager.Current.AccentColor = (Color)convertFromString;
+                if (convertFromString != null)
+                    AppearanceManager.Current.AccentColor = (Color)convertFromString;
             }
 
             catch (Exception)
             {
-                AppearanceManager.Current.AccentColor = (Color)ColorConverter.ConvertFromString("#FF1BA1E2");
+                var convertFromString = ColorConverter.ConvertFromString("#FF1BA1E2");
+                if (convertFromString != null)
+                    AppearanceManager.Current.AccentColor = (Color)convertFromString;
             }
         }
 
