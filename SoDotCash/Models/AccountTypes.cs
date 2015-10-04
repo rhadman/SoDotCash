@@ -26,6 +26,7 @@ namespace SoDotCash.Models
         public static readonly AccountType Checking = new AccountType(1, "Checking");
         public static readonly AccountType Savings = new AccountType(2, "Savings");
         public static readonly AccountType Creditcard = new AccountType(3, "Credit Card");
+        public static readonly AccountType Cash = new AccountType(4, "Cash");
 
         private AccountType(int value, string name)
         {
