@@ -153,7 +153,7 @@ namespace SoDotCashTest
         }
 
         /// <summary>
-        /// Test parsing an OFX1 style response file and retrieving respon
+        /// Test parsing an OFX1 style response file
         /// </summary>
         [TestMethod]
         public void TestOfx1()
@@ -172,9 +172,35 @@ namespace SoDotCashTest
                 // Expect: Response message set 0 is SignonResponse
                 Assert.IsInstanceOfType(obj.Items[0], typeof(SignonResponseMessageSetV1));
 
-                string errormessage;
                 // Parses the response to ensure it's valid, and records response data to trace log
-                DumpStatement(Statement.CreateFromOFXResponse(obj, out errormessage));
+                DumpStatement(Statement.CreateFromOFXResponse(obj));
+
+            }
+        }
+
+        /// <summary>
+        /// Test parsing an OFX1 style response file that is invalid
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void TestOfx1Invalid()
+        {
+            using (var stream = new FileStream("test_cc_2.ofx", FileMode.Open))
+            {
+                OFX1ToOFX2Converter converter = new OFX1ToOFX2Converter(stream);
+
+                // Deserialize the XML data 
+                var obj = converter.ConvertToOFX();
+
+                // Expect: 2 response sets
+                Assert.IsNotNull(obj.Items);
+                Assert.AreEqual(obj.Items.Length, 2);
+
+                // Expect: Response message set 0 is SignonResponse
+                Assert.IsInstanceOfType(obj.Items[0], typeof(SignonResponseMessageSetV1));
+
+                // Parses the response to ensure it's valid, and records response data to trace log
+                DumpStatement(Statement.CreateFromOFXResponse(obj));
 
             }
         }
@@ -243,10 +269,10 @@ namespace SoDotCashTest
                     await AuthenticatedOfxService.GetStatement((OFX.Types.CreditCardAccount)account, startTime, DateTimeOffset.Now);
 
                 // Should only be one statement
-                Assert.Equals(statements.Item1.Count(), 1);
+                Assert.Equals(statements.Count(), 1);
 
                 // Iterates statements and transactions, records to debug file and raises exception if the data is invalid
-                DumpStatement(statements.Item1);
+                DumpStatement(statements);
             }
         }
 

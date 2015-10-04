@@ -705,6 +705,7 @@
     <Compile Include="Protocol\YearToDate.cs" />
     <Compile Include="Types\Account.cs" />
     <Compile Include="Types\Credentials.cs" />
+    <Compile Include="Types\Exceptions\OfxException.cs" />
     <Compile Include="Types\FinancialInstitution.cs" />
     <Compile Include="Types\SavingsAccount.cs" />
     <Compile Include="Types\CheckingAccount.cs" />

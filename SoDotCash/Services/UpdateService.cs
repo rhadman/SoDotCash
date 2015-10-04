@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using OFX;
+using OFX.Types.Exceptions;
 using SoDotCash.Models;
 
 namespace SoDotCash.Services
@@ -133,18 +134,26 @@ namespace SoDotCash.Services
 
                 // Deserialize the OFX file data to an object form
                 var converter = new OFX1ToOFX2Converter(ofxFileStream);
-                string errorMessage;
 
-                var statements = OFX.Types.Statement.CreateFromOFXResponse(converter.ConvertToOFX(), out errorMessage);
-
-                if (!String.IsNullOrEmpty(errorMessage) || !String.IsNullOrWhiteSpace(errorMessage))
+                // Convert file into statements
+                try
                 {
-                    MessageBox.Show(errorMessage, "Error");
-                }
+                    var statements = OFX.Types.Statement.CreateFromOFXResponse(converter.ConvertToOFX());
 
-                else
+                    // Merge statements
                     foreach (var statement in statements)
                         MergeStatementTransactionsIntoAccount(account, statement);
+
+                }
+                catch (OfxException ex)
+                {
+                    MessageBox.Show(ex.Message, "Error");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show("The provided OFX file could not be parsed.", "Error");
+                }
+
             }
 
         }
@@ -241,15 +250,22 @@ namespace SoDotCash.Services
                 }
 
                 // Retrieve statement(s) (should only be one per protocol, but we can handle any number)
-                var ofxStatments = await ofxService.GetStatement(ofxAccount, startTime, endTime).ConfigureAwait(false);
-
-                if (!String.IsNullOrEmpty(ofxStatments.Item2) || !String.IsNullOrWhiteSpace(ofxStatments.Item2))
+                try
                 {
-                    MessageBox.Show(ofxStatments.Item2, "Error");
+                    var ofxStatments =
+                        await ofxService.GetStatement(ofxAccount, startTime, endTime).ConfigureAwait(false);
+                    foreach (var ofxStatement in ofxStatments)
+                        MergeStatementTransactionsIntoAccount(account, ofxStatement);
+                }
+                catch (OfxException ex)
+                {
+                    MessageBox.Show(ex.Message, "Error");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show("The data provided by the financial institution could not be parsed.", "Error");
                 }
 
-                foreach (var ofxStatement in ofxStatments.Item1)
-                    MergeStatementTransactionsIntoAccount(account, ofxStatement);
             }
 
         }

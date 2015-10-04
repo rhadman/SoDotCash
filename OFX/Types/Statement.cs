@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OFX.Internal;
 using OFX.Protocol;
+using OFX.Types.Exceptions;
 
 namespace OFX.Types
 {
@@ -79,10 +80,8 @@ namespace OFX.Types
         /// </summary>
         /// <param name="ofxResponse">OFX object populated with one or more statement responses</param>
         /// <returns></returns>
-        public static IEnumerable<Statement> CreateFromOFXResponse(Protocol.OFX ofxResponse, out string errorMessage)
+        public static IEnumerable<Statement> CreateFromOFXResponse(Protocol.OFX ofxResponse)
         {
-            errorMessage = "";
-
             List<Statement> statementList = new List<Statement>();
 
             // Handle Credit Card responses
@@ -117,7 +116,7 @@ namespace OFX.Types
                         statementList.Add(new Statement(transactionResponse.STMTRS));
                     else
                     {
-                        errorMessage = transactionResponse.STATUS.MESSAGE;
+                        throw new OfxException(transactionResponse.STATUS.MESSAGE);
                     }
                 }
             }
