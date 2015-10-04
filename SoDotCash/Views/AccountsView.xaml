@@ -61,7 +61,8 @@
 
         </Grid>
 
-        <mui:ModernTab Grid.Column="1" x:Name="TabControl" IsEnabled="{Binding ElementName=AccountsList, Mode=OneWay, Path=SelectedValue, Converter={StaticResource SelectedValueToIsEnabled}}" >
+        <mui:ModernTab Grid.Column="1" x:Name="TabControl" IsEnabled="{Binding ElementName=AccountsList, Mode=OneWay, Path=SelectedValue, Converter={StaticResource SelectedValueToIsEnabled}}" 
+                       SelectedSource="{Binding SelectedTabSource, Mode=TwoWay}" >
             <mui:ModernTab.Links>
                 <mui:Link DisplayName="Graph" Source="/Views/AccountsViewTabs/AccountGraph.xaml" />
                 <mui:Link DisplayName="Ledger" Source="/Views/AccountsViewTabs/AccountLedger.xaml" />

@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using FirstFloor.ModernUI.Windows.Navigation;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
 using SoDotCash.Models;
@@ -30,8 +27,6 @@ namespace SoDotCash.ViewModels
         public AccountsViewModel(IModernNavigationService navService)
         {
             _modernNavigationService = navService;
-            // Start on Overview tab
-            ActiveTabIndex = TabIndex.Overview;
         }
 
         /// <summary>
@@ -89,19 +84,17 @@ namespace SoDotCash.ViewModels
                 RaisePropertyChanged(() => AccountLowBalance);
                 RaisePropertyChanged(() => AccountAvgBalance);
 
-
                 // Selected account name is changed
                 RaisePropertyChanged(() => SelectedAccountName);
 
                 // Name of account is changed
                 RaisePropertyChanged(() => FiUserName);
 
-                RaisePropertyChanged();
+                // If no tab is selected, show overview tab
+                if (value!=null && String.IsNullOrEmpty(SelectedTabSource))
+                    SelectedTabSource = "/Views/AccountsViewTabs/AccountGraph.xaml";
 
-                //Application.Current.Dispatcher.BeginInvoke((Action) (() =>
-                //    NavigationCommands.GoToPage.Execute("/Views/AccountsViewTabs/AccountGraph.xaml",
-                //        NavigationService.GetDescendantFromName(Application.Current.MainWindow, "TabFrame"))
-                //    ));
+                RaisePropertyChanged();
             }
         }
 
@@ -135,6 +128,8 @@ namespace SoDotCash.ViewModels
                 RaisePropertyChanged(() => SelectedAccount.AccountName);
 
                 RaisePropertyChanged();
+
+                _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
             }
             
         }
@@ -154,29 +149,17 @@ namespace SoDotCash.ViewModels
             }
         }
 
-
         /// <summary>
-        /// Bound index of the active tab in the account data display section
+        /// Bound source XAML path of the currently selected tab
         /// </summary>
-        private TabIndex _activeTabIndex;
-        public TabIndex ActiveTabIndex
+        private string _selectedTabSource;
+        public string SelectedTabSource
         {
-            get { return _activeTabIndex;}
+            get { return _selectedTabSource;  }
             set
             {
-                _activeTabIndex = value;
+                _selectedTabSource = value;
                 RaisePropertyChanged();
-                RaisePropertyChanged(() => ActiveTabIndexAsInt);
-            }
-        }
-        public int ActiveTabIndexAsInt
-        {
-            get { return (int) _activeTabIndex; }
-            set
-            {
-                _activeTabIndex = (TabIndex) value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(() => ActiveTabIndex);
             }
         }
 
