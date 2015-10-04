@@ -50,14 +50,7 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                     <TreeView.Style>
-                        <Style BasedOn="{StaticResource {x:Type TreeView}}" TargetType="TreeView">
-                            <Style.Triggers>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Background" Value="Red" />
-                                    
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
+                        <Style BasedOn="{StaticResource accountViewTreeStyle}" TargetType="TreeView"/>
                     </TreeView.Style>
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
