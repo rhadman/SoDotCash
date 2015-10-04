@@ -467,8 +467,8 @@ namespace SoDotCash.ViewModels
             // Update accounts on accounts view
             locator.Accounts.UpdateAccounts();
 
-            // Set selected
-            locator.Accounts.SelectedAccount = newAccount;
+            // Navigate to empty tab
+            locator.Accounts.SelectedTabSource = null;
 
             // Transition back to accounts view
             _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
