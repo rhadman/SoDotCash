@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SoDotCash.Views.AccountsViewTabs"
+             xmlns:services="clr-namespace:SoDotCash.Services"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              DataContext="{Binding Source={StaticResource Locator}, Path=Accounts}"
              >
@@ -15,7 +17,8 @@
                 <Button x:Name="ButtonImportTransactions" Content="Import Transactions" HorizontalAlignment="Left" VerticalAlignment="Top"  Command="{Binding ImportTransactionsCommand}" />
                 <Button x:Name="ButtonDownloadTransactions" Content="Download Transactions" HorizontalAlignment="Left" VerticalAlignment="Top"  Command="{Binding DownloadTransactionsCommand}" Margin="20,0,0,0"/>
             </StackPanel>
-            
+            <ProgressBar IsIndeterminate="true" Visibility="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=ActionsPending, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <!--<xctk:BusyIndicator IsBusy="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=ActionsPending}" BusyContent="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=CurrentActionDescription}"/>-->
         </StackPanel>
     </Grid>
 
