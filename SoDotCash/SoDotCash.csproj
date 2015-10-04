@@ -216,7 +216,7 @@
     </ApplicationDefinition>
     <Compile Include="Converters\BoolToInverseBoolConverter.cs" />
     <Compile Include="Converters\NumberToIsPositiveConverter.cs" />
-    <Compile Include="Converters\SelectedValueToIsEnabled.cs" />
+    <Compile Include="Converters\IsNotNullConverter.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\AccountTypes.cs" />
     <Compile Include="Models\EditableEntity.cs" />
