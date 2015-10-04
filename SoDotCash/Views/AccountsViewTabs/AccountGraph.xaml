@@ -27,7 +27,7 @@
                 <!--Comment out data points from the default template; just an empty template-->
                 <Grid x:Name="Root" Opacity="1"/>
             </ControlTemplate>
-            <Style x:Key="CommonLineSeriesDataPoint" TargetType="charting:LineDataPoint">
+            <Style x:Key="CommonLineSeriesDataPointBlue" TargetType="charting:LineDataPoint">
                 <Setter Property="IndependentValueStringFormat" Value="{}{0:yyyy}" />
                 <Setter Property="DependentValueStringFormat" Value="{}{0:c0}" />
                 <Setter Property="Background" Value="#FF0077CC" />
@@ -36,8 +36,11 @@
                 <Setter Property="IsTabStop" Value="False" />
                 <Setter Property="Template" Value="{StaticResource CommonLineSeriesDataPointTemplate}" />
             </Style>
+            <Style x:Key="CommonLineSeriesDataPointRed" TargetType="charting:LineDataPoint" BasedOn="{StaticResource CommonLineSeriesDataPointBlue}">
+                <Setter Property="Background" Value="Red" />
+            </Style>
             <Style TargetType="charting:LineSeries">
-                <Setter Property="DataPointStyle" Value="{StaticResource CommonLineSeriesDataPoint}" />
+                <Setter Property="DataPointStyle" Value="{StaticResource CommonLineSeriesDataPointBlue}" />
             </Style>
         </Grid.Resources>
         <Grid>
@@ -140,13 +143,15 @@
                                         DependentValuePath="Balance"
 									    IndependentValuePath="Date"
 									    Title="Historical Balance"
-                                        IsSelectionEnabled="True">
+                                        IsSelectionEnabled="True" 
+                                        DataPointStyle="{StaticResource CommonLineSeriesDataPointRed}">
                                 <charting:LineSeries.IndependentAxis>
                                     <charting:DateTimeAxis Orientation="X"
                                                 ShowGridLines="True"
                                                 AxisLabelStyle="{StaticResource DateTimeAxisLabelStyle}"/>
                                 </charting:LineSeries.IndependentAxis>
                             </charting:LineSeries>
+                          
                             <charting:Chart.Template>
                                 <ControlTemplate TargetType="charting:Chart">
                                     <Border Background="{TemplateBinding Background}"
