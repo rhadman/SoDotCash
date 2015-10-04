@@ -34,8 +34,9 @@ namespace SoDotCash.ViewModels
         {
             // Transition view to add account
             _modernNavigationService.NavigateTo(nameof(ViewModelLocator.AddAccount));
-            //var locator = new ViewModelLocator();
-            //locator.Main.ActiveViewModel = locator.AddAccount;
+
+            // Do not allow navigation back to welcome screen
+            _modernNavigationService.ClearNavigationHistory();
         }
     }
 }
