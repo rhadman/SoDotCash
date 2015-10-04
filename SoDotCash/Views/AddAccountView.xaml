@@ -4,9 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vms="clr-namespace:SoDotCash.ViewModels"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d"
              Height="400" Width="1250"
              DataContext="{Binding AddAccount, Source={StaticResource Locator}}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding ViewLoaded}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>    
     <StackPanel Orientation="Vertical" Margin="10">
 
         <GroupBox Header="Basic Information">
