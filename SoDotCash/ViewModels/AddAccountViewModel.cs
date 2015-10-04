@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using FirstFloor.ModernUI.Windows.Controls;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using SoDotCash.Models;
 using SoDotCash.Services;
 using SoDotCash.ViewModels.Navigation;
-using SoDotCash.Views;
 
 namespace SoDotCash.ViewModels
 {
@@ -443,6 +439,8 @@ namespace SoDotCash.ViewModels
             // Transition back to accounts view
             _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
 
+            // Do not allow navigation back to add account screen
+            _modernNavigationService.ClearNavigationHistory();
         }
 
 
