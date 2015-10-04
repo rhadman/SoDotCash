@@ -12,7 +12,15 @@ namespace SoDotCash.ViewModels
 {
     public class InitViewModel : ModernViewModelBase
     {
+        /// <summary>
+        /// Service for changing current page
+        /// </summary>
         private readonly IModernNavigationService _modernNavigationService;
+
+        /// <summary>
+        /// Indicator of whether initialization has been called
+        /// </summary>
+        private bool initialized;
 
         /// <summary>
         /// Mapped OnLoaded event trigger - Allows actions when the view is loaded
@@ -29,8 +37,13 @@ namespace SoDotCash.ViewModels
         /// </summary>
         private void Loaded()
         {
-            // Perform the rest of the init asyncronously
-            AsyncInit();
+            // Initialize only once
+            if (!initialized)
+            {
+                initialized = true;
+                // Perform the rest of the init asyncronously
+                AsyncInit();
+            }
         }
 
         /// <summary>
