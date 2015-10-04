@@ -27,41 +27,74 @@ namespace SoDotCash.ViewModels.Navigation
 
         #region [ IModernNavigationService Implementation ]
 
+        /// <summary>
+        /// Return to the previous page in the navigation stack
+        /// </summary>
         public void GoBack()
         {
             if (_historic.Count > 1)
             {
+                // Remove the current page from the history stack
                 _historic.RemoveAt(_historic.Count - 1);
+
+                // Navigate to the previous page
                 NavigateTo(_historic.Last(), null);
             }
         }
 
+        /// <summary>
+        /// Navigate to a different page
+        /// </summary>
+        /// <param name="pageKey">Key identifying the page to navigate to</param>
         public void NavigateTo(string pageKey)
         {
+            // Relay to parameter-accepting call
             NavigateTo(pageKey, null);
         }
 
+        /// <summary>
+        /// Navigate to a different page
+        /// </summary>
+        /// <param name="pageKey">Key identifying the page to navigate to</param>
+        /// <param name="parameter">(optional) Parameter to be consumed by the new page</param>
         public void NavigateTo(string pageKey, object parameter)
         {
             lock (_pagesByKey)
             {
+                // Verify that the key is a known key
                 if(!_pagesByKey.ContainsKey(pageKey))
                     throw new ArgumentException($"No such page: {pageKey}. Did you forget to call NavigationService.Configure?", nameof(pageKey));
 
+                // Retrieve the main frame that displays pages
                 var frame = GetDescendantFromName(Application.Current.MainWindow) as ModernFrame;
-
                 if (frame != null)
+                    // Update the frame to use the new page
                     frame.Source = _pagesByKey[pageKey];
 
                 Parameter = parameter;
-                _historic.Add(pageKey);
+
+                // Don't add to history if we're returning to the page
+                if (!_historic.Any() || _historic.Last() != pageKey)
+                    _historic.Add(pageKey);
+
+                // Store current page key
                 CurrentPageKey = pageKey;
             }
         }
 
+        /// <summary>
+        /// Key identifying the current page in the display
+        /// </summary>
         public string CurrentPageKey { get; private set; }
+
+        /// <summary>
+        /// Optional parameter passed for current page consumption
+        /// </summary>
         public object Parameter { get; private set; }
 
+        /// <summary>
+        /// Clear the entire navigation history
+        /// </summary>
         public void ClearNavigationHistory()
         {
             _historic.Clear();
