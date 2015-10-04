@@ -27,11 +27,35 @@ namespace SoDotCash.ViewModels
     /// </summary>
     public class AddAccountViewModel : ModernViewModelBase
     {
+        /// <summary>
+        /// Reference to navigation service
+        /// </summary>
         private readonly IModernNavigationService _modernNavigationService;
 
         public AddAccountViewModel(IModernNavigationService navService)
         {
             _modernNavigationService = navService;
+        }
+
+        /// <summary>
+        /// Mapped OnLoaded event trigger - Allows actions when the view is loaded
+        /// </summary>
+        public ICommand ViewLoaded => new RelayCommand(Loaded);
+
+        /// <summary>
+        /// Called when the view associated with this viewmodel is displayed
+        /// </summary>
+        private void Loaded()
+        {
+            // Clear properties
+            AccountSource = EAccountSource.Automatic;
+            AccountName = null;
+            SelectedFinancialInstitution = null;
+            FinancialInstitutionUsername = null;
+            AccountRetrievalFailed = false;
+            NoAccountsRetrieved = false;
+            AvailableAccounts = null;
+            SelectedAccount = null;
         }
 
         #region [ Always Visible Fields ]
@@ -62,7 +86,16 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// User entered account name
         /// </summary>
-        public string AccountName { get; set; }
+        private string _accountName;
+        public string AccountName
+        {
+            get {  return _accountName; }
+            set
+            {
+                _accountName = value;
+                RaisePropertyChanged();
+            }
+        }
 
         #endregion
 

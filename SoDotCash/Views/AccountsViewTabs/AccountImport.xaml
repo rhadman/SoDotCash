@@ -4,20 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SoDotCash.Views.AccountsViewTabs"
-             xmlns:services="clr-namespace:SoDotCash.Services"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              DataContext="{Binding Source={StaticResource Locator}, Path=Accounts}"
              >
 
-    <Grid Width="730" Height="300">
+    <Grid Width="730" Height="350">
         <StackPanel Orientation="Vertical">
             <TextBlock Margin="10" Text="This section allows you to import transactions from an OFX/QFX file. If this account is linked with a supported online financial institution, you may also download transactions." TextWrapping="Wrap"/>
             <StackPanel Orientation="Horizontal" Margin="10">
                 <Button x:Name="ButtonImportTransactions" Content="Import Transactions" HorizontalAlignment="Left" VerticalAlignment="Top"  Command="{Binding ImportTransactionsCommand}" />
                 <Button x:Name="ButtonDownloadTransactions" Content="Download Transactions" HorizontalAlignment="Left" VerticalAlignment="Top"  Command="{Binding DownloadTransactionsCommand}" Margin="20,0,0,0"/>
             </StackPanel>
-            <ProgressBar IsIndeterminate="true" Visibility="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=ActionsPending, Converter={StaticResource BoolToVisibilityConverter}}"/>
             <!--<xctk:BusyIndicator IsBusy="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=ActionsPending}" BusyContent="{Binding Source={x:Static services:BackgroundTaskTracker.Instance}, Path=CurrentActionDescription}"/>-->
         </StackPanel>
     </Grid>

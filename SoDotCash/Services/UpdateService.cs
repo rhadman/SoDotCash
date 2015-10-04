@@ -128,20 +128,24 @@ namespace SoDotCash.Services
         /// <param name="ofxFileStream">Open and positioned readable stream containing an OFX statement</param>
         public static void MergeOfxFileIntoAccount(Account account, Stream ofxFileStream)
         {
-            // Deserialize the OFX file data to an object form
-            var converter = new OFX1ToOFX2Converter(ofxFileStream);
-            string errorMessage;
-
-            var statements = OFX.Types.Statement.CreateFromOFXResponse(converter.ConvertToOFX(), out errorMessage);
-
-            if (!String.IsNullOrEmpty(errorMessage) || !String.IsNullOrWhiteSpace(errorMessage))
+            using (BackgroundTaskTracker.BeginTask("Importing Transactions"))
             {
-                MessageBox.Show(errorMessage, "Error");
-            }
 
-            else
-                foreach (var statement in statements)
-                    MergeStatementTransactionsIntoAccount(account, statement);
+                // Deserialize the OFX file data to an object form
+                var converter = new OFX1ToOFX2Converter(ofxFileStream);
+                string errorMessage;
+
+                var statements = OFX.Types.Statement.CreateFromOFXResponse(converter.ConvertToOFX(), out errorMessage);
+
+                if (!String.IsNullOrEmpty(errorMessage) || !String.IsNullOrWhiteSpace(errorMessage))
+                {
+                    MessageBox.Show(errorMessage, "Error");
+                }
+
+                else
+                    foreach (var statement in statements)
+                        MergeStatementTransactionsIntoAccount(account, statement);
+            }
 
         }
 
