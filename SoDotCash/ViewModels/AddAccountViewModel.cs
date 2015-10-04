@@ -441,10 +441,6 @@ namespace SoDotCash.ViewModels
             locator.Accounts.SelectedAccount = newAccount;
 
             // Transition back to accounts view
-            
-            //locator.Main.ActiveViewModel = locator.Accounts;
-            
-
             _modernNavigationService.NavigateTo(nameof(ViewModelLocator.Accounts));
 
         }
