@@ -557,7 +557,7 @@ namespace SoDotCash.ViewModels
         /// <summary>
         /// Prompts for an OFX file and imports transactions
         /// </summary>
-        public void ImportTransactions()
+        public async void ImportTransactions()
         {
             var fileDialog = new OpenFileDialog {Filter = "Bank Statements (*.ofx, *.qfx)|*.ofx;*.qfx"};
             if (fileDialog.ShowDialog() != true)
@@ -570,7 +570,7 @@ namespace SoDotCash.ViewModels
             using (var ofxFileStream = fileDialog.OpenFile())
             {
                 // Parse the file and merge transactions into the current account
-                UpdateService.MergeOfxFileIntoAccount(SelectedAccount, ofxFileStream);
+                await Task.Run(() => UpdateService.MergeOfxFileIntoAccount(SelectedAccount, ofxFileStream)).ConfigureAwait(false);
             }
 
             // Update transactions
