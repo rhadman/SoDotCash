@@ -85,7 +85,7 @@ namespace SoDotCash.ViewModels
             }
             catch
             {
-                //a navigation server alreayd exists so no need to register
+                //a navigation server already exists so no need to register
             }
         }
 
