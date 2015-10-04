@@ -17,8 +17,7 @@
             
             </StackPanel>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
-                <!--<Button Height="50" Content="Let's get started!" FontSize="30" Command="{Binding GetStartedCommand}"/>-->
-                <Button Height="50" Content="Let's get started!" FontSize="30" Command="mui:LinkCommands.NavigateLink" CommandParameter="/Views/AddAccountView.xaml"/>
+                <Button Height="50" Content="Let's get started!" FontSize="30" Command="{Binding GetStartedCommand}"/>
             </StackPanel>
         </DockPanel>
 
