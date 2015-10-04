@@ -76,23 +76,20 @@ namespace SoDotCash.ViewModels
                     AppearanceManager.Current.ThemeSource = AppearanceManager.LightThemeSource;
                     break;
             }
-
-            // Start with default color
-            var convertFromString = ColorConverter.ConvertFromString("#FF1BA1E2");
-            if (convertFromString != null)
-                AppearanceManager.Current.AccentColor = (Color)convertFromString;
-
+            
             //Try to convert the color in the config file to be a color
             //  if any of it fails then leave it to the default color
             try
             {
-                convertFromString = ColorConverter.ConvertFromString(Properties.Settings.Default.Accent);
-                if (convertFromString != null)
-                    AppearanceManager.Current.AccentColor = (Color)convertFromString;
+                
+                var colorFromString = ColorConverter.ConvertFromString(Properties.Settings.Default.Accent) ??
+                                      ColorConverter.ConvertFromString("#FF1BA1E2");
+
+                AppearanceManager.Current.AccentColor = (Color)colorFromString;
             }
             catch (Exception)
             {
-                // Ignore, leave as default
+                AppearanceManager.Current.AccentColor = (Color)ColorConverter.ConvertFromString("#FF1BA1E2");
             }
         }
 
